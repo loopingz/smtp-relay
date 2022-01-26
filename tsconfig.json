@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "es2015",
+    "lib": ["es2019", "DOM"],
+    "module": "commonjs",
+    "outDir": "./lib",
+    "strict": false,
+    "declaration": true,
+    "sourceMap": true,
+    "experimentalDecorators": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["**/node_modules"]
+}
