@@ -1,0 +1,10 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    ignore:
+      # Ignore updates to @types/node as we want support for NodeJS LTS
+      - dependency-name: "@types/node"
+      - dependency-name: "typedoc"
