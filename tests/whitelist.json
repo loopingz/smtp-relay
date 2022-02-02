@@ -1,0 +1,24 @@
+{
+  "flows": {
+    "localhost": {
+      "filters": [
+        {
+          "type": "whitelist",
+          "to": ["recipient@domain1.com", "regexp:.*@domain2.com"],
+          "from": ["regexp:^.*@smtp-relay.com$"]
+        }
+      ],
+      "outputs": [
+        {
+          "type": "file",
+          "path": "./emails/${timestamp}.eml"
+        }
+      ]
+    }
+  },
+  "options": {
+    "disableReverseLookup": false,
+    "authOptional": true,
+    "logger": true
+  }
+}

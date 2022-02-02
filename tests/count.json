@@ -1,0 +1,28 @@
+{
+  "flows": {
+    "localhost": {
+      "filters": [
+        {
+          "type": "count"
+        },
+        {
+          "type": "open"
+        },
+        {
+          "type": "count"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "file",
+          "path": "./emails/${timestamp}.eml"
+        }
+      ]
+    }
+  },
+  "options": {
+    "disableReverseLookup": false,
+    "authOptional": true,
+    "logger": true
+  }
+}

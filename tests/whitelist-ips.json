@@ -1,0 +1,24 @@
+{
+  "flows": {
+    "localhost": {
+      "filters": [
+        {
+          "type": "whitelist",
+          "ips": ["127.0.0.1"],
+          "domains": ["localhost"]
+        }
+      ],
+      "outputs": [
+        {
+          "type": "file",
+          "path": "./emails/${timestamp}.eml"
+        }
+      ]
+    }
+  },
+  "options": {
+    "disableReverseLookup": false,
+    "authOptional": true,
+    "logger": true
+  }
+}
