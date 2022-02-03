@@ -2,31 +2,17 @@ import { SMTPServer } from "smtp-server";
 import * as fs from "fs";
 import { SmtpFlow, SmtpFlowConfig } from "./flow";
 import * as path from "path";
+import stripJsonComments from "strip-json-comments";
+import { simpleParser } from "mailparser";
+import { ParsedMail } from "mailparser";
+import { SMTPServerSession } from "smtp-server";
+import { SMTPServerOptions } from "smtp-server";
+import { SMTPServerAuthentication } from "smtp-server";
+import { SMTPServerAddress } from "smtp-server";
+import { SMTPServerDataStream } from "smtp-server";
 
 export type SmtpCallback = (err?, result?) => void;
 export type SmtpNext = () => void;
-export interface SmtpAuth {
-  /**
-   *  indicates the authentication method used, ‘PLAIN’, ‘LOGIN’ or ‘XOAUTH2’
-   */
-  method: string;
-  /**
-   * is the username of the user
-   */
-  username: string;
-  /**
-   *  is the password if LOGIN or PLAIN was used
-   */
-  password: string;
-  /**
-   * is the OAuth2 bearer access token if ‘XOAUTH2’ was used as the authentication method
-   */
-  accessToken: string;
-  /**
-   * is a function for validating CRAM-MD5 challenge responses. Takes the password of the user as an argument and returns true if the response matches the password
-   */
-  validatePassword: (password: string) => boolean;
-}
 
 export interface SmtpConfig {
   /**
@@ -57,9 +43,9 @@ export interface SmtpConfig {
         options.useXForward boolean, if set to true, enables usage of XFORWARD extension. See session.xForward (Map object) for the details provided by the client
         options.lmtp boolean, if set to true use LMTP protocol instead of SMTP
         options.socketTimeout how many milliseconds of inactivity to allow before disconnecting the client (defaults to 1 minute)
-        options.closeTimeout how many millisceonds to wait before disconnecting pending connections once server.close() has been called (defaults to 30 seconds)
+        options.closeTimeout how many milliseconds to wait before disconnecting pending connections once server.close() has been called (defaults to 30 seconds)
    */
-  options: any;
+  options: SMTPServerOptions;
   /**
    * @default 10025
    */
@@ -79,79 +65,35 @@ export interface SmtpConfig {
 }
 
 /**
- * Address object in the mailFrom and rcptTo values include the following properties
- */
-export interface SmtpAddress {
-  /**
-   * is the address provided with the MAIL FROM or RCPT TO command
-   */
-  address: string;
-  /**
-   * is an object with additional arguments (all key names are uppercase)
-   */
-  args: string;
-}
-/**
  * Session object that is passed to the handler functions includes the following properties
  */
-export interface SmtpSession {
+export interface SmtpSession extends SMTPServerSession {
   /**
    * Path to the email file
+   * 
+   * Parsed mail* object has the following properties
+
+      headers – a Map object with lowercase header keys
+      subject is the subject line (also available from the header mail.headers.get(‘subject’))
+      from is an address object for the From: header
+      to is an address object for the To: header
+      cc is an address object for the Cc: header
+      bcc is an address object for the Bcc: header (usually not present)
+      date is a Date object for the Date: header
+      messageId is the Message-ID value string
+      inReplyTo is the In-Reply-To value string
+      reply-to is an address object for the Cc: header
+      references is an array of referenced Message-ID values
+      html is the HTML body of the message. If the message included embedded images as cid: urls then these are all replaced with base64 formatted data: URIs
+      text is the plaintext body of the message
+      textAsHtml is the plaintext body of the message formatted as HTML
+      attachments is an array of attachments
    */
-  email?: string;
+  email?: ParsedMail;
   /**
-   * Mail from
+   * Path of the email content
    */
-  mailFrom?: string;
-  /**
-   * Recipients
-   */
-  rcptTos?: string[];
-  /**
-   * random string identificator generated when the client connected
-   */
-  id: string;
-  /**
-   * the IP address for the connected client
-   */
-  remoteAddress: string;
-  /**
-   * reverse resolved hostname for remoteAddress
-   */
-  clientHostname: string;
-  /**
-   * the opening SMTP command (HELO/EHLO/LHLO)
-   */
-  openingCommand: string;
-  /**
-   * hostname the client provided with HELO/EHLO call
-   */
-  hostNameAppearsAs: string;
-  /**
-   * includes envelope data
-   */
-  envelope: {
-    /**
-     * includes an address object or is set to false
-     */
-    mailFrom: SmtpAddress | false;
-    /**
-     *  includes an array of address objects
-     */
-    rcptTo: SmtpAddress[];
-  };
-  /**
-   * includes the user value returned with the authentication handler
-   */
-  user: any;
-  /**
-   * number of the current transaction. 1 is for the first message, 2 is for the 2nd message etc.
-   */
-  transaction: number;
-  /**
-   * indicates the current protocol type for the received header (SMTP, ESMTP, ESMTPA etc.)
-   */
-  transmissionType: string;
+  emailPath?: string;
   /**
    * Current flows status within the relay
    */
@@ -170,7 +112,7 @@ export class SmtpServer {
     if (!fs.existsSync(configFile)) {
       throw new Error(`Configuration '${configFile}' not found`);
     }
-    this.config = JSON.parse(fs.readFileSync(configFile).toString()) || {};
+    this.config = JSON.parse(stripJsonComments(fs.readFileSync(configFile).toString())) || {};
     this.config.port ??= 10025;
     this.config.bind ??= "localhost";
     this.config.cachePath ??= ".email_${iso8601}.eml";
@@ -185,13 +127,14 @@ export class SmtpServer {
     this.server = new SMTPServer({
       banner: "loopingz/smtp-relay",
       ...this.config.options,
-      onAuth: (auth: SmtpAuth, session: SmtpSession, callback: SmtpCallback) => this.onAuth(auth, session, callback),
+      onAuth: (auth: SMTPServerAuthentication, session: SmtpSession, callback: SmtpCallback) =>
+        this.onAuth(auth, session, callback),
       onConnect: (session: SmtpSession, callback: SmtpCallback) => this.onConnect(session, callback),
-      onMailFrom: (address: SmtpAddress, session: SmtpSession, callback: SmtpCallback) =>
+      onMailFrom: (address: SMTPServerAddress, session: SmtpSession, callback: SmtpCallback) =>
         this.onEvent("MailFrom", address, session, callback),
-      onRcptTo: (address: SmtpAddress, session: SmtpSession, callback: SmtpCallback) =>
+      onRcptTo: (address: SMTPServerAddress, session: SmtpSession, callback: SmtpCallback) =>
         this.onEvent("RcptTo", address, session, callback),
-      onData: (stream: ReadableStream, session: SmtpSession, callback: SmtpCallback) =>
+      onData: (stream: SMTPServerDataStream, session: SmtpSession, callback: SmtpCallback) =>
         this.onData(stream, session, callback)
     });
 
@@ -244,7 +187,6 @@ export class SmtpServer {
   async onConnect(session: SmtpSession, callback: SmtpCallback) {
     try {
       session.flows = {};
-      session.rcptTos = [];
       Object.keys(this.flows).forEach(n => (session.flows[n] = "PENDING"));
       await this.filter("Connect", session, [session], this.flows);
       this.manageCallback(session, callback);
@@ -263,17 +205,18 @@ export class SmtpServer {
     return value;
   }
 
-  async onData(stream: ReadableStream, session: SmtpSession, callback: SmtpCallback) {
-    session.email = SmtpServer.replaceVariables(this.config.cachePath, { ...session });
+  async onData(stream: SMTPServerDataStream, session: SmtpSession, callback: SmtpCallback) {
+    session.emailPath = SmtpServer.replaceVariables(this.config.cachePath, { ...session });
 
     // @ts-ignore
-    stream.pipe(fs.createWriteStream(session.email));
+    stream.pipe(fs.createWriteStream(session.emailPath));
     // @ts-ignore
     stream.on("end", async () => {
       await this.filter("Data", session, [session]);
+      session.email = await simpleParser(fs.createReadStream(session.emailPath));
       await this.onDataRead(session);
       if (!this.config.keepCache) {
-        fs.unlinkSync(session.email);
+        fs.unlinkSync(session.emailPath);
       }
       callback();
     });
@@ -282,7 +225,7 @@ export class SmtpServer {
     stream.on("error", err => callback(`error converting stream - ${err}`));
   }
 
-  async onAuth(auth: SmtpAuth, session: SmtpSession, callback: SmtpCallback) {
+  async onAuth(auth: SMTPServerAuthentication, session: SmtpSession, callback: SmtpCallback) {
     try {
       await this.filter("Auth", session, [auth, session]);
       this.manageCallback(session, callback);
@@ -291,13 +234,8 @@ export class SmtpServer {
     }
   }
 
-  async onEvent(evt: "MailFrom" | "RcptTo", param: SmtpAddress, session: SmtpSession, callback: SmtpCallback) {
+  async onEvent(evt: "MailFrom" | "RcptTo", param: SMTPServerAddress, session: SmtpSession, callback: SmtpCallback) {
     try {
-      if (evt === "RcptTo") {
-        session.rcptTos.push(param.address);
-      } else if (evt === "MailFrom") {
-        session.mailFrom = param.address;
-      }
       await this.filter(evt, session, [param, session]);
       // If no decision made after RCPT TO we consider refused
       if (evt === "RcptTo") {

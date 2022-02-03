@@ -9,14 +9,17 @@
     "@aws-sdk/client-sqs": "^3.48.0",
     "@google-cloud/pubsub": "^2.18.5",
     "@google-cloud/storage": "^5.18.1",
+    "mailparser": "^3.4.0",
     "nodemailer": "^6.7.2",
-    "smtp-server": "^3.9.0"
+    "smtp-server": "^3.9.0",
+    "strip-json-comments": "<4.0.0"
   },
   "files": [
     "lib"
   ],
   "scripts": {
     "build": "tsc",
+    "build:binaries": "pkg .",
     "pretest": "npm run build",
     "lint": "prettier --check src/**/*",
     "lint:fix": "prettier --write src/**/*",
@@ -39,6 +42,7 @@
   "devDependencies": {
     "@istanbuljs/nyc-config-typescript": "^1.0.2",
     "@testdeck/mocha": "^0.2.0",
+    "@types/mailparser": "^3.4.0",
     "@types/mocha": "^9.1.0",
     "@types/smtp-server": "^3.5.7",
     "mocha": "^9.2.0",

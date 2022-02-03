@@ -1,6 +1,7 @@
 import { SmtpFilter } from "../filter";
 import { SmtpComponentConfig } from "../component";
-import { SmtpAddress, SmtpSession } from "../server";
+import { SmtpSession } from "../server";
+import { SMTPServerAddress } from "smtp-server";
 
 export interface WhitelistFilterConfiguration extends SmtpComponentConfig {
   from?: (string | RegExp)[];
@@ -28,7 +29,7 @@ export class WhitelistFilter extends SmtpFilter<WhitelistFilterConfiguration> {
    * @param account
    * @returns
    */
-  async onMailFrom(account: SmtpAddress) {
+  async onMailFrom(account: SMTPServerAddress) {
     return this.check("from", account.address);
   }
 
@@ -94,7 +95,7 @@ export class WhitelistFilter extends SmtpFilter<WhitelistFilterConfiguration> {
    * @param account
    * @returns
    */
-  async onRcptTo(account: SmtpAddress) {
+  async onRcptTo(account: SMTPServerAddress) {
     return this.check("to", account.address);
   }
 }

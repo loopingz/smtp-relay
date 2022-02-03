@@ -35,7 +35,7 @@ export class FileProcessor<T extends FileProcessorConfig = FileProcessorConfig> 
    */
   async onMail(session: SmtpSession): Promise<void> {
     return new Promise((resolve, reject) => {
-      let read = fs.createReadStream(session.email);
+      let read = fs.createReadStream(session.emailPath);
       read.pipe(
         fs.createWriteStream(path.join(this.config.path, SmtpServer.replaceVariables(this.config.filename, session)))
       );

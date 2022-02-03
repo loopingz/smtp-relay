@@ -1,0 +1,27 @@
+// Replace my previous project aws-smtp-relay
+{
+  "flows": {
+    "localhost": {
+      "filters": [
+        // Allow any ip to use the SMTP
+        {
+          "type": "whitelist",
+          "ips": ["regexp:.*"]
+        }
+      ],
+      "outputs": [
+        {
+          "type": "aws",
+          // Send it to SES
+          "ses": {}
+        }
+      ]
+    }
+  },
+  "options": {
+    "disableReverseLookup": false,
+    // Do not require auth
+    "authOptional": true,
+    "logger": true
+  }
+}

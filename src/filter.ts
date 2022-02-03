@@ -1,22 +1,23 @@
 import { SmtpFlow } from "./flow";
-import { SmtpAddress, SmtpAuth, SmtpSession } from "./server";
+import { SmtpSession } from "./server";
 import { SmtpComponent, SmtpComponentConfig } from "./component";
+import { SMTPServerAddress, SMTPServerAuthentication } from "smtp-server";
 
 export class SmtpFilter<T extends SmtpComponentConfig = SmtpComponentConfig> extends SmtpComponent<T> {
   name: string;
   flow: SmtpFlow;
   config: T;
 
-  async onAuth(auth: SmtpAuth, session: SmtpSession): Promise<boolean | undefined> {
+  async onAuth(auth: SMTPServerAuthentication, session: SmtpSession): Promise<boolean | undefined> {
     return undefined;
   }
   async onConnect(session: SmtpSession): Promise<boolean | undefined> {
     return undefined;
   }
-  onMailFrom(address: SmtpAddress, session: SmtpSession): Promise<boolean | undefined> {
+  onMailFrom(address: SMTPServerAddress, session: SmtpSession): Promise<boolean | undefined> {
     return undefined;
   }
-  onRcptTo(address: SmtpAddress, session: SmtpSession): Promise<boolean | undefined> {
+  onRcptTo(address: SMTPServerAddress, session: SmtpSession): Promise<boolean | undefined> {
     return undefined;
   }
   onData(session: SmtpSession): Promise<boolean | undefined> {
