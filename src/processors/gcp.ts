@@ -9,5 +9,7 @@ export interface GCPProcessorConfig extends SmtpComponentConfig {
 export class GCPProcessor<T extends GCPProcessorConfig = GCPProcessorConfig> extends SmtpProcessor<T> {
   type: string = "gcp";
 
-  async onMail(session: SmtpSession): Promise<void> {}
+  async onMail(session: SmtpSession): Promise<void> {
+    // TODO Implement the AWS
+  }
 }

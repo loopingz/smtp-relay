@@ -4,5 +4,7 @@ import { SmtpSession } from "../server";
 export class PackerProcessor extends SmtpProcessor {
   type: string = "packer";
 
-  async onMail(session: SmtpSession): Promise<void> {}
+  async onMail(session: SmtpSession): Promise<void> {
+    // TODO Implement compression
+  }
 }

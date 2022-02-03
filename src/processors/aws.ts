@@ -9,5 +9,7 @@ export interface AWSProcessorConfig extends SmtpComponentConfig {
 export class AWSProcessor<T extends AWSProcessorConfig = AWSProcessorConfig> extends SmtpProcessor<T> {
   type: string = "aws";
 
-  async onMail(session: SmtpSession): Promise<void> {}
+  async onMail(session: SmtpSession): Promise<void> {
+    // TODO Implement the AWS
+  }
 }

@@ -20,5 +20,7 @@ export class SmtpComponent<T extends SmtpComponentConfig = SmtpComponentConfig> 
     this.init();
   }
 
-  init() {}
+  init() {
+    this.name ??= this.config.type;
+  }
 }

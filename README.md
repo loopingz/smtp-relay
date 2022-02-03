@@ -1,5 +1,12 @@
 # smtp-relay
 
+![CI](https://github.com/loopingz/smtp-relay/workflows/CI/badge.svg)
+
+[![codecov](https://codecov.io/gh/loopingz/smtp-relay/branch/main/graph/badge.svg?token=8BR86VbkKf)](https://codecov.io/gh/loopingz/smtp-relay)
+[![SonarCloud.io](https://sonarcloud.io/api/project_badges/measure?project=smtp-relay&metric=alert_status)](https://sonarcloud.io/dashboard/index/smtp-relay)
+![CodeQL](https://github.com/loopingz/smtp-relay/workflows/CodeQL/badge.svg)
+
+
 This project replace a previous project `aws-smtp-relay` 
 
 The goal is to have a dynamic SMTP server that can either be used to run a debug SMTP locally that just store received email in a folder
