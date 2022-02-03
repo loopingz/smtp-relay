@@ -1,10 +1,11 @@
 import { SmtpFilter } from "./filter";
-import { SmtpProcessor, SmtpProcessorConfig } from "./processor";
+import { SmtpProcessor } from "./processor";
+import { SmtpComponentConfig } from "./component";
 
 export interface SmtpFlowConfig {
-  filters?: SmtpProcessorConfig[];
+  filters?: SmtpComponentConfig[];
   filtersOperator?: "AND" | "OR";
-  outputs: SmtpProcessorConfig[];
+  outputs: SmtpComponentConfig[];
 }
 
 export class SmtpFlow {

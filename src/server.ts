@@ -1,6 +1,8 @@
 import { SMTPServer } from "smtp-server";
 import * as fs from "fs";
 import { SmtpFlow, SmtpFlowConfig } from "./flow";
+import * as path from "path";
+
 export type SmtpCallback = (err?, result?) => void;
 export type SmtpNext = () => void;
 export interface SmtpAuth {
@@ -66,6 +68,14 @@ export interface SmtpConfig {
    * @default localhost
    */
   bind?: string;
+  /**
+   * @default `.email_${iso8601}.eml`
+   */
+  cachePath?: string;
+  /**
+   * @default false
+   */
+  keepCache?: boolean;
 }
 
 /**
@@ -85,7 +95,10 @@ export interface SmtpAddress {
  * Session object that is passed to the handler functions includes the following properties
  */
 export interface SmtpSession {
-  email?: Buffer;
+  /**
+   * Path to the email file
+   */
+  email?: string;
   /**
    * random string identificator generated when the client connected
    */
@@ -136,6 +149,7 @@ export interface SmtpSession {
    */
   flows: { [key: string]: "PENDING" | "ACCEPTED" };
 }
+
 export class SmtpServer {
   server: SMTPServer;
   config: SmtpConfig;
@@ -151,6 +165,8 @@ export class SmtpServer {
     this.config = JSON.parse(fs.readFileSync(configFile).toString()) || {};
     this.config.port ??= 10025;
     this.config.bind ??= "localhost";
+    this.config.cachePath ??= ".email_${iso8601}.eml";
+    fs.mkdirSync(path.dirname(this.config.cachePath), { recursive: true });
     this.flows = {};
     for (let i in this.config.flows) {
       this.flows[i] = new SmtpFlow(i, this.config.flows[i]);
@@ -234,17 +250,31 @@ export class SmtpServer {
     }
   }
 
+  static replaceVariables(value: string, replacements: { [key: string]: any } = {}): string {
+    let now = new Date();
+    replacements.timestamp = now.getTime().toString();
+    replacements.iso8601 = now.toISOString().replace(/[-:\.]/g, "");
+    for (let i in replacements) {
+      value = value.replace(new RegExp("\\$\\{" + i + "\\}", "g"), replacements[i].toString());
+    }
+    return value;
+  }
+
   async onData(stream: ReadableStream, session: SmtpSession, callback: SmtpCallback) {
-    const _buf = Array<any>();
+    session.email = SmtpServer.replaceVariables(this.config.cachePath, { ...session });
+
     // @ts-ignore
-    stream.on("data", chunk => _buf.push(chunk));
+    stream.pipe(fs.createWriteStream(session.email));
     // @ts-ignore
     stream.on("end", async () => {
-      session.email = Buffer.concat(_buf);
       await this.filter("Data", session, [session]);
       await this.onDataRead(session);
+      if (!this.config.keepCache) {
+        fs.unlinkSync(session.email);
+      }
       callback();
     });
+
     // @ts-ignore
     stream.on("error", err => callback(`error converting stream - ${err}`));
   }
@@ -276,12 +306,11 @@ export class SmtpServer {
   async onDataRead(session: SmtpSession) {
     try {
       for (let name in session.flows) {
-        // Skip any flow that was not accepted explicitely
-        if (session.flows[name] === "PENDING") {
-          continue;
-        }
         let flow = this.flows[name];
         console.log("Call outputs", flow.outputs);
+        for (let output of flow.outputs) {
+          await output.onMail(session);
+        }
       }
     } catch (err) {
       console.error(err);

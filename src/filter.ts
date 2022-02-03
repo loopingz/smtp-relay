@@ -1,21 +1,11 @@
 import { SmtpFlow } from "./flow";
-import { SmtpProcessorConfig } from "./processor";
 import { SmtpAddress, SmtpAuth, SmtpSession } from "./server";
+import { SmtpComponent, SmtpComponentConfig } from "./component";
 
-export interface SmtpFilterConfig {
-  name?: string;
-  type: string;
-}
-export class SmtpFilter<T extends SmtpFilterConfig = SmtpFilterConfig> {
+export class SmtpFilter<T extends SmtpComponentConfig = SmtpComponentConfig> extends SmtpComponent<T> {
   name: string;
   flow: SmtpFlow;
   config: T;
-
-  constructor(flow: SmtpFlow, config: T) {
-    this.name = config.name;
-    this.config = config;
-    this.flow = flow;
-  }
 
   async onAuth(auth: SmtpAuth, session: SmtpSession): Promise<boolean | undefined> {
     return undefined;
@@ -39,7 +29,7 @@ export class SmtpFilter<T extends SmtpFilterConfig = SmtpFilterConfig> {
     SmtpFilter.registry[type] = constructor;
   }
 
-  static get(flow: SmtpFlow, config: SmtpProcessorConfig): SmtpFilter {
+  static get(flow: SmtpFlow, config: SmtpComponentConfig): SmtpFilter {
     return new SmtpFilter.registry[config.type](flow, config);
   }
 

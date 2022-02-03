@@ -12,7 +12,7 @@ The smtp server is subdivided with:
 
  - Filters
  - Core
- - Outputs
+ - Processors
  - Flows
 
 ### Filters

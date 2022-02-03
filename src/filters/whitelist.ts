@@ -1,8 +1,8 @@
-import { SmtpFilter, SmtpFilterConfig } from "../filter";
-import { SmtpFlow } from "../flow";
+import { SmtpFilter } from "../filter";
+import { SmtpComponentConfig } from "../component";
 import { SmtpAddress, SmtpSession } from "../server";
 
-export interface WhitelistFilterConfiguration extends SmtpFilterConfig {
+export interface WhitelistFilterConfiguration extends SmtpComponentConfig {
   from?: (string | RegExp)[];
   to?: (string | RegExp)[];
   ips?: (string | RegExp)[];
@@ -15,11 +15,10 @@ export interface WhitelistFilterConfiguration extends SmtpFilterConfig {
 export class WhitelistFilter extends SmtpFilter<WhitelistFilterConfiguration> {
   type: string = "whitelist";
 
-  constructor(flow: SmtpFlow, config: WhitelistFilterConfiguration) {
-    super(flow, config);
+  init() {
     // Ensure regexps do not allow any partial match
     ["from", "to", "ips", "domains"]
-      .filter(a => config[a])
+      .filter(a => this.config[a])
       .forEach(attr => {
         this.config[attr] = this.config[attr].map(r => this.getRegExp(r));
       });

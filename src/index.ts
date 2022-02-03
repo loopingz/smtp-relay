@@ -9,6 +9,8 @@ export function defaultModules() {
   SmtpProcessor.register("file", FileProcessor);
 }
 
+// Cannot really test main module
+/* istanbul ignore if */
 if (module === require.main) {
   defaultModules();
   let smtp = new SmtpServer();

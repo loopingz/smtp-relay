@@ -1,12 +1,13 @@
 import { SmtpProcessor } from "../processor";
 import { SmtpSession } from "../server";
+import { SmtpComponentConfig } from "../component";
 
-export class GCPMiddleware implements SmtpProcessor {
+export interface GCPProcessorConfig extends SmtpComponentConfig {
+  storage: string;
+  pubsub: string;
+}
+export class GCPProcessor<T extends GCPProcessorConfig = GCPProcessorConfig> extends SmtpProcessor<T> {
   type: string = "gcp";
-  config: {
-    storage: string;
-    pubsub: string;
-  };
 
   async onMail(session: SmtpSession): Promise<void> {}
 }

@@ -1,6 +1,7 @@
-import { SmtpFilter, SmtpFilterConfig } from "../filter";
+import { SmtpFilter } from "../filter";
+import { SmtpComponentConfig } from "../component";
 
-export interface HttpFilterConfig extends SmtpFilterConfig {
+export interface HttpFilterConfig extends SmtpComponentConfig {
   url: string;
   method?: "PUT" | "POST";
   /**

@@ -1,12 +1,12 @@
 import { SmtpFlow } from "./flow";
 import { SmtpSession } from "./server";
+import { SmtpComponent, SmtpComponentConfig } from "./component";
 
 /**
  * Middleware to add behavior to the smtp
  */
-export class SmtpProcessor {
-  type: string;
-  onMail: (session: SmtpSession) => Promise<any>;
+export abstract class SmtpProcessor<T extends SmtpComponentConfig = SmtpComponentConfig> extends SmtpComponent<T> {
+  abstract onMail(session: SmtpSession): Promise<any>;
 
   static registry = {};
 
@@ -14,12 +14,7 @@ export class SmtpProcessor {
     SmtpProcessor.registry[type] = constructor;
   }
 
-  static get(flow: SmtpFlow, config: SmtpProcessorConfig): SmtpProcessor {
+  static get(flow: SmtpFlow, config: SmtpComponentConfig): SmtpProcessor {
     return new SmtpProcessor.registry[config.type](flow, config);
   }
-}
-
-export interface SmtpProcessorConfig {
-  type: string;
-  name?: string;
 }

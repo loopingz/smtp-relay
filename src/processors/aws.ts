@@ -1,12 +1,13 @@
 import { SmtpProcessor } from "../processor";
 import { SmtpSession } from "../server";
+import { SmtpComponentConfig } from "../component";
 
-export class AWSMiddleware implements SmtpProcessor {
+export interface AWSProcessorConfig extends SmtpComponentConfig {
+  sqs: string;
+  s3: string;
+}
+export class AWSProcessor<T extends AWSProcessorConfig = AWSProcessorConfig> extends SmtpProcessor<T> {
   type: string = "aws";
-  config: {
-    sqs: string;
-    s3: string;
-  };
 
   async onMail(session: SmtpSession): Promise<void> {}
 }

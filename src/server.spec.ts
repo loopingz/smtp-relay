@@ -171,4 +171,10 @@ class SmtpServerTest {
     // @ts-ignore
     server.removeFlow({ name: "Test" });
   }
+
+  @test
+  replaceVars() {
+    assert.ok(SmtpServer.replaceVariables("${timestamp}", {}).match(/\d+/) !== undefined);
+    console.log(SmtpServer.replaceVariables("${iso8601}"));
+  }
 }
