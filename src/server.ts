@@ -100,6 +100,14 @@ export interface SmtpSession {
    */
   email?: string;
   /**
+   * Mail from
+   */
+  mailFrom?: string;
+  /**
+   * Recipients
+   */
+  rcptTos?: string[];
+  /**
    * random string identificator generated when the client connected
    */
   id: string;
@@ -160,7 +168,7 @@ export class SmtpServer {
       configFile = "./smtp-relay.json";
     }
     if (!fs.existsSync(configFile)) {
-      throw new Error("Configuration not found");
+      throw new Error(`Configuration '${configFile}' not found`);
     }
     this.config = JSON.parse(fs.readFileSync(configFile).toString()) || {};
     this.config.port ??= 10025;
@@ -177,8 +185,7 @@ export class SmtpServer {
     this.server = new SMTPServer({
       banner: "loopingz/smtp-relay",
       ...this.config.options,
-      onAuth: (auth: SmtpAuth, session: SmtpSession, callback: SmtpCallback) =>
-        this.onEvent("Auth", auth, session, callback),
+      onAuth: (auth: SmtpAuth, session: SmtpSession, callback: SmtpCallback) => this.onAuth(auth, session, callback),
       onConnect: (session: SmtpSession, callback: SmtpCallback) => this.onConnect(session, callback),
       onMailFrom: (address: SmtpAddress, session: SmtpSession, callback: SmtpCallback) =>
         this.onEvent("MailFrom", address, session, callback),
@@ -214,12 +221,8 @@ export class SmtpServer {
         continue;
       }
       for (let filter of flow.filters) {
-        if (!filter[`on${evt}`]) {
-          continue;
-        }
         // @ts-ignore
         let res = await filter[`on${evt}`](...args);
-        console.log(`${filter.name}.on${evt}() = `, res);
         // If undefined the filter is not giving an answer so skipping
         if (res === undefined) {
           continue;
@@ -239,9 +242,9 @@ export class SmtpServer {
   }
 
   async onConnect(session: SmtpSession, callback: SmtpCallback) {
-    console.log("onConnect");
     try {
       session.flows = {};
+      session.rcptTos = [];
       Object.keys(this.flows).forEach(n => (session.flows[n] = "PENDING"));
       await this.filter("Connect", session, [session], this.flows);
       this.manageCallback(session, callback);
@@ -279,13 +282,22 @@ export class SmtpServer {
     stream.on("error", err => callback(`error converting stream - ${err}`));
   }
 
-  async onEvent(
-    evt: "Auth" | "MailFrom" | "RcptTo",
-    param: SmtpAddress | SmtpAuth,
-    session: SmtpSession,
-    callback: SmtpCallback
-  ) {
+  async onAuth(auth: SmtpAuth, session: SmtpSession, callback: SmtpCallback) {
     try {
+      await this.filter("Auth", session, [auth, session]);
+      this.manageCallback(session, callback);
+    } catch (err) {
+      callback(err);
+    }
+  }
+
+  async onEvent(evt: "MailFrom" | "RcptTo", param: SmtpAddress, session: SmtpSession, callback: SmtpCallback) {
+    try {
+      if (evt === "RcptTo") {
+        session.rcptTos.push(param.address);
+      } else if (evt === "MailFrom") {
+        session.mailFrom = param.address;
+      }
       await this.filter(evt, session, [param, session]);
       // If no decision made after RCPT TO we consider refused
       if (evt === "RcptTo") {

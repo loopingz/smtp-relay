@@ -177,4 +177,31 @@ class SmtpServerTest {
     assert.ok(SmtpServer.replaceVariables("${timestamp}", {}).match(/\d+/) !== undefined);
     console.log(SmtpServer.replaceVariables("${iso8601}"));
   }
+
+  @test
+  defaultConf() {
+    assert.throws(() => new SmtpServer(), /Configuration '.\/smtp-relay.json' not found/);
+  }
+
+  @test
+  async filtersOperatorOR() {
+    defaultModules();
+    let server = new SmtpServer("./tests/whitelist-or.json");
+    server.init();
+    await new SmtpTest().sendEmail("test@smtp-relay.com", "recipient@domain1.com", "Coucouc");
+    await new SmtpTest().sendEmail("test@smtp-relay.com", "recipient@domain2.com", "Coucouc");
+    await new SmtpTest().failEmail("RCPT", "test@smtp-relay.com", "recipient@domain3.com", "Coucouc");
+    server.close();
+  }
+
+  @test
+  async filtersOperatorAND() {
+    defaultModules();
+    let server = new SmtpServer("./tests/whitelist-and.json");
+    server.init();
+    await new SmtpTest().failEmail("RCPT", "test@smtp-relay.com", "recipient@domain1.com", "Coucouc");
+    await new SmtpTest().failEmail("RCPT", "test@smtp-relay.com", "recipient@domain2.com", "Coucouc");
+    await new SmtpTest().failEmail("RCPT", "test@smtp-relay.com", "recipient@domain3.com", "Coucouc");
+    server.close();
+  }
 }

@@ -21,11 +21,11 @@ export class FileProcessor<T extends FileProcessorConfig = FileProcessorConfig> 
    * @override
    */
   init() {
+    this.config.filename ??= "${iso8601}.eml";
     if (!this.config.path) {
       throw new Error("Need to specify a path");
     }
     fs.mkdirSync(this.config.path, { recursive: true });
-    this.config.filename ??= "${iso8601}.eml";
   }
 
   /**
