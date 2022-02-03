@@ -3,7 +3,7 @@
 ![CI](https://github.com/loopingz/smtp-relay/workflows/CI/badge.svg)
 
 [![codecov](https://codecov.io/gh/loopingz/smtp-relay/branch/main/graph/badge.svg?token=8BR86VbkKf)](https://codecov.io/gh/loopingz/smtp-relay)
-[![SonarCloud.io](https://sonarcloud.io/api/project_badges/measure?project=smtp-relay&metric=alert_status)](https://sonarcloud.io/dashboard/index/smtp-relay)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=loopingz_smtp-relay&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=loopingz_smtp-relay)
 ![CodeQL](https://github.com/loopingz/smtp-relay/workflows/CodeQL/badge.svg)
 
 
