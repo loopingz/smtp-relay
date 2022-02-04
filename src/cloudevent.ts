@@ -54,12 +54,12 @@ export function getCloudEvent<T extends SmtpCloudEvent = SmtpCloudEvent>(
     subject: session.email?.messageId,
     data: <T>{
       email: (email => ({
-        from: email.from.value.shift().address.substr(0, truncation),
+        from: email.from.value.shift()?.address.substr(0, truncation),
         attachments: email.attachments.map(a => ({
-          filename: a.filename.substr(0, truncation),
+          filename: a.filename?.substr(0, truncation),
           size: a.size
         })),
-        subject: email.subject.substr(0, truncation),
+        subject: email.subject?.substr(0, truncation),
         priority: email.priority,
         cc: mapAddressObjects(email.cc)?.substr(0, truncation),
         to: mapAddressObjects(email.to)?.substr(0, truncation),

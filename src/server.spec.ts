@@ -174,8 +174,7 @@ class SmtpServerTest {
 
   @test
   replaceVars() {
-    // @ts-ignore
-    let session: SmtpSession = {};
+    let session = getFakeSession();
     assert.ok(SmtpServer.replaceVariables("${timestamp}", session).match(/\d+/) !== undefined);
     console.log(SmtpServer.replaceVariables("${iso8601}", session, {}));
   }
@@ -206,4 +205,37 @@ class SmtpServerTest {
     await new SmtpTest().failEmail("RCPT", "test@smtp-relay.com", "recipient@domain3.com", "Coucouc");
     server.close();
   }
+}
+
+export function getFakeSession(): SmtpSession {
+  // @ts-ignore
+  return {
+    // @ts-ignore
+    email: {
+      attachments: [],
+      from: {
+        value: [{ address: "test@test.com", name: "Test" }],
+        html: "",
+        text: ""
+      }
+    },
+    localAddress: "localhost",
+    localPort: 10025,
+    clientHostname: "localhost",
+    remoteAddress: "127.0.0.1",
+    remotePort: 235,
+    hostNameAppearsAs: "localhost",
+    id: "1234",
+    secure: false,
+    transmissionType: "TEST",
+    time: new Date(),
+    emailPath: "unit-test-fake-path",
+    envelope: {
+      mailFrom: {
+        address: "test@test.com",
+        args: []
+      },
+      rcptTo: []
+    }
+  };
 }

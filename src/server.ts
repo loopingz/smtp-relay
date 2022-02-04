@@ -143,6 +143,7 @@ export class SmtpServer {
         this.onData(stream, session, callback)
     });
 
+    /* istanbul ignore next */
     this.server.on("error", err => {
       console.log("Error %s", err.message);
     });
@@ -211,7 +212,7 @@ export class SmtpServer {
     replacements.to = session.envelope.rcptTo.map(a => a.address).join(",") || "";
 
     for (let i in replacements) {
-      value = value.replace(new RegExp("\\$\\{" + i + "\\}", "g"), replacements[i].toString());
+      value = value.replace(new RegExp("\\$\\{" + i + "\\}", "g"), replacements[i]?.toString());
     }
     return value;
   }
@@ -232,7 +233,7 @@ export class SmtpServer {
       callback();
     });
 
-    // @ts-ignore
+    /* istanbul ignore next */
     stream.on("error", err => callback(`error converting stream - ${err}`));
   }
 
