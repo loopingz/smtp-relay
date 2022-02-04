@@ -53,3 +53,17 @@ You can have as many flow as you desire within the SMTP server
 ### Core
 
 Manage the coordination of different component and is in charge of capturing the mail stream
+
+
+### Common variables available for replacements
+
+*iso8601*: date and time in YYYYmmddHHiiss format
+*timestamp*: UNIX timestamp
+*id*: Session id
+
+The following variables are not always available but should be within processors
+
+*from*: Email of the sender
+*messageId*: Message id
+*subject*: subject of the email
+*to*: list of recipient comma separated

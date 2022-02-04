@@ -10,6 +10,7 @@ import { SMTPServerOptions } from "smtp-server";
 import { SMTPServerAuthentication } from "smtp-server";
 import { SMTPServerAddress } from "smtp-server";
 import { SMTPServerDataStream } from "smtp-server";
+import { CloudEvent } from "cloudevents";
 
 export type SmtpCallback = (err?, result?) => void;
 export type SmtpNext = () => void;
@@ -68,6 +69,10 @@ export interface SmtpConfig {
  * Session object that is passed to the handler functions includes the following properties
  */
 export interface SmtpSession extends SMTPServerSession {
+  /**
+   * Time when the session was established
+   */
+  time: Date;
   /**
    * Path to the email file
    * 
@@ -186,6 +191,7 @@ export class SmtpServer {
 
   async onConnect(session: SmtpSession, callback: SmtpCallback) {
     try {
+      session.time = new Date();
       session.flows = {};
       Object.keys(this.flows).forEach(n => (session.flows[n] = "PENDING"));
       await this.filter("Connect", session, [session], this.flows);
@@ -195,10 +201,15 @@ export class SmtpServer {
     }
   }
 
-  static replaceVariables(value: string, replacements: { [key: string]: any } = {}): string {
-    let now = new Date();
-    replacements.timestamp = now.getTime().toString();
-    replacements.iso8601 = now.toISOString().replace(/[-:\.]/g, "");
+  static replaceVariables(value: string, session: SmtpSession, replacements: { [key: string]: any } = {}): string {
+    replacements.timestamp = session.time.getTime().toString();
+    replacements.iso8601 = session.time.toISOString().replace(/[-:\.]/g, "");
+    replacements.id = session.id;
+    replacements.messageId = session.email?.messageId || "";
+    replacements.from = session.envelope.mailFrom ? session.envelope.mailFrom.address : "";
+    replacements.subject = session.email?.subject || "";
+    replacements.to = session.envelope.rcptTo.map(a => a.address).join(",") || "";
+
     for (let i in replacements) {
       value = value.replace(new RegExp("\\$\\{" + i + "\\}", "g"), replacements[i].toString());
     }
@@ -257,8 +268,8 @@ export class SmtpServer {
     try {
       for (let name in session.flows) {
         let flow = this.flows[name];
-        console.log("Call outputs", flow.outputs);
         for (let output of flow.outputs) {
+          console.log(`Output[${output.name}] triggered`);
           await output.onMail(session);
         }
       }

@@ -1,6 +1,6 @@
 import { suite, test } from "@testdeck/mocha";
 import { Socket } from "net";
-import { SmtpServer } from "./server";
+import { SmtpServer, SmtpSession } from "./server";
 import { SmtpFilter } from "./filter";
 import { SmtpFlow } from "./flow";
 import * as assert from "assert";
@@ -174,8 +174,10 @@ class SmtpServerTest {
 
   @test
   replaceVars() {
-    assert.ok(SmtpServer.replaceVariables("${timestamp}", {}).match(/\d+/) !== undefined);
-    console.log(SmtpServer.replaceVariables("${iso8601}"));
+    // @ts-ignore
+    let session: SmtpSession = {};
+    assert.ok(SmtpServer.replaceVariables("${timestamp}", session).match(/\d+/) !== undefined);
+    console.log(SmtpServer.replaceVariables("${iso8601}", session, {}));
   }
 
   @test
