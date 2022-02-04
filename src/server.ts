@@ -3,7 +3,7 @@ import * as fs from "fs";
 import { SmtpFlow, SmtpFlowConfig } from "./flow";
 import * as path from "path";
 import stripJsonComments from "strip-json-comments";
-import { simpleParser } from "mailparser";
+import { AddressObject, simpleParser } from "mailparser";
 import { ParsedMail } from "mailparser";
 import { SMTPServerSession } from "smtp-server";
 import { SMTPServerOptions } from "smtp-server";
@@ -290,4 +290,17 @@ export class SmtpServer {
   close() {
     this.server.close();
   }
+}
+
+export function mapAddressObjects<T = any>(
+  obj: AddressObject | AddressObject[] | undefined,
+  transform: (obj: AddressObject) => T
+): T[] | undefined {
+  if (!obj) {
+    return undefined;
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(transform);
+  }
+  return [transform(obj)];
 }

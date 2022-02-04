@@ -1,13 +1,17 @@
 import { SmtpFilter } from "./filter";
 import { WhitelistFilter } from "./filters/whitelist";
 import { SmtpProcessor } from "./processor";
+import { AWSProcessor } from "./processors/aws";
 import { FileProcessor } from "./processors/file";
 import { GCPProcessor } from "./processors/gcp";
+import { NodeMailerProcessor } from "./processors/nodemailer";
 import { SmtpServer } from "./server";
 
 export function defaultModules() {
   SmtpFilter.register("whitelist", WhitelistFilter);
   SmtpProcessor.register("file", FileProcessor);
+  SmtpProcessor.register("nodemailer", NodeMailerProcessor);
+  SmtpProcessor.register("aws", AWSProcessor);
   SmtpProcessor.register("gcp", GCPProcessor);
 }
 

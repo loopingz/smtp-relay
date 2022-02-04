@@ -1,6 +1,6 @@
 import { CloudEvent } from "cloudevents";
 import { AddressObject } from "mailparser";
-import { SmtpSession } from "./server";
+import { mapAddressObjects, SmtpSession } from "./server";
 
 /**
  * CloudEvent Data representation for smtp-relay
@@ -33,20 +33,13 @@ export interface SmtpCloudEvent {
   };
 }
 
-function mapAddressObjects(obj: AddressObject | AddressObject[] | undefined): string | undefined {
-  if (!obj) {
-    return undefined;
-  }
-  if (Array.isArray(obj)) {
-    return obj.map(a => mapAddressObjects(a)).join(",");
-  }
-  return obj.value.map(ad => ad.address).join(",");
-}
-
 export function getCloudEvent<T extends SmtpCloudEvent = SmtpCloudEvent>(
   session: SmtpSession,
   truncation: number = 8192
 ): CloudEvent<T> {
+  const addressTransformer = a => {
+    return a.value.map(ad => ad.address).join(",");
+  };
   return new CloudEvent<T>({
     type: "com.loopingz.smtp-relay",
     source: session.localAddress,
@@ -61,9 +54,9 @@ export function getCloudEvent<T extends SmtpCloudEvent = SmtpCloudEvent>(
         })),
         subject: email.subject?.substr(0, truncation),
         priority: email.priority,
-        cc: mapAddressObjects(email.cc)?.substr(0, truncation),
-        to: mapAddressObjects(email.to)?.substr(0, truncation),
-        bcc: mapAddressObjects(email.bcc)?.substr(0, truncation),
+        cc: mapAddressObjects(email.cc, addressTransformer)?.join(",").substr(0, truncation),
+        to: mapAddressObjects(email.to, addressTransformer)?.join(",").substr(0, truncation),
+        bcc: mapAddressObjects(email.bcc, addressTransformer)?.join(",").substr(0, truncation),
         text: email.text?.substr(0, truncation),
         html: email.html ? email.html.substr(0, truncation) : undefined
       }))(session.email),
