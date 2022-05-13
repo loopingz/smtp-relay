@@ -15,6 +15,83 @@ The goal is to have a dynamic SMTP server that can either be used to run a debug
 Or relay a SMTP protocol to an SES API call (goal of `aws-smtp-relay`)
 Or simulate some Incoming capabilities of AWS SES, like `mail2s3` or `mail2sqs` and similar `mail2gcpstorage` and `mail2gcppubsub`
 
+## Quick Start
+
+### Replace aws-smtp-relay
+
+Run with a configuration file:
+
+```
+// Replace my previous project aws-smtp-relay
+{
+  "flows": {
+    "localhost": {
+      "filters": [
+        // Allow any ip to use the SMTP
+        {
+          "type": "whitelist",
+          "ips": ["regexp:.*"]
+        }
+      ],
+      "outputs": [
+        {
+          "type": "aws",
+          // Send it to SES
+          "ses": {}
+        }
+      ]
+    }
+  },
+  "options": {
+    "disableReverseLookup": false,
+    // Do not require auth
+    "authOptional": true,
+    "logger": true
+  }
+}
+```
+
+### SMTP 2 GCP Storage
+
+```
+{
+  "flows": {
+    "localhost": {
+      "filters": [
+        // Allow any ip to use the SMTP
+        {
+          "type": "whitelist",
+          "to": ["regexp:.*@mydomain.com"]
+        }
+      ],
+      "outputs": [
+        {
+          "type": "gcp",
+          // Store it in the bucket
+          "path": "gs://myemail/",
+          // Send a message to the queue containing the bucket url if exist and the metadata of the email
+          "pubsub": ""
+        }
+      ]
+    }
+  },
+  "options": {
+    "disableReverseLookup": false,
+    // Do not require auth
+    "authOptional": true,
+    "logger": true
+  }
+}
+```
+
+### Run it locally for dev
+
+You can just leveraging the Docker image
+
+```
+docker run -p 10025:10025 -v `pwd`/emails:/smtp-relay/received_emails ./configs/fake-smtp.jsonc
+```
+
 ## Concepts
 
 The smtp server is subdivided with:
