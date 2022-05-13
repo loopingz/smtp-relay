@@ -1,5 +1,7 @@
 # smtp-relay
 
+![logo](https://raw.githubusercontent.com/loopingz/aws-smtp-relay/master/docs/aws-smtp-relay-logo.png)
+
 ![CI](https://github.com/loopingz/smtp-relay/workflows/CI/badge.svg)
 
 [![codecov](https://codecov.io/gh/loopingz/smtp-relay/branch/main/graph/badge.svg?token=8BR86VbkKf)](https://codecov.io/gh/loopingz/smtp-relay)
