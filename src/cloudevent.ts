@@ -47,21 +47,21 @@ export function getCloudEvent<T extends SmtpCloudEvent = SmtpCloudEvent>(
     subject: session.email?.messageId,
     data: <T>{
       email: (email => ({
-        from: email.from.value.shift()?.address.substr(0, truncation),
+        from: email.from.value.shift()?.address.substring(0, truncation),
         attachments: email.attachments.map(a => ({
-          filename: a.filename?.substr(0, truncation),
+          filename: a.filename?.substring(0, truncation),
           size: a.size
         })),
-        subject: email.subject?.substr(0, truncation),
+        subject: email.subject?.substring(0, truncation),
         priority: email.priority,
-        cc: mapAddressObjects(email.cc, addressTransformer)?.join(",").substr(0, truncation),
-        to: mapAddressObjects(email.to, addressTransformer)?.join(",").substr(0, truncation),
-        bcc: mapAddressObjects(email.bcc, addressTransformer)?.join(",").substr(0, truncation),
-        text: email.text?.substr(0, truncation),
-        html: email.html ? email.html.substr(0, truncation) : undefined
+        cc: mapAddressObjects(email.cc, addressTransformer)?.join(",").substring(0, truncation),
+        to: mapAddressObjects(email.to, addressTransformer)?.join(",").substring(0, truncation),
+        bcc: mapAddressObjects(email.bcc, addressTransformer)?.join(",").substring(0, truncation),
+        text: email.text?.substring(0, truncation),
+        html: email.html ? email.html.substring(0, truncation) : undefined
       }))(session.email),
       server: {
-        clientHostname: session.clientHostname.substr(0, truncation),
+        clientHostname: session.clientHostname.substring(0, truncation),
         remoteAddress: session.remoteAddress,
         remotePort: session.remotePort,
         hostNameAppearAs: session.hostNameAppearsAs,

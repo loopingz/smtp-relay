@@ -8,19 +8,19 @@ export class SmtpFilter<T extends SmtpComponentConfig = SmtpComponentConfig> ext
   flow: SmtpFlow;
   config: T;
 
-  async onAuth(auth: SMTPServerAuthentication, session: SmtpSession): Promise<boolean | undefined> {
+  async onAuth(_auth: SMTPServerAuthentication, _session: SmtpSession): Promise<boolean | undefined> {
     return undefined;
   }
-  async onConnect(session: SmtpSession): Promise<boolean | undefined> {
+  async onConnect(_session: SmtpSession): Promise<boolean | undefined> {
     return undefined;
   }
-  onMailFrom(address: SMTPServerAddress, session: SmtpSession): Promise<boolean | undefined> {
+  onMailFrom(_address: SMTPServerAddress, _session: SmtpSession): Promise<boolean | undefined> {
     return undefined;
   }
-  onRcptTo(address: SMTPServerAddress, session: SmtpSession): Promise<boolean | undefined> {
+  onRcptTo(_address: SMTPServerAddress, _session: SmtpSession): Promise<boolean | undefined> {
     return undefined;
   }
-  onData(session: SmtpSession): Promise<boolean | undefined> {
+  onData(_session: SmtpSession): Promise<boolean | undefined> {
     return undefined;
   }
 

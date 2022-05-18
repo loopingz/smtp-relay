@@ -3,14 +3,14 @@ import * as fs from "fs";
 import { SmtpFlow, SmtpFlowConfig } from "./flow";
 import * as path from "path";
 import stripJsonComments from "strip-json-comments";
-import { AddressObject, simpleParser } from "mailparser";
-import { ParsedMail } from "mailparser";
-import { SMTPServerSession } from "smtp-server";
-import { SMTPServerOptions } from "smtp-server";
-import { SMTPServerAuthentication } from "smtp-server";
-import { SMTPServerAddress } from "smtp-server";
-import { SMTPServerDataStream } from "smtp-server";
-import { CloudEvent } from "cloudevents";
+import { AddressObject, simpleParser, ParsedMail } from "mailparser";
+import {
+  SMTPServerAddress,
+  SMTPServerDataStream,
+  SMTPServerSession,
+  SMTPServerOptions,
+  SMTPServerAuthentication
+} from "smtp-server";
 
 export type SmtpCallback = (err?, result?) => void;
 export type SmtpNext = () => void;
@@ -166,7 +166,7 @@ export class SmtpServer {
   ) {
     for (let name in this.flows) {
       let flow = this.flows[name];
-      if (session.flows[name] === "ACCEPTED" && flow.config.filtersOperator === "OR") {
+      if (flows[name] === "ACCEPTED" && flow.config.filtersOperator === "OR") {
         continue;
       }
       for (let filter of flow.filters) {
@@ -178,13 +178,13 @@ export class SmtpServer {
         }
         if (flow.config.filtersOperator === "OR") {
           if (res) {
-            session.flows[name] = "ACCEPTED";
+            flows[name] = "ACCEPTED";
           }
         } else if (!res) {
           delete session.flows[name];
           break;
         } else {
-          session.flows[name] = "ACCEPTED";
+          flows[name] = "ACCEPTED";
         }
       }
     }

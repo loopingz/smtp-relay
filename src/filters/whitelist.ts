@@ -41,7 +41,7 @@ export class WhitelistFilter extends SmtpFilter<WhitelistFilterConfiguration> {
     if (!reg.startsWith("regexp:")) {
       return reg;
     }
-    reg = reg.substr(7);
+    reg = reg.substring(7);
     if (!reg.startsWith("^")) {
       reg = "^" + reg;
     }

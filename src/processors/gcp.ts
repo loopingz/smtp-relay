@@ -1,7 +1,5 @@
-import { SmtpServer, SmtpSession } from "../server";
 import { Storage } from "@google-cloud/storage";
 import { PubSub } from "@google-cloud/pubsub";
-import { getCloudEvent } from "../cloudevent";
 import { CloudProcessor, CloudProcessorConfig } from "./cloud";
 
 /**

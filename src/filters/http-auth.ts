@@ -14,7 +14,7 @@ export interface HttpFilterConfig extends SmtpComponentConfig {
 export class HttpFilter extends SmtpFilter<HttpFilterConfig> {
   type: string = "http-auth";
 
-  async onMailFrom(account) {
+  async onMailFrom(_account) {
     return undefined;
   }
 
