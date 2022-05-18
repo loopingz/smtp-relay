@@ -158,15 +158,10 @@ export class SmtpServer {
     this.flows[flow.name] = undefined;
   }
 
-  async filter(
-    evt: "Auth" | "MailFrom" | "RcptTo" | "Data" | "Connect" | "Close",
-    session: SmtpSession,
-    args: any[],
-    flows: any = session.flows
-  ) {
+  async filter(evt: "Auth" | "MailFrom" | "RcptTo" | "Data" | "Connect" | "Close", session: SmtpSession, args: any[]) {
     for (let name in this.flows) {
       let flow = this.flows[name];
-      if (flows[name] === "ACCEPTED" && flow.config.filtersOperator === "OR") {
+      if (session.flows[name] === "ACCEPTED" && flow.config.filtersOperator === "OR") {
         continue;
       }
       for (let filter of flow.filters) {
@@ -178,24 +173,29 @@ export class SmtpServer {
         }
         if (flow.config.filtersOperator === "OR") {
           if (res) {
-            flows[name] = "ACCEPTED";
+            session.flows[name] = "ACCEPTED";
           }
         } else if (!res) {
           delete session.flows[name];
           break;
         } else {
-          flows[name] = "ACCEPTED";
+          session.flows[name] = "ACCEPTED";
         }
       }
     }
   }
 
+  /**
+   * Manage connection filters
+   * @param session
+   * @param callback
+   */
   async onConnect(session: SmtpSession, callback: SmtpCallback) {
     try {
       session.time = new Date();
       session.flows = {};
       Object.keys(this.flows).forEach(n => (session.flows[n] = "PENDING"));
-      await this.filter("Connect", session, [session], this.flows);
+      await this.filter("Connect", session, [session]);
       this.manageCallback(session, callback);
     } catch (err) {
       callback(err);
@@ -217,6 +217,12 @@ export class SmtpServer {
     return value;
   }
 
+  /**
+   * Manage the Data filter
+   * @param stream
+   * @param session
+   * @param callback
+   */
   async onData(stream: SMTPServerDataStream, session: SmtpSession, callback: SmtpCallback) {
     session.emailPath = SmtpServer.replaceVariables(this.config.cachePath, { ...session });
 
@@ -237,6 +243,12 @@ export class SmtpServer {
     stream.on("error", err => callback(`error converting stream - ${err}`));
   }
 
+  /**
+   * Manage the authentication filter
+   * @param auth
+   * @param session
+   * @param callback
+   */
   async onAuth(auth: SMTPServerAuthentication, session: SmtpSession, callback: SmtpCallback) {
     try {
       await this.filter("Auth", session, [auth, session]);
@@ -246,6 +258,13 @@ export class SmtpServer {
     }
   }
 
+  /**
+   * Manage RcptTo and MailFrom filtering
+   * @param evt
+   * @param param
+   * @param session
+   * @param callback
+   */
   async onEvent(evt: "MailFrom" | "RcptTo", param: SMTPServerAddress, session: SmtpSession, callback: SmtpCallback) {
     try {
       await this.filter(evt, session, [param, session]);
@@ -265,6 +284,10 @@ export class SmtpServer {
     }
   }
 
+  /**
+   *
+   * @param session
+   */
   async onDataRead(session: SmtpSession) {
     try {
       for (let name in session.flows) {
@@ -287,6 +310,9 @@ export class SmtpServer {
     }
   }
 
+  /**
+   * Close current server
+   */
   close() {
     this.server.close();
   }

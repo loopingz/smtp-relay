@@ -5,6 +5,7 @@ import { SmtpFilter } from "./filter";
 import { SmtpFlow } from "./flow";
 import * as assert from "assert";
 import { defaultModules } from ".";
+import * as sinon from "sinon";
 
 export class SmtpTest {
   sock: Socket;
@@ -204,6 +205,17 @@ class SmtpServerTest {
     await new SmtpTest().failEmail("RCPT", "test@smtp-relay.com", "recipient@domain2.com", "Coucouc");
     await new SmtpTest().failEmail("RCPT", "test@smtp-relay.com", "recipient@domain3.com", "Coucouc");
     server.close();
+  }
+
+  @test
+  async cov() {
+    let server = new SmtpServer("./tests/whitelist-and.json");
+    let stub = sinon.stub(console, "error");
+    // Should log but not crash
+    server.onDataRead(null);
+    assert.strictEqual(stub.callCount, 1);
+    server.onConnect(null, null);
+    server.onEvent("RcptTo", null, null, null);
   }
 }
 

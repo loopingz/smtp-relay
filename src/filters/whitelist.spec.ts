@@ -26,6 +26,7 @@ class WhitelistSmtpServerTest {
     let server = new SmtpServer("./tests/whitelist-ips.json");
     server.init();
     await new SmtpTest().sendEmail("test@smtp-relay.com", "dest@smtp-relay.com", "Coucouc");
+    console.log("CLOSING SERVER");
     server.close();
   }
 }

@@ -3,7 +3,7 @@ import { SmtpComponentConfig } from "../component";
 
 export interface HttpFilterConfig extends SmtpComponentConfig {
   url: string;
-  method?: "PUT" | "POST";
+  method?: "PUT" | "POST" | "GET";
   /**
    * If not define the HTTP code is used
    * < 300: Allowed
@@ -11,19 +11,14 @@ export interface HttpFilterConfig extends SmtpComponentConfig {
    */
   jsonpath?: string;
 }
+
+/**
+ *
+ */
 export class HttpFilter extends SmtpFilter<HttpFilterConfig> {
   type: string = "http-auth";
 
-  async onMailFrom(_account) {
-    return undefined;
-  }
-
-  async onConnect() {
-    return undefined;
-  }
-
-  async onRcptTo() {
-    // Send the information for validation
+  async onAuth(): Promise<boolean> {
     return false;
   }
 }
