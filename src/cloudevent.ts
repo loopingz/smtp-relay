@@ -1,5 +1,4 @@
 import { CloudEvent } from "cloudevents";
-import { AddressObject } from "mailparser";
 import { mapAddressObjects, SmtpSession } from "./server";
 
 /**

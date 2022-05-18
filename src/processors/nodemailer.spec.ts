@@ -1,10 +1,10 @@
 import { suite, test } from "@testdeck/mocha";
 import * as assert from "assert";
+import { HeaderValue } from "mailparser";
+import * as sinon from "sinon";
 import { SmtpSession } from "../server";
 import { getFakeSession } from "../server.spec";
-import * as sinon from "sinon";
 import { NodeMailerProcessor } from "./nodemailer";
-import { HeaderValue } from "mailparser";
 
 @suite
 class NodeMailerProcessorTest {

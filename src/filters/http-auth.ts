@@ -1,5 +1,5 @@
-import { SmtpFilter } from "../filter";
 import { SmtpComponentConfig } from "../component";
+import { SmtpFilter } from "../filter";
 
 export interface HttpFilterConfig extends SmtpComponentConfig {
   url: string;

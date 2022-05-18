@@ -1,10 +1,10 @@
 import { suite, test } from "@testdeck/mocha";
 import * as assert from "assert";
+import * as fs from "fs";
+import * as sinon from "sinon";
 import { SmtpSession } from "../server";
 import { getFakeSession } from "../server.spec";
 import { AWSProcessor } from "./aws";
-import * as sinon from "sinon";
-import * as fs from "fs";
 
 @suite
 class AWSProcessorTest {

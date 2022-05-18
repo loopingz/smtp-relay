@@ -1,10 +1,10 @@
 import { suite, test } from "@testdeck/mocha";
 import * as assert from "assert";
+import { Attachment } from "mailparser";
+import * as sinon from "sinon";
 import { SmtpSession } from "../server";
 import { getFakeSession } from "../server.spec";
 import { GCPProcessor } from "./gcp";
-import * as sinon from "sinon";
-import { Attachment } from "mailparser";
 
 @suite
 class GCPProcessorTest {

@@ -1,5 +1,5 @@
-import { Storage } from "@google-cloud/storage";
 import { PubSub } from "@google-cloud/pubsub";
+import { Storage } from "@google-cloud/storage";
 import { CloudProcessor, CloudProcessorConfig } from "./cloud";
 
 /**

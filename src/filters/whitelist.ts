@@ -1,7 +1,7 @@
-import { SmtpFilter } from "../filter";
-import { SmtpComponentConfig } from "../component";
-import { SmtpSession } from "../server";
 import { SMTPServerAddress } from "smtp-server";
+import { SmtpComponentConfig } from "../component";
+import { SmtpFilter } from "../filter";
+import { SmtpSession } from "../server";
 
 export interface WhitelistFilterConfiguration extends SmtpComponentConfig {
   from?: (string | RegExp)[];

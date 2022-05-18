@@ -1,10 +1,10 @@
+import { ParsedMail } from "mailparser";
+import * as nodemailer from "nodemailer";
+import Mail from "nodemailer/lib/mailer";
+import SMTPTransport from "nodemailer/lib/smtp-transport";
+import { SmtpComponentConfig } from "../component";
 import { SmtpProcessor } from "../processor";
 import { mapAddressObjects, SmtpSession } from "../server";
-import * as nodemailer from "nodemailer";
-import { SmtpComponentConfig } from "../component";
-import SMTPTransport from "nodemailer/lib/smtp-transport";
-import Mail from "nodemailer/lib/mailer";
-import { ParsedMail } from "mailparser";
 
 export interface NodeMailerProcessorConfig extends SmtpComponentConfig {
   override?: Mail.Options;

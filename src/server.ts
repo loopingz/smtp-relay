@@ -1,10 +1,10 @@
-import { SMTPServer } from "smtp-server";
 import * as fs from "fs";
 import { SmtpFlow, SmtpFlowConfig } from "./flow";
 import * as path from "path";
 import stripJsonComments from "strip-json-comments";
 import { AddressObject, simpleParser, ParsedMail } from "mailparser";
 import {
+  SMTPServer,
   SMTPServerAddress,
   SMTPServerDataStream,
   SMTPServerSession,

@@ -1,7 +1,6 @@
 import { suite, test } from "@testdeck/mocha";
-import { SmtpServer } from "../server";
-import * as assert from "assert";
 import { defaultModules } from "..";
+import { SmtpServer } from "../server";
 import { SmtpTest } from "../server.spec";
 
 @suite
