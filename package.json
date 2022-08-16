@@ -9,7 +9,7 @@
     "@aws-sdk/client-ses": "^3.49.0",
     "@aws-sdk/client-sqs": "^3.48.0",
     "@google-cloud/pubsub": "^2.18.5",
-    "@google-cloud/storage": "^5.18.1",
+    "@google-cloud/storage": "^6.4.1",
     "cloudevents": "^6.0.1",
     "mailparser": "^3.4.0",
     "nodemailer": "^6.7.2",
