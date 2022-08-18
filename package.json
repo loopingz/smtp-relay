@@ -8,6 +8,7 @@
     "@aws-sdk/client-s3": "^3.49.0",
     "@aws-sdk/client-ses": "^3.49.0",
     "@aws-sdk/client-sqs": "^3.49.0",
+    "@aws-sdk/client-sts": "^3.49.0",
     "@google-cloud/pubsub": "^3.1.0",
     "@google-cloud/storage": "^6.4.1",
     "cloudevents": "^6.0.1",
