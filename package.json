@@ -44,7 +44,7 @@
   },
   "devDependencies": {
     "@istanbuljs/nyc-config-typescript": "^1.0.2",
-    "@testdeck/mocha": "^0.2.0",
+    "@testdeck/mocha": "^0.3.0",
     "@types/mailparser": "^3.4.0",
     "@types/mocha": "^9.1.0",
     "@types/smtp-server": "^3.5.7",
