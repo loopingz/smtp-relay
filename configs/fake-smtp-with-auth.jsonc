@@ -1,0 +1,26 @@
+// Can replace fakeSMTP.jar
+{
+    "flows": {
+      "localhost": {
+        "filters": [
+          // Allow only SMTP_USERNAME, SMTP_PASSWORD env
+          {
+            "type": "static-auth"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "file",
+            // Send store files in emails/
+            "path": "./received_emails/"
+          }
+        ]
+      }
+    },
+    "options": {
+      "disableReverseLookup": false,
+      "allowInsecureAuth": true,
+      "logger": true
+    }
+  }
+    

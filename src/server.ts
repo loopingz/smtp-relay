@@ -1,16 +1,16 @@
 import * as fs from "fs";
-import { SmtpFlow, SmtpFlowConfig } from "./flow";
+import { AddressObject, ParsedMail, simpleParser } from "mailparser";
 import * as path from "path";
-import stripJsonComments from "strip-json-comments";
-import { AddressObject, simpleParser, ParsedMail } from "mailparser";
 import {
   SMTPServer,
   SMTPServerAddress,
+  SMTPServerAuthentication,
   SMTPServerDataStream,
-  SMTPServerSession,
   SMTPServerOptions,
-  SMTPServerAuthentication
+  SMTPServerSession
 } from "smtp-server";
+import stripJsonComments from "strip-json-comments";
+import { SmtpFlow, SmtpFlowConfig } from "./flow";
 
 export type SmtpCallback = (err?, result?) => void;
 export type SmtpNext = () => void;
@@ -150,10 +150,18 @@ export class SmtpServer {
     this.server.listen(this.config.port);
   }
 
+  /**
+   * Add a flow to the server
+   * @param flow
+   */
   addFlow(flow: SmtpFlow) {
     this.flows[flow.name] = flow;
   }
 
+  /**
+   * Remove a flow from the server
+   * @param flow
+   */
   removeFlow(flow: SmtpFlow) {
     this.flows[flow.name] = undefined;
   }
@@ -202,6 +210,14 @@ export class SmtpServer {
     }
   }
 
+  /**
+   * Replace variables so they can be used to define storage path or other
+   *
+   * @param value
+   * @param session
+   * @param replacements
+   * @returns
+   */
   static replaceVariables(value: string, session: SmtpSession, replacements: { [key: string]: any } = {}): string {
     replacements.timestamp = session.time.getTime().toString();
     replacements.iso8601 = session.time.toISOString().replace(/[-:\.]/g, "");
@@ -252,7 +268,12 @@ export class SmtpServer {
   async onAuth(auth: SMTPServerAuthentication, session: SmtpSession, callback: SmtpCallback) {
     try {
       await this.filter("Auth", session, [auth, session]);
-      this.manageCallback(session, callback);
+      // No filter have approved the auth
+      if (Object.keys(session.flows).length === 0) {
+        throw new Error("Invalid authentication");
+      }
+      // Return user as valid
+      callback(null, { user: auth.username });
     } catch (err) {
       callback(err);
     }

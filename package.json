@@ -26,7 +26,8 @@
     "pretest": "npm run build",
     "lint": "prettier --check src/**/*",
     "lint:fix": "prettier --write src/**/*",
-    "test": "nyc mocha --recursive --exit --timeout=6000 -r node_modules/ts-node/register src/**/*.spec.ts src/*.spec.ts"
+    "test": "nyc mocha --recursive --exit --timeout=6000 -r node_modules/ts-node/register src/**/*.spec.ts src/*.spec.ts",
+    "server": "tsc && node lib/index.js"
   },
   "nyc": {
     "extends": "@istanbuljs/nyc-config-typescript",
