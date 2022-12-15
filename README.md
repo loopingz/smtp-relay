@@ -135,12 +135,17 @@ Manage the coordination of different component and is in charge of capturing the
 ### Common variables available for replacements
 
 _iso8601_: date and time in YYYYmmddHHiiss format
+
 _timestamp_: UNIX timestamp
+
 _id_: Session id
 
 The following variables are not always available but should be within processors
 
 _from_: Email of the sender
+
 _messageId_: Message id
+
 _subject_: subject of the email
+
 _to_: list of recipient comma separated
