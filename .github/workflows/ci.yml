@@ -37,9 +37,11 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node }}
+          registry-url: "https://registry.npmjs.org"
+          cache: "yarn"
 
       - name: Install dependencies
-        run: yarn
+        run: yarn --frozen-lockfile
 
       - name: Test project
         run: yarn run test
