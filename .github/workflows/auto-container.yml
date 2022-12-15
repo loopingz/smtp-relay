@@ -1,0 +1,38 @@
+name: Publish Docker
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    name: Make a release and publish to NPM
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Build image
+        id: build-image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: smtp-relay
+          tags: ${{github.ref_name}} latest
+          archs: amd64, arm64
+          dockerfiles: |
+            ./Dockerfile
+
+    - name: Push To docker.io
+      uses: redhat-actions/push-to-registry@v2
+      with:
+        image: ${{ steps.build-image.outputs.image }}
+        tags: ${{ steps.build-image.outputs.tags }}
+        registry: docker.io/loopingz
+        username: loopingz
+        password: ${{ secrets.DOCKER_HUB }}
