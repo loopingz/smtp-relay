@@ -62,7 +62,9 @@
     "excludeNodeModules": true
   },
   "devDependencies": {
+    "@auto-it/all-contributors": "^10.37.6",
     "@auto-it/conventional-commits": "^10.37.6",
+    "@auto-it/first-time-contributor": "^10.37.6",
     "@testdeck/mocha": "^0.3.3",
     "@types/mailparser": "^3.4.0",
     "@types/mocha": "^10.0.1",
@@ -78,5 +80,21 @@
     "sinon": "^15.0.0",
     "ts-node": "^10.4.0",
     "typescript": "^4.9.3"
+  },
+  "auto": {
+    "plugins": [
+      "npm",
+      "all-contributors",
+      "conventional-commits",
+      "first-time-contributor",
+      "released",
+      ["docker", { "registry": "ghcr.io/loopingz/smtp-relay", "tagPrereleaseAliases": true, "image": "smtp-relay:release", "tagLatest": true }]
+    ],
+    "baseBranch": "main",
+    "prereleaseBranches": [
+        "next"
+    ],
+    "author": "GitHub Actions Bot <github-bot@loopingz.com>",
+    "onlyPublishWithReleaseLabel": true
   }
 }
