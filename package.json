@@ -88,7 +88,7 @@
       "conventional-commits",
       "first-time-contributor",
       "released",
-      ["docker", { "registry": "ghcr.io/loopingz/smtp-relay", "tagPrereleaseAliases": true, "image": "smtp-relay:release", "tagLatest": true }]
+      ["docker", { "registry": "docker.io/loopingz/smtp-relay", "tagPrereleaseAliases": true, "image": "smtp-relay:release", "tagLatest": true }]
     ],
     "baseBranch": "main",
     "prereleaseBranches": [
