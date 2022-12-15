@@ -1,3 +1,15 @@
+# v1.0.1 (Thu Dec 15 2022)
+
+#### 🐛 Bug Fix
+
+- fix: docker builder [#38](https://github.com/loopingz/smtp-relay/pull/38) ([@loopingz](https://github.com/loopingz))
+
+#### Authors: 1
+
+- Remi Cattiau ([@loopingz](https://github.com/loopingz))
+
+---
+
 # v1.0.0 (Thu Dec 15 2022)
 
 :tada: This release contains work from a new contributor! :tada:
