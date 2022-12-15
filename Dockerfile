@@ -6,7 +6,7 @@ ADD src /app/src/
 ADD package.json /app
 ADD tsconfig.json /app
 ADD yarn.lock /app
-RUN cd /app && yarn --frozen-lockfile && yarn build && npm prune --production
+RUN cd /app && yarn --frozen-lockfile --network-timeout 600000 && yarn build && npm prune --production
 
 # Run it in distroless
 FROM gcr.io/distroless/nodejs:18
