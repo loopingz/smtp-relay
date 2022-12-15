@@ -3,3 +3,4 @@ node_modules
 lib
 reports
 yarn.lock
+.env
