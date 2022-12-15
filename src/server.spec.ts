@@ -1,11 +1,12 @@
 import { suite, test } from "@testdeck/mocha";
+import * as assert from "assert";
 import { Socket } from "net";
-import { SmtpServer, SmtpSession } from "./server";
+import * as sinon from "sinon";
+import { defaultModules } from ".";
 import { SmtpFilter } from "./filter";
 import { SmtpFlow } from "./flow";
-import * as assert from "assert";
-import { defaultModules } from ".";
-import * as sinon from "sinon";
+import { SmtpProcessor } from "./processor";
+import { SmtpServer, SmtpSession } from "./server";
 
 export class SmtpTest {
   sock: Socket;
@@ -39,6 +40,7 @@ export class SmtpTest {
   }
 
   async connect(port: number = 10025) {
+    this.sock ??= new Socket();
     return new Promise<void>(resolve => {
       this.sock.connect(port, "localhost", resolve);
     });
@@ -216,6 +218,37 @@ class SmtpServerTest {
     assert.strictEqual(stub.callCount, 1);
     server.onConnect(null, null);
     server.onEvent("RcptTo", null, null, null);
+
+    assert.throws(() => SmtpProcessor.get(null, { type: "unknown-processor" }), /unknown-processor/);
+  }
+
+  @test
+  async testAuth() {
+    defaultModules();
+    let server = new SmtpServer("./tests/auth.json");
+    server.init();
+    let test = new SmtpTest();
+    let p1 = test.waitFor("220");
+    await test.connect();
+    test.output = "";
+    test.sock.on("data", data => {
+      console.log("Received:", data.toString());
+      test.output += data + "\n";
+      if (data.toString().substr(0, 3) === test.waitCode) {
+        let p = test.waitForPromise;
+        test.waitForPromise = null;
+        p();
+      }
+    });
+    await p1;
+    await test.write(`HELO test.com`, "250");
+    await test.write(`AUTH LOGIN`, "334");
+    await test.write(`dGVzdA==`, "334");
+    await test.write(`dGVzdDI=`, "535");
+    await test.write(`AUTH LOGIN`, "334");
+    await test.write(`dGVzdA==`, "334");
+    await test.write(`dGVzdA==`, "235");
+    server.close();
   }
 }
 

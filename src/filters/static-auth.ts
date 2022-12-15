@@ -10,9 +10,9 @@ export interface StaticAuthConfiguration extends SmtpComponentConfig {
   /**
    * User to use for Authentication
    *
-   * If not define will search for SMTP_USER environment variable
+   * If not define will search for SMTP_USERNAME environment variable
    */
-  user?: string;
+  username?: string;
   /**
    * Staticly defined password
    *
@@ -37,10 +37,10 @@ export class StaticAuthFilter extends SmtpFilter<StaticAuthConfiguration> {
    * @override
    */
   init() {
-    this.config.user ??= process.env.SMTP_USERNAME;
+    this.config.username ??= process.env.SMTP_USERNAME;
     this.config.password ??= process.env.SMTP_PASSWORD;
     this.config.salt ??= process.env.SMTP_PASSWORD_SALT;
-    if (this.config.user === undefined || this.config.password === undefined) {
+    if (this.config.username === undefined || this.config.password === undefined) {
       throw new Error("static-auth filter requires to have authentication defined");
     }
     const info = this.config.password.split(":");
@@ -61,7 +61,7 @@ export class StaticAuthFilter extends SmtpFilter<StaticAuthConfiguration> {
     if (
       auth.method !== "XOAUTH2" &&
       this.validatePassword(<string>auth.password) &&
-      auth.username === this.config.user
+      auth.username === this.config.username
     ) {
       return true;
     }

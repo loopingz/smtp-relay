@@ -1,7 +1,7 @@
+import { SMTPServerAddress, SMTPServerAuthentication } from "smtp-server";
+import { SmtpComponent, SmtpComponentConfig } from "./component";
 import { SmtpFlow } from "./flow";
 import { SmtpSession } from "./server";
-import { SmtpComponent, SmtpComponentConfig } from "./component";
-import { SMTPServerAddress, SMTPServerAuthentication } from "smtp-server";
 
 export class SmtpFilter<T extends SmtpComponentConfig = SmtpComponentConfig> extends SmtpComponent<T> {
   name: string;
@@ -31,6 +31,9 @@ export class SmtpFilter<T extends SmtpComponentConfig = SmtpComponentConfig> ext
   }
 
   static get(flow: SmtpFlow, config: SmtpComponentConfig): SmtpFilter {
+    if (!SmtpFilter.registry[config.type]) {
+      throw new Error(`${config.type} is an unknown filter type`);
+    }
     return new SmtpFilter.registry[config.type](flow, config);
   }
 
