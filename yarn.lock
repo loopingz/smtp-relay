@@ -86,6 +86,17 @@
     typescript-memoize "^1.0.0-alpha.3"
     url-join "^4.0.0"
 
+"@auto-it/docker@^10.37.6":
+  version "10.37.6"
+  resolved "https://registry.yarnpkg.com/@auto-it/docker/-/docker-10.37.6.tgz#ea181c6b252b81be1eac0ff127df55be0ee8ee17"
+  integrity sha512-I8X7Tc+24EcDz3D6CjtUV+B7m+b5tdVVWr9aWGj3z2fPphb7bnPvejpVfHXPgAwxmomxHGxdT9pMgzja8vNMgw==
+  dependencies:
+    "@auto-it/core" "10.37.6"
+    fp-ts "^2.5.3"
+    io-ts "^2.1.2"
+    semver "^7.0.0"
+    tslib "2.1.0"
+
 "@auto-it/first-time-contributor@^10.37.6":
   version "10.37.6"
   resolved "https://registry.yarnpkg.com/@auto-it/first-time-contributor/-/first-time-contributor-10.37.6.tgz#cbd95505de84068b0459d1ffd23a6a6a42497e9e"
