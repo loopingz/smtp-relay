@@ -2,5 +2,4 @@ node_modules
 .nyc_output
 lib
 reports
-yarn.lock
 .env
