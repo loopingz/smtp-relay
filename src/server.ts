@@ -143,7 +143,7 @@ export class SmtpServer {
         this.onData(stream, session, callback)
     });
 
-    /* istanbul ignore next */
+    /* c8 ignore next 3 */
     this.server.on("error", err => {
       console.log("Error %s", err.message);
     });

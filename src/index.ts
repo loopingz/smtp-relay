@@ -1,3 +1,4 @@
+import * as url from "node:url";
 import { SmtpFilter } from "./filter";
 import { StaticAuthFilter } from "./filters/static-auth";
 import { WhitelistFilter } from "./filters/whitelist";
@@ -39,8 +40,8 @@ export function defaultModules() {
 }
 
 // Cannot really test main module
-/* istanbul ignore if */
-if (module === require.main) {
+/* c8 ignore start */
+if (import.meta.url === url.pathToFileURL(process.argv[1]).href) {
   defaultModules();
   let conf = process.argv.pop();
   if (conf === __filename) {
@@ -49,3 +50,4 @@ if (module === require.main) {
   let smtp = new SmtpServer(conf);
   smtp.init();
 }
+/* c8 ignore stop */

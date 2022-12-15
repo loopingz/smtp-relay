@@ -4,6 +4,7 @@
   "main": "lib/index.js",
   "bin": "lib/index.js",
   "license": "MIT",
+  "type": "module",
   "dependencies": {
     "@aws-sdk/client-s3": "^3.49.0",
     "@aws-sdk/client-ses": "^3.49.0",
@@ -15,7 +16,7 @@
     "mailparser": "^3.4.0",
     "nodemailer": "^6.7.2",
     "smtp-server": "^3.9.0",
-    "strip-json-comments": "<4.0.0"
+    "strip-json-comments": "^4.0.0"
   },
   "engines": {
     "node": ">= 16"
@@ -29,11 +30,10 @@
     "pretest": "npm run build",
     "lint": "prettier --check src/**/*",
     "lint:fix": "prettier --write src/**/*",
-    "test": "nyc mocha --recursive --exit --timeout=6000 -r node_modules/ts-node/register src/**/*.spec.ts src/*.spec.ts",
+    "test": "c8 mocha --recursive --exit --timeout=6000 src/**/*.spec.ts src/*.spec.ts",
     "server": "tsc && node lib/index.js"
   },
-  "nyc": {
-    "extends": "@istanbuljs/nyc-config-typescript",
+  "c8": {
     "report-dir": "./reports",
     "reporter": [
       "html",
@@ -42,23 +42,23 @@
       "text"
     ],
     "exclude": [
-      "**/*.spec.ts",
-      "test/**/*"
-    ]
+      "**/*.spec.ts"
+    ],
+    "excludeNodeModules": true
   },
   "devDependencies": {
-    "@istanbuljs/nyc-config-typescript": "^1.0.2",
     "@testdeck/mocha": "^0.3.3",
     "@types/mailparser": "^3.4.0",
     "@types/mocha": "^10.0.1",
     "@types/smtp-server": "^3.5.7",
+    "@webda/tsc-esm": "^1.0.2",
+    "c8": "^7.12.0",
     "mocha": "^10.0.0",
-    "nyc": "^15.1.0",
     "pkg": "^5.5.2",
     "prettier": "^2.5.1",
-    "sinon": "^15.0.0",
     "prettier-plugin-organize-imports": "^2.3.4",
+    "sinon": "^15.0.0",
     "ts-node": "^10.4.0",
-    "typescript": "^4.5.5"
+    "typescript": "^4.9.3"
   }
 }
