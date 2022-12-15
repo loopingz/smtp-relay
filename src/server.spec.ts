@@ -220,6 +220,8 @@ class SmtpServerTest {
     server.onEvent("RcptTo", null, null, null);
 
     assert.throws(() => SmtpProcessor.get(null, { type: "unknown-processor" }), /unknown-processor/);
+    assert.throws(() => new SmtpServer("./tests/whitelist-and.ini"), /Configuration format not handled/);
+    new SmtpServer("./tests/whitelist.yaml");
   }
 
   @test

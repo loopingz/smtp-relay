@@ -10,6 +10,7 @@ import {
   SMTPServerSession
 } from "smtp-server";
 import stripJsonComments from "strip-json-comments";
+import { parse as YAMLParse } from "yaml";
 import { SmtpFlow, SmtpFlowConfig } from "./flow";
 
 export type SmtpCallback = (err?, result?) => void;
@@ -117,7 +118,13 @@ export class SmtpServer {
     if (!fs.existsSync(configFile)) {
       throw new Error(`Configuration '${configFile}' not found`);
     }
-    this.config = JSON.parse(stripJsonComments(fs.readFileSync(configFile).toString())) || {};
+    if (configFile.match(/\.jsonc?$/)) {
+      this.config = JSON.parse(stripJsonComments(fs.readFileSync(configFile).toString())) || {};
+    } else if (configFile.match(/\.ya?ml$/)) {
+      this.config = YAMLParse(fs.readFileSync(configFile).toString()) || {};
+    } else {
+      throw new Error(`Configuration format not handled ${configFile}`);
+    }
     this.config.port ??= 10025;
     this.config.bind ??= "localhost";
     this.config.cachePath ??= ".email_${iso8601}.eml";

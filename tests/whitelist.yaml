@@ -1,0 +1,16 @@
+flows:
+  localhost:
+    filters:
+      - type: whitelist
+        to:
+          - recipient@domain1.com
+      - type: whitelist
+        to:
+          - recipient@domain2.com
+    outputs:
+      - type: file
+        path: "./emails/"
+options:
+  disableReverseLookup: false
+  authOptional: true
+  logger: true
