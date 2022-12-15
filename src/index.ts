@@ -43,6 +43,12 @@ export function defaultModules() {
 /* c8 ignore start */
 // url.pathToFileURL(__filename).href for CJS
 if (import.meta.url === url.pathToFileURL(process.argv[1]).href) {
+
+  process.on("SIGINT", () => {
+    console.log("Exiting server");
+    process.exit(0);
+  });
+
   defaultModules();
   let conf;
   if (process.argv.length > 2) {
