@@ -6,6 +6,7 @@
   "files": [
     "README.md"
   ],
+  "exclude": ["dependabot"],
   "imageSize": 100,
   "commit": false,
   "commitConvention": "angular",
