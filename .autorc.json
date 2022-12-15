@@ -1,0 +1,12 @@
+{
+    "plugins": [
+        "npm",
+        "conventional-commits",
+        "released"
+    ],
+    "baseBranch": "main",
+    "prereleaseBranches": [
+        "next"
+    ],
+    "author": "GitHub Actions Bot <github-bot@loopingz.com>"
+}

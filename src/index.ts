@@ -41,11 +41,12 @@ export function defaultModules() {
 
 // Cannot really test main module
 /* c8 ignore start */
+// url.pathToFileURL(__filename).href for CJS
 if (import.meta.url === url.pathToFileURL(process.argv[1]).href) {
   defaultModules();
-  let conf = process.argv.pop();
-  if (conf === __filename) {
-    conf = undefined;
+  let conf;
+  if (process.argv.length > 2) {
+    conf = process.argv.pop();
   }
   let smtp = new SmtpServer(conf);
   smtp.init();

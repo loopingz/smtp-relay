@@ -5,6 +5,19 @@
   "bin": "lib/index.js",
   "license": "MIT",
   "type": "module",
+  "author": {
+    "name": "Remi Cattiau",
+    "email": "remi@cattiau.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/loopingz/smtp-relay"
+  },
+  "keywords": [
+    "smtp",
+    "relay",
+    "ses"
+  ],
   "dependencies": {
     "@aws-sdk/client-s3": "^3.49.0",
     "@aws-sdk/client-ses": "^3.49.0",
@@ -26,13 +39,14 @@
     "lib"
   ],
   "scripts": {
-    "build": "tsc",
-    "build:binaries": "pkg .",
+    "build": "tsc-esm",
+    "build:binaries": "esbuild ./src/index.ts --bundle --platform=node --outfile=smtp-relay.cjs && pkg smtp-relay.cjs --compress GZip -t node16-linux-x64,node16-macos-x64,node16-win-x64",
     "pretest": "npm run build",
     "lint": "prettier --check src/**/*",
     "lint:fix": "prettier --write src/**/*",
     "test": "c8 mocha --recursive --exit --timeout=6000 src/**/*.spec.ts src/*.spec.ts",
-    "server": "tsc && node lib/index.js"
+    "server": "tsc-esm && node lib/index.js",
+    "release": "yarn build && auto shipit"
   },
   "c8": {
     "report-dir": "./reports",
@@ -48,12 +62,15 @@
     "excludeNodeModules": true
   },
   "devDependencies": {
+    "@auto-it/conventional-commits": "^10.37.6",
     "@testdeck/mocha": "^0.3.3",
     "@types/mailparser": "^3.4.0",
     "@types/mocha": "^10.0.1",
     "@types/smtp-server": "^3.5.7",
     "@webda/tsc-esm": "^1.0.2",
+    "auto": "^10.37.6",
     "c8": "^7.12.0",
+    "esbuild": "^0.16.7",
     "mocha": "^10.0.0",
     "pkg": "^5.5.2",
     "prettier": "^2.5.1",
