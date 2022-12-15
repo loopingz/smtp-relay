@@ -1,6 +1,6 @@
 # smtp-relay
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-0-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 ![logo](https://raw.githubusercontent.com/loopingz/aws-smtp-relay/master/docs/aws-smtp-relay-logo.png)
@@ -160,8 +160,15 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
+<table>
+  <tr>
+    <td align="center"><a href="https://www.loopingz.com/"><img src="https://avatars.githubusercontent.com/u/3437026?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Remi Cattiau</b></sub></a><br /><a href="https://github.com/loopingz/loopingz/smtp-relay/commits?author=loopingz" title="Documentation">📖</a> <a href="https://github.com/loopingz/loopingz/smtp-relay/commits?author=loopingz" title="Code">💻</a> <a href="#infra-loopingz" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
+  </tr>
+</table>
+
 <!-- markdownlint-restore -->
 <!-- prettier-ignore-end -->
+
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!

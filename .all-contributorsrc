@@ -6,10 +6,24 @@
   "files": [
     "README.md"
   ],
-  "exclude": ["dependabot"],
+  "exclude": [
+    "dependabot"
+  ],
   "imageSize": 100,
   "commit": false,
   "commitConvention": "angular",
-  "contributors": [],
+  "contributors": [
+    {
+      "login": "loopingz",
+      "name": "Remi Cattiau",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3437026?v=4",
+      "profile": "https://www.loopingz.com/",
+      "contributions": [
+        "doc",
+        "code",
+        "infra"
+      ]
+    }
+  ],
   "contributorsPerLine": 7
 }
