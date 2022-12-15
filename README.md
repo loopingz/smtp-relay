@@ -1,7 +1,4 @@
 # smtp-relay
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 ![logo](https://raw.githubusercontent.com/loopingz/aws-smtp-relay/master/docs/aws-smtp-relay-logo.png)
 
@@ -10,6 +7,12 @@
 [![codecov](https://codecov.io/gh/loopingz/smtp-relay/branch/main/graph/badge.svg?token=8BR86VbkKf)](https://codecov.io/gh/loopingz/smtp-relay)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=loopingz_smtp-relay&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=loopingz_smtp-relay)
 ![CodeQL](https://github.com/loopingz/smtp-relay/workflows/CodeQL/badge.svg)
+
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+
+[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 This project replace a previous project `aws-smtp-relay`
 
@@ -109,10 +112,11 @@ These components decide to accept or refuse an email.
 
 At each SMTP command step, they can make a decision to refuse or accept an email or not make a decision `boolean|undefined`
 
-By default, two filters exist:
+By default, 3 filters exist:
 
 - whitelist: allow emails based on regexp or exact values
 - http-auth: proxy the decision on the email to an HTTP endpoint
+- static-auth: staticly defined user/password for authentication
 
 ### Processors
 
