@@ -64,6 +64,7 @@
   "devDependencies": {
     "@auto-it/all-contributors": "^10.37.6",
     "@auto-it/conventional-commits": "^10.37.6",
+    "@auto-it/docker": "^10.37.6",
     "@auto-it/first-time-contributor": "^10.37.6",
     "@testdeck/mocha": "^0.3.3",
     "@types/mailparser": "^3.4.0",
@@ -88,11 +89,19 @@
       "conventional-commits",
       "first-time-contributor",
       "released",
-      ["docker", { "registry": "docker.io/loopingz/smtp-relay", "tagPrereleaseAliases": true, "image": "smtp-relay:release", "tagLatest": true }]
+      [
+        "docker",
+        {
+          "registry": "docker.io/loopingz/smtp-relay",
+          "tagPrereleaseAliases": true,
+          "image": "smtp-relay:release",
+          "tagLatest": true
+        }
+      ]
     ],
     "baseBranch": "main",
     "prereleaseBranches": [
-        "next"
+      "next"
     ],
     "author": "GitHub Actions Bot <github-bot@loopingz.com>",
     "onlyPublishWithReleaseLabel": true
