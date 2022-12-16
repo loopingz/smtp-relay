@@ -86,17 +86,6 @@
     typescript-memoize "^1.0.0-alpha.3"
     url-join "^4.0.0"
 
-"@auto-it/docker@^10.37.6":
-  version "10.37.6"
-  resolved "https://registry.yarnpkg.com/@auto-it/docker/-/docker-10.37.6.tgz#ea181c6b252b81be1eac0ff127df55be0ee8ee17"
-  integrity sha512-I8X7Tc+24EcDz3D6CjtUV+B7m+b5tdVVWr9aWGj3z2fPphb7bnPvejpVfHXPgAwxmomxHGxdT9pMgzja8vNMgw==
-  dependencies:
-    "@auto-it/core" "10.37.6"
-    fp-ts "^2.5.3"
-    io-ts "^2.1.2"
-    semver "^7.0.0"
-    tslib "2.1.0"
-
 "@auto-it/first-time-contributor@^10.37.6":
   version "10.37.6"
   resolved "https://registry.yarnpkg.com/@auto-it/first-time-contributor/-/first-time-contributor-10.37.6.tgz#cbd95505de84068b0459d1ffd23a6a6a42497e9e"
@@ -4987,10 +4976,10 @@ prelude-ls@~1.1.2:
   resolved "https://registry.yarnpkg.com/prelude-ls/-/prelude-ls-1.1.2.tgz#21932a549f5e52ffd9a827f570e04be62a97da54"
   integrity sha512-ESF23V4SKG6lVSGZgYNpbsiaAkdab6ZgOxe52p7+Kid3W3u3bxR4Vfd/o21dmN7jSt0IwgZ4v5MUd26FEtXE9w==
 
-prettier-plugin-organize-imports@^2.3.4:
-  version "2.3.4"
-  resolved "https://registry.yarnpkg.com/prettier-plugin-organize-imports/-/prettier-plugin-organize-imports-2.3.4.tgz#65473861ae5ab7960439fff270a2258558fbe9ba"
-  integrity sha512-R8o23sf5iVL/U71h9SFUdhdOEPsi3nm42FD/oDYIZ2PQa4TNWWuWecxln6jlIQzpZTDMUeO1NicJP6lLn2TtRw==
+prettier-plugin-organize-imports@^3.2.1:
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/prettier-plugin-organize-imports/-/prettier-plugin-organize-imports-3.2.1.tgz#7e0e0a18457e0166e740daaff1aed1c08069fcb9"
+  integrity sha512-bty7C2Ecard5EOXirtzeCAqj4FU4epeuWrQt/Z+sh8UVEpBlBZ3m3KNPz2kFu7KgRTQx/C9o4/TdquPD1jOqjQ==
 
 prettier@^2.5.1:
   version "2.8.1"
