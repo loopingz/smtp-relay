@@ -1,3 +1,16 @@
+# v1.0.2 (Fri Dec 16 2022)
+
+#### 🐛 Bug Fix
+
+- ci: publish version w/o release label [#40](https://github.com/loopingz/smtp-relay/pull/40) ([@loopingz](https://github.com/loopingz))
+- fix: use deploykey instead of gh actions creds for push [#39](https://github.com/loopingz/smtp-relay/pull/39) ([@loopingz](https://github.com/loopingz))
+
+#### Authors: 1
+
+- Remi Cattiau ([@loopingz](https://github.com/loopingz))
+
+---
+
 # v1.0.1 (Thu Dec 15 2022)
 
 #### 🐛 Bug Fix
