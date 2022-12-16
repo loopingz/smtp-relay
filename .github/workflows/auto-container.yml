@@ -1,9 +1,10 @@
-name: Publish Docker
+name: Publish Container
 
 on:
   push:
     tags:
       - "*"
+  workflow_dispatch:
 
 jobs:
   publish:
