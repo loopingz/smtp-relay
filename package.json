@@ -94,6 +94,6 @@
       "next"
     ],
     "author": "GitHub Actions Bot <github-bot@loopingz.com>",
-    "onlyPublishWithReleaseLabel": true
+    "onlyPublishWithReleaseLabel": false
   }
 }
