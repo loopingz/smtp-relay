@@ -8,3 +8,5 @@ updates:
       # Ignore updates to @types/node as we want support for NodeJS LTS
       - dependency-name: "@types/node"
       - dependency-name: "strip-json-comments"
+    # Disable version updates for npm dependencies - keep only security updates
+    open-pull-requests-limit: 0

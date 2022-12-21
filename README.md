@@ -20,7 +20,14 @@ Or simulate some Incoming capabilities of AWS SES, like `mail2s3` or `mail2sqs` 
 
 ## Quick Start
 
+
 ### Replace aws-smtp-relay
+
+Docker command
+
+```
+docker run -p 10025:10025 loopingz/smtp-relay:latest configs/aws-smtp-relay.jsonc
+```
 
 Run with a configuration file:
 
@@ -92,7 +99,9 @@ Run with a configuration file:
 You can just leveraging the Docker image
 
 ```
-docker run -p 10025:10025 -v `pwd`/emails:/smtp-relay/received_emails ./configs/fake-smtp.jsonc
+docker run -p 10025:10025 -v `pwd`/emails:/smtp-relay/received_emails loopingz/smtp-relay:latest ./configs/fake-smtp.jsonc
+# With auth
+docker run -e SMTP_USERNAME=test -e SMTP_PASSWORD=plain:test -p 10025:10025 -v `pwd`/emails:/smtp-relay/received-emails loopingz/smtp-relay:latest configs/fake-smtp-with-auth.jsonc
 ```
 
 ## Concepts

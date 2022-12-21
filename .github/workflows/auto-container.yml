@@ -10,7 +10,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
 
-    name: Make a release and publish to NPM
+    name: Build multi-arch docker and push
     steps:
       - uses: actions/checkout@v3
         with:
