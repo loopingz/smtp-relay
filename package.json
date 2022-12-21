@@ -19,7 +19,7 @@
     "ses"
   ],
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.234.0",
+    "@aws-sdk/client-s3": "^3.235.0",
     "@aws-sdk/client-ses": "^3.234.0",
     "@aws-sdk/client-sqs": "^3.235.0",
     "@aws-sdk/client-sts": "^3.49.0",
