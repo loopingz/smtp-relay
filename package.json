@@ -21,7 +21,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.234.0",
     "@aws-sdk/client-ses": "^3.234.0",
-    "@aws-sdk/client-sqs": "^3.234.0",
+    "@aws-sdk/client-sqs": "^3.235.0",
     "@aws-sdk/client-sts": "^3.49.0",
     "@google-cloud/pubsub": "^3.1.0",
     "@google-cloud/storage": "^6.4.1",
