@@ -1,3 +1,15 @@
+# v1.2.1 (Wed Jan 25 2023)
+
+#### 🐛 Bug Fix
+
+- fix: add default CONSOLE logger [#56](https://github.com/loopingz/smtp-relay/pull/56) ([@loopingz](https://github.com/loopingz))
+
+#### Authors: 1
+
+- Remi Cattiau ([@loopingz](https://github.com/loopingz))
+
+---
+
 # v1.2.0 (Wed Jan 25 2023)
 
 #### 🚀 Enhancement
