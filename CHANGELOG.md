@@ -1,3 +1,22 @@
+# v1.2.0 (Wed Jan 25 2023)
+
+#### 🚀 Enhancement
+
+- ci: update json schema prior to release [#55](https://github.com/loopingz/smtp-relay/pull/55) ([@loopingz](https://github.com/loopingz))
+- feat: add verbose log (Close #36) [#55](https://github.com/loopingz/smtp-relay/pull/55) ([@loopingz](https://github.com/loopingz))
+- feat: add json schema for config file [#55](https://github.com/loopingz/smtp-relay/pull/55) ([@loopingz](https://github.com/loopingz))
+- feat: add prometheus support (Close #52) [#55](https://github.com/loopingz/smtp-relay/pull/55) ([@loopingz](https://github.com/loopingz))
+
+#### 🐛 Bug Fix
+
+- fix: prometheus coverage [#55](https://github.com/loopingz/smtp-relay/pull/55) ([@loopingz](https://github.com/loopingz))
+
+#### Authors: 1
+
+- Remi Cattiau ([@loopingz](https://github.com/loopingz))
+
+---
+
 # v1.1.0 (Wed Jan 25 2023)
 
 #### 🚀 Enhancement
