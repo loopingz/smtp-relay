@@ -1,7 +1,9 @@
 import { ConsoleLogger, FileLogger, WorkerLogLevel, WorkerOutput } from "@webda/workout";
 import * as fs from "fs";
+import * as http from "http";
 import { AddressObject, ParsedMail, simpleParser } from "mailparser";
 import * as path from "path";
+import { collectDefaultMetrics, Counter, register } from "prom-client";
 import {
   SMTPServer,
   SMTPServerAddress,
@@ -33,6 +35,10 @@ export interface FileLoggerOptions extends LoggerOptions {
 
 export interface SmtpConfig {
   /**
+   * @pattern https:\/\/raw\.githubusercontent\.com\/loopingz\/smtp-relay\/(main|v\d+\.\d+\.\d+)\/config\.schema\.json
+   */
+  $schema: string;
+  /**
    * Define email flows
    */
   flows: { [key: string]: SmtpFlowConfig };
@@ -62,7 +68,32 @@ export interface SmtpConfig {
         options.socketTimeout how many milliseconds of inactivity to allow before disconnecting the client (defaults to 1 minute)
         options.closeTimeout how many milliseconds to wait before disconnecting pending connections once server.close() has been called (defaults to 30 seconds)
    */
-  options: Omit<SMTPServerOptions, "logger"> & { loggers?: (ConsoleLoggerOptions | FileLoggerOptions)[] };
+  options: Pick<
+    SMTPServerOptions,
+    | "secure"
+    | "name"
+    | "banner"
+    | "size"
+    | "disabledCommands"
+    | "hide8BITMIME"
+    | "hidePIPELINING"
+    | "hideSMTPUTF8"
+    | "hideSTARTTLS"
+    | "allowInsecureAuth"
+    | "closeTimeout"
+    | "socketTimeout"
+    | "lmtp"
+    | "useXForward"
+    | "useXClient"
+    | "useProxy"
+    | "maxClients"
+    | "maxVersion"
+    | "authMethods"
+    | "authOptional"
+    | "disableReverseLookup"
+  > & {
+    loggers?: (ConsoleLoggerOptions | FileLoggerOptions)[];
+  };
   /**
    * @default 10025
    */
@@ -79,6 +110,32 @@ export interface SmtpConfig {
    * @default false
    */
   keepCache?: boolean;
+  /**
+   * Configure prometheus metrics
+   */
+  prometheus?: {
+    /**
+     * Port to bind to serve prometheus metrics
+     */
+    portNumber: number;
+    /**
+     * Url to use
+     * @default /metrics
+     */
+    url?: string;
+    /**
+     * Collect node metrics
+     */
+    nodeMetrics?: boolean;
+    /**
+     * Default labels to add to prometheus
+     */
+    defaultLabels?: { [key: string]: string };
+    /**
+     * Bind to a specific address
+     */
+    bind?: string;
+  };
 }
 
 /**
@@ -126,6 +183,8 @@ export class SmtpServer {
   config: SmtpConfig;
   flows: { [key: string]: SmtpFlow };
   logger: WorkerOutput;
+  counter?: Counter;
+  promServer: http.Server<typeof http.IncomingMessage, typeof http.ServerResponse>;
 
   constructor(configFile: string = undefined) {
     if (!configFile) {
@@ -146,6 +205,29 @@ export class SmtpServer {
     this.config.cachePath ??= ".email_${iso8601}.eml";
     this.config.options ??= {};
     this.config.options.loggers ??= [];
+    if (this.config.prometheus) {
+      register.setDefaultLabels(this.config.prometheus.defaultLabels || {});
+      if (this.config.prometheus.nodeMetrics) {
+        collectDefaultMetrics();
+      }
+      this.config.prometheus.url ??= "/metrics";
+      this.counter = new Counter({
+        name: "smtp-relay-emails",
+        labelNames: ["flow", "status", "output"],
+        help: "Emails counter"
+      });
+      this.promServer = http
+        .createServer(async (req, res) => {
+          if (req.method === "GET" && req.url === this.config.prometheus.url) {
+            res.writeHead(200, { "Content-Type": register.contentType });
+            res.write(await register.metrics());
+            res.end();
+          }
+          res.writeHead(404);
+          res.end();
+        })
+        .listen(this.config.prometheus.portNumber, this.config.prometheus.bind);
+    }
     this.logger = new WorkerOutput();
     fs.mkdirSync(path.dirname(this.config.cachePath), { recursive: true });
     this.flows = {};
@@ -347,21 +429,24 @@ export class SmtpServer {
    * @param session
    */
   async onDataRead(session: SmtpSession) {
-    try {
-      for (let name in session.flows) {
-        let flow = this.flows[name];
-        for (let output of flow.outputs) {
-          console.log(`Output[${output.name}] triggered`);
+    for (let name in session.flows) {
+      let flow = this.flows[name];
+      this.counter.inc({ status: "accepted", flow: name });
+      for (let output of flow.outputs) {
+        console.log(`Output[${output.name}] triggered`);
+        try {
           await output.onMail(session);
+        } catch (err) {
+          flow.logger.log("ERROR", err);
+          this.counter.inc({ status: "error", flow: name, output: output.name });
         }
       }
-    } catch (err) {
-      console.error(err);
     }
   }
 
   manageCallback(session: SmtpSession, callback: SmtpCallback) {
     if (Object.keys(session.flows).length === 0) {
+      this.counter.inc({ status: "rejected" });
       callback(new Error("Message refused"));
     } else {
       callback();
