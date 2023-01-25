@@ -9,7 +9,9 @@
 ![CodeQL](https://github.com/loopingz/smtp-relay/workflows/CodeQL/badge.svg)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+
 [![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 This project replace a previous project `aws-smtp-relay`
@@ -19,7 +21,6 @@ Or relay a SMTP protocol to an SES API call (goal of `aws-smtp-relay`)
 Or simulate some Incoming capabilities of AWS SES, like `mail2s3` or `mail2sqs` and similar `mail2gcpstorage` and `mail2gcppubsub`
 
 ## Quick Start
-
 
 ### Replace aws-smtp-relay
 
@@ -56,7 +57,17 @@ Run with a configuration file:
     "disableReverseLookup": false,
     // Do not require auth
     "authOptional": true,
-    "logger": true
+    "loggers": [
+      {
+        "level": "INFO",
+        "type": "CONSOLE"
+      },
+      {
+        "level": "INFO",
+        "type": "FILE",
+        "filepath": "./smtp.log"
+      }
+    ]
   }
 }
 ```
@@ -88,8 +99,7 @@ Run with a configuration file:
   "options": {
     "disableReverseLookup": false,
     // Do not require auth
-    "authOptional": true,
-    "logger": true
+    "authOptional": true
   }
 }
 ```
@@ -163,6 +173,33 @@ _messageId_: Message id
 _subject_: subject of the email
 
 _to_: list of recipient comma separated
+
+## Logs
+
+You can define log configuration with the loggers definition.
+
+We currently support "CONSOLE" or "FILE"
+
+```
+"loggers": [
+  {
+    "level": "INFO",
+    "type": "CONSOLE"
+  },
+  {
+    "level": "INFO",
+    "type": "FILE",
+    "filepath": "./smtp.log",
+    "sizeLimit": 50000000
+  }
+]
+```
+
+From the library `@webda/workout`, the loglevel if not defined fallback to the `LOG_LEVEL` environment variable and then fallback again to `INFO`
+
+The `FILE` type have a size limit defined and will increment a number at the end of the filepath if needed. It has a default sizeLimit define by the library.
+
+A `format` can be defined too
 
 ## Contributors ✨
 

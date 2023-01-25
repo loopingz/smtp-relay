@@ -1,4 +1,5 @@
 import { suite, test } from "@testdeck/mocha";
+import { WorkerOutput } from "@webda/workout";
 import * as assert from "assert";
 import { Socket } from "net";
 import * as sinon from "sinon";
@@ -125,11 +126,15 @@ export class SmtpTest {
 class CountFilter extends SmtpFilter {
   type: string = "count";
   stats: { [key: string]: number };
-  constructor(flow: SmtpFlow) {
-    super(flow, {
-      name: "",
-      type: "count"
-    });
+  constructor(flow: SmtpFlow, _: void, logger: WorkerOutput) {
+    super(
+      flow,
+      {
+        name: "",
+        type: "count"
+      },
+      logger
+    );
     this.stats = {};
     ["Connect", "Data", "RcptTo", "MailFrom", "Auth"].forEach(m => {
       m = `on${m}`;

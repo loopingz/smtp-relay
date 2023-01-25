@@ -19,6 +19,12 @@
   "options": {
     "disableReverseLookup": false,
     "authOptional": true,
-    "logger": true
+    "loggers": [
+      {
+        "type": "CONSOLE",
+        "level": "WARN"
+      },
+      { "type": "FILE", "filepath": "./test.log", "level": "TRACE" }
+    ]
   }
 }

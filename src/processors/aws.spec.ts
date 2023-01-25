@@ -1,4 +1,5 @@
 import { suite, test } from "@testdeck/mocha";
+import { WorkerOutput } from "@webda/workout";
 import * as assert from "assert";
 import * as fs from "fs";
 import * as sinon from "sinon";
@@ -23,7 +24,7 @@ class AWSProcessorTest {
 
   @test
   async pubsub() {
-    let aws = new AWSProcessor(undefined, { type: "aws", pubsub: { topic: "test" } });
+    let aws = new AWSProcessor(undefined, { type: "aws", pubsub: { topic: "test" } }, new WorkerOutput());
     let session: SmtpSession = getFakeSession();
     let evt;
     sinon.stub(aws.sqs, "sendMessage").callsFake(data => {
@@ -35,10 +36,14 @@ class AWSProcessorTest {
 
   @test
   async storage() {
-    let aws: AWSProcessor = new AWSProcessor(undefined, {
-      type: "aws",
-      storage: { bucket: "test", path: "${id}.eml" }
-    });
+    let aws: AWSProcessor = new AWSProcessor(
+      undefined,
+      {
+        type: "aws",
+        storage: { bucket: "test", path: "${id}.eml" }
+      },
+      new WorkerOutput()
+    );
     let session: SmtpSession = getFakeSession();
     let cmd;
     // Test raw
@@ -62,10 +67,14 @@ class AWSProcessorTest {
 
   @test
   async ses() {
-    let aws: AWSProcessor = new AWSProcessor(undefined, {
-      type: "aws",
-      ses: true
-    });
+    let aws: AWSProcessor = new AWSProcessor(
+      undefined,
+      {
+        type: "aws",
+        ses: true
+      },
+      new WorkerOutput()
+    );
     let session: SmtpSession = getFakeSession();
     let cmd;
     // Test raw

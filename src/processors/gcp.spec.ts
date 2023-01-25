@@ -1,4 +1,5 @@
 import { suite, test } from "@testdeck/mocha";
+import { WorkerOutput } from "@webda/workout";
 import * as assert from "assert";
 import { Attachment } from "mailparser";
 import * as sinon from "sinon";
@@ -23,7 +24,7 @@ class GCPProcessorTest {
 
   @test
   async pubsub() {
-    let gcp = new GCPProcessor(undefined, { type: "gcp", pubsub: { topic: "test" } });
+    let gcp = new GCPProcessor(undefined, { type: "gcp", pubsub: { topic: "test" } }, new WorkerOutput());
     let session: SmtpSession = getFakeSession();
     let evt;
     sinon.stub(gcp.pubsub, "topic").callsFake(() => {
@@ -39,10 +40,14 @@ class GCPProcessorTest {
 
   @test
   async storage() {
-    let gcp: GCPProcessor = new GCPProcessor(undefined, {
-      type: "gcp",
-      storage: { bucket: "test", path: "${id}.eml" }
-    });
+    let gcp: GCPProcessor = new GCPProcessor(
+      undefined,
+      {
+        type: "gcp",
+        storage: { bucket: "test", path: "${id}.eml" }
+      },
+      new WorkerOutput()
+    );
     let session: SmtpSession = getFakeSession();
     let filename;
     let destination;

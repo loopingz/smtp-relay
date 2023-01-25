@@ -1,3 +1,4 @@
+import { WorkerOutput } from "@webda/workout";
 import { SMTPServerAddress, SMTPServerAuthentication } from "smtp-server";
 import { SmtpComponent, SmtpComponentConfig } from "./component";
 import { SmtpFlow } from "./flow";
@@ -7,6 +8,7 @@ export class SmtpFilter<T extends SmtpComponentConfig = SmtpComponentConfig> ext
   name: string;
   flow: SmtpFlow;
   config: T;
+  logger: WorkerOutput;
 
   async onAuth(_auth: SMTPServerAuthentication, _session: SmtpSession): Promise<boolean | undefined> {
     return undefined;
@@ -34,7 +36,7 @@ export class SmtpFilter<T extends SmtpComponentConfig = SmtpComponentConfig> ext
     if (!SmtpFilter.registry[config.type]) {
       throw new Error(`${config.type} is an unknown filter type`);
     }
-    return new SmtpFilter.registry[config.type](flow, config);
+    return new SmtpFilter.registry[config.type](flow, config, flow.logger);
   }
 
   getState(session: SmtpSession) {

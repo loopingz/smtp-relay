@@ -1,4 +1,5 @@
 import { suite, test } from "@testdeck/mocha";
+import { WorkerOutput } from "@webda/workout";
 import * as assert from "assert";
 import { SmtpFlow } from "../flow";
 import { StaticAuthFilter } from "./static-auth";
@@ -7,15 +8,16 @@ import { StaticAuthFilter } from "./static-auth";
 class StaticSmtpServerTest {
   @test
   async cov() {
-    const flow = new SmtpFlow("test", { outputs: [] });
+    const logger = new WorkerOutput();
+    const flow = new SmtpFlow("test", { outputs: [] }, logger);
     let filter: StaticAuthFilter;
-    assert.throws(() => new StaticAuthFilter(flow, { type: "static-auth" }), /requires to have authentication/);
+    assert.throws(() => new StaticAuthFilter(flow, { type: "static-auth" }, logger), /requires to have authentication/);
     process.env.SMTP_USERNAME = "test";
-    assert.throws(() => new StaticAuthFilter(flow, { type: "static-auth" }), /requires to have authentication/);
+    assert.throws(() => new StaticAuthFilter(flow, { type: "static-auth" }, logger), /requires to have authentication/);
     process.env.SMTP_PASSWORD = "test";
-    assert.throws(() => new StaticAuthFilter(flow, { type: "static-auth" }), /do not recognize hash/);
+    assert.throws(() => new StaticAuthFilter(flow, { type: "static-auth" }, logger), /do not recognize hash/);
     process.env.SMTP_PASSWORD = "plain:test";
-    filter = new StaticAuthFilter(flow, { type: "static-auth" });
+    filter = new StaticAuthFilter(flow, { type: "static-auth" }, logger);
     assert.ok(!(await filter.onAuth({ method: "LOGIN", validatePassword: () => false })));
     assert.ok(
       !(await filter.onAuth({ method: "LOGIN", username: "test", password: "plop", validatePassword: () => false }))
