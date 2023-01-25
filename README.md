@@ -9,7 +9,9 @@
 ![CodeQL](https://github.com/loopingz/smtp-relay/workflows/CodeQL/badge.svg)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+
 [![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 This project replace a previous project `aws-smtp-relay`
@@ -209,6 +211,8 @@ From the library `@webda/workout`, the loglevel if not defined fallback to the `
 The `FILE` type have a size limit defined and will increment a number at the end of the filepath if needed. It has a default sizeLimit define by the library.
 
 A `format` can be defined too
+
+By default the loggers are defined as a single `CONSOLE` logger. You can disable completely by adding a `loggers: []` property
 
 ## Contributors ✨
 

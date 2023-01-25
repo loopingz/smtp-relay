@@ -23,11 +23,6 @@
     "disableReverseLookup": false,
     "hideSTARTTLS": true,
     // Do not require auth
-    "authOptional": true,
-    "loggers": [
-      {
-        "type": "CONSOLE"
-      }
-    ]
+    "authOptional": true
   }
 }
