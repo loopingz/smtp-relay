@@ -20,12 +20,7 @@
   },
   "options": {
     "disableReverseLookup": false,
-    "allowInsecureAuth": true,
-    "loggers": [
-      {
-        "type": "CONSOLE"
-      }
-    ]
+    "allowInsecureAuth": true
   }
 }
     

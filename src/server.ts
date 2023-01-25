@@ -204,7 +204,8 @@ export class SmtpServer {
     this.config.bind ??= "localhost";
     this.config.cachePath ??= ".email_${iso8601}.eml";
     this.config.options ??= {};
-    this.config.options.loggers ??= [];
+    // Default to console
+    this.config.options.loggers ??= [{ type: "CONSOLE" }];
     if (this.config.prometheus) {
       register.setDefaultLabels(this.config.prometheus.defaultLabels || {});
       if (this.config.prometheus.nodeMetrics) {
