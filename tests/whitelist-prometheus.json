@@ -1,0 +1,34 @@
+{
+  "$schema": "https://raw.githubusercontent.com/loopingz/smtp-relay/main/config.schema.json",
+  "flows": {
+    "localhost": {
+      "filters": [
+        {
+          "type": "whitelist",
+          "to": ["recipient@domain1.com", "regexp:.*@domain2.com"],
+          "from": ["regexp:^.*@smtp-relay.com$"]
+        }
+      ],
+      "outputs": [
+        {
+          "type": "file",
+          "path": "./emails/"
+        }
+      ]
+    }
+  },
+  "options": {
+    "disableReverseLookup": false,
+    "authOptional": true,
+    "loggers": [
+      {
+        "type": "CONSOLE",
+        "level": "WARN"
+      }
+    ]
+  },
+  "prometheus": {
+    "portNumber": 8080,
+    "nodeMetrics": true
+  }
+}
