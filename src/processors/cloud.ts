@@ -79,20 +79,20 @@ export abstract class CloudProcessor<T extends CloudProcessorConfig = CloudProce
   async store(session: SmtpSession) {
     if (this.config.storage.type === "attachments") {
       if (session.email.attachments.length === 0) {
-        console.log(`Output[${this.name}] No attachment ignoring ${session.email.messageId}`);
+        this.logger.log("INFO", `Output[${this.name}] No attachment ignoring ${session.email.messageId}`);
       }
       for (const i in session.email.attachments) {
         const attachment = session.email.attachments[i];
         const destFileName = SmtpServer.replaceVariables(this.config.storage.path, session, {
           attachment: attachment.filename || `attachment_${i}`
         });
-        console.log(`Output[${this.name}] Storing attachment ${attachment.filename} to ${destFileName}`);
+        this.logger.log("INFO", `Output[${this.name}] Storing attachment ${attachment.filename} to ${destFileName}`);
         await this.storeData(destFileName, attachment.content);
       }
     } else {
       const destFileName = SmtpServer.replaceVariables(this.config.storage.path, session);
       if (this.config.storage.type === "raw") {
-        console.log(`Output[${this.name}] Storing ${this.config.type} to ${destFileName}`);
+        this.logger.log("INFO", `Output[${this.name}] Storing ${this.config.type} to ${destFileName}`);
         await this.storeFile(destFileName, session.emailPath);
       } else {
         let data: string;
@@ -102,10 +102,13 @@ export abstract class CloudProcessor<T extends CloudProcessorConfig = CloudProce
           data = session.email.html;
         }
         if (data) {
-          console.log(`Output[${this.name}] Storing ${this.config.storage.type} to ${destFileName}`);
+          this.logger.log("INFO", `Output[${this.name}] Storing ${this.config.storage.type} to ${destFileName}`);
           await this.storeData(destFileName, data);
         } else {
-          console.log(`Output[${this.name}] No data(${this.config.storage.type}) ignoring ${session.email.messageId}`);
+          this.logger.log(
+            "DEBUG",
+            `Output[${this.name}] No data(${this.config.storage.type}) ignoring ${session.email.messageId}`
+          );
         }
       }
     }

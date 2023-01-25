@@ -1,3 +1,4 @@
+import { WorkerOutput } from "@webda/workout";
 import { SmtpComponentConfig } from "./component";
 import { SmtpFilter } from "./filter";
 import { SmtpProcessor } from "./processor";
@@ -48,7 +49,7 @@ export class SmtpFlow {
    */
   name: string;
 
-  constructor(name: string, config: SmtpFlowConfig) {
+  constructor(name: string, config: SmtpFlowConfig, public logger: WorkerOutput) {
     this.name = name;
     this.config = config;
     config.filtersOperator ??= "AND";

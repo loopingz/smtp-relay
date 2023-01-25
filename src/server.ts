@@ -1,3 +1,4 @@
+import { ConsoleLogger, FileLogger, WorkerLogLevel, WorkerOutput } from "@webda/workout";
 import * as fs from "fs";
 import { AddressObject, ParsedMail, simpleParser } from "mailparser";
 import * as path from "path";
@@ -15,6 +16,20 @@ import { SmtpFlow, SmtpFlowConfig } from "./flow";
 
 export type SmtpCallback = (err?, result?) => void;
 export type SmtpNext = () => void;
+
+export interface LoggerOptions {
+  level?: WorkerLogLevel;
+  format?: string;
+}
+export interface ConsoleLoggerOptions extends LoggerOptions {
+  type: "CONSOLE";
+}
+
+export interface FileLoggerOptions extends LoggerOptions {
+  type: "FILE";
+  filepath: string;
+  sizeLimit: number;
+}
 
 export interface SmtpConfig {
   /**
@@ -47,7 +62,7 @@ export interface SmtpConfig {
         options.socketTimeout how many milliseconds of inactivity to allow before disconnecting the client (defaults to 1 minute)
         options.closeTimeout how many milliseconds to wait before disconnecting pending connections once server.close() has been called (defaults to 30 seconds)
    */
-  options: SMTPServerOptions;
+  options: Omit<SMTPServerOptions, "logger"> & { loggers?: (ConsoleLoggerOptions | FileLoggerOptions)[] };
   /**
    * @default 10025
    */
@@ -110,6 +125,7 @@ export class SmtpServer {
   server: SMTPServer;
   config: SmtpConfig;
   flows: { [key: string]: SmtpFlow };
+  logger: WorkerOutput;
 
   constructor(configFile: string = undefined) {
     if (!configFile) {
@@ -128,17 +144,31 @@ export class SmtpServer {
     this.config.port ??= 10025;
     this.config.bind ??= "localhost";
     this.config.cachePath ??= ".email_${iso8601}.eml";
+    this.config.options ??= {};
+    this.config.options.loggers ??= [];
+    this.logger = new WorkerOutput();
     fs.mkdirSync(path.dirname(this.config.cachePath), { recursive: true });
     this.flows = {};
     for (let i in this.config.flows) {
-      this.flows[i] = new SmtpFlow(i, this.config.flows[i]);
+      this.flows[i] = new SmtpFlow(i, this.config.flows[i], this.logger);
     }
   }
 
   init() {
+    this.config.options.loggers.forEach(logger => {
+      if (logger.type === "CONSOLE") {
+        new ConsoleLogger(this.logger, logger.level, logger.format);
+      } else if (logger.type === "FILE") {
+        new FileLogger(this.logger, logger.level, logger.filepath, logger.sizeLimit, logger.format);
+      }
+    });
+
+    const logger = this.logger.getBunyanLogger();
     this.server = new SMTPServer({
       banner: "loopingz/smtp-relay",
       ...this.config.options,
+      // We move SMTPServer log INFO level to DEBUG as it is very verbose
+      logger: this.config.options.loggers.length > 0 ? { ...logger, info: logger.debug, level: () => {} } : false,
       onAuth: (auth: SMTPServerAuthentication, session: SmtpSession, callback: SmtpCallback) =>
         this.onAuth(auth, session, callback),
       onConnect: (session: SmtpSession, callback: SmtpCallback) => this.onConnect(session, callback),
@@ -152,7 +182,7 @@ export class SmtpServer {
 
     /* c8 ignore next 3 */
     this.server.on("error", err => {
-      console.log("Error %s", err.message);
+      this.logger.log("ERROR", err.message);
     });
     this.server.listen(this.config.port);
   }

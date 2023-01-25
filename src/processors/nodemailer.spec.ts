@@ -1,4 +1,5 @@
 import { suite, test } from "@testdeck/mocha";
+import { WorkerOutput } from "@webda/workout";
 import * as assert from "assert";
 import { HeaderValue } from "mailparser";
 import * as sinon from "sinon";
@@ -10,18 +11,22 @@ import { NodeMailerProcessor } from "./nodemailer";
 class NodeMailerProcessorTest {
   @test
   async mailer() {
-    let nodemailer = new NodeMailerProcessor(undefined, {
-      type: "nodemailer",
-      nodemailer: {
-        host: "smtp.example.com",
-        port: 587,
-        secure: false, // upgrade later with STARTTLS
-        auth: {
-          user: "username",
-          pass: "password"
+    let nodemailer = new NodeMailerProcessor(
+      undefined,
+      {
+        type: "nodemailer",
+        nodemailer: {
+          host: "smtp.example.com",
+          port: 587,
+          secure: false, // upgrade later with STARTTLS
+          auth: {
+            user: "username",
+            pass: "password"
+          }
         }
-      }
-    });
+      },
+      new WorkerOutput()
+    );
 
     let session: SmtpSession = getFakeSession();
     let msg;

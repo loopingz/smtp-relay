@@ -22,7 +22,11 @@
     "disableReverseLookup": false,
     // Do not require auth
     "authOptional": true,
-    "logger": true
+    "loggers": [
+      {
+        "type": "CONSOLE"
+      }
+    ]
   }
 }
   

@@ -1,3 +1,4 @@
+import { WorkerOutput } from "@webda/workout";
 import { SmtpFlow } from "./flow";
 
 /**
@@ -10,13 +11,9 @@ export interface SmtpComponentConfig {
 
 export class SmtpComponent<T extends SmtpComponentConfig = SmtpComponentConfig> {
   name: string;
-  flow: SmtpFlow;
-  config: T;
 
-  constructor(flow: SmtpFlow, config: T) {
+  constructor(public flow: SmtpFlow, public config: T, public logger: WorkerOutput) {
     this.name = config.name;
-    this.config = config;
-    this.flow = flow;
     this.init();
   }
 
