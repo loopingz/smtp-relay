@@ -1,0 +1,2419 @@
+{
+  "$ref": "#/definitions/SmtpConfig",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "AWSProcessorConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "pubsub": {
+          "additionalProperties": false,
+          "description": "Publish a cloudevent on the topic of Google PubSub if set",
+          "properties": {
+            "topic": {
+              "description": "Topic to use for publishing",
+              "type": "string"
+            },
+            "truncate": {
+              "default": 8192,
+              "description": "Define the maximum size for subject,html,text",
+              "type": "number"
+            }
+          },
+          "required": [
+            "topic"
+          ],
+          "type": "object"
+        },
+        "putOptions": {
+          "$ref": "#/definitions/PutObjectCommandInput"
+        },
+        "s3client": {},
+        "sendMessageOptions": {
+          "$ref": "#/definitions/SendMessageCommandInput"
+        },
+        "sendRawEmailOptions": {
+          "$ref": "#/definitions/SendRawEmailCommandInput"
+        },
+        "ses": {
+          "type": "boolean"
+        },
+        "sesClient": {},
+        "sqsclient": {},
+        "storage": {
+          "additionalProperties": false,
+          "description": "Store email or part of email within a Google Storage",
+          "properties": {
+            "bucket": {
+              "description": "Bucket name",
+              "type": "string"
+            },
+            "path": {
+              "description": "Path on this bucket",
+              "type": "string"
+            },
+            "type": {
+              "default": "raw",
+              "description": "Part of the email to save\n\nraw: the whole email as received by our SMTP attachments: any files attached to the email, ignoring emails without attachments text: The text content of the email if it exists html: The html content of the email if it exists",
+              "enum": [
+                "raw",
+                "attachments",
+                "text",
+                "html"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "bucket",
+            "path"
+          ],
+          "type": "object"
+        },
+        "type": {
+          "const": "aws",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "type": "object"
+    },
+    "ChecksumAlgorithm": {
+      "enum": [
+        "CRC32",
+        "CRC32C",
+        "SHA1",
+        "SHA256"
+      ],
+      "type": "string"
+    },
+    "ConsoleLoggerOptions": {
+      "additionalProperties": false,
+      "properties": {
+        "format": {
+          "type": "string"
+        },
+        "level": {
+          "$ref": "#/definitions/WorkerLogLevel"
+        },
+        "type": {
+          "const": "CONSOLE",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "type": "object"
+    },
+    "DKIM.MultipleKeysOptions": {
+      "additionalProperties": false,
+      "properties": {
+        "cacheDir": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "const": false,
+              "type": "boolean"
+            }
+          ],
+          "description": "optional location for cached messages. If not set then caching is not used."
+        },
+        "cacheTreshold": {
+          "description": "optional size in bytes, if message is larger than this treshold it gets cached to disk (assuming cacheDir is set and writable). Defaults to 131072 (128 kB).",
+          "type": "number"
+        },
+        "hashAlgo": {
+          "description": "optional algorithm for the body hash, defaults to ‘sha256’",
+          "type": "string"
+        },
+        "headerFieldNames": {
+          "description": "an optional colon separated list of header keys to sign (eg. message-id:date:from:to...')",
+          "type": "string"
+        },
+        "keys": {
+          "description": "is an optional array of key objects (domainName, keySelector, privateKey) if you want to add more than one signature to the message. If this value is set then the default key values are ignored",
+          "items": {
+            "$ref": "#/definitions/DKIM.SingleKeyOptions"
+          },
+          "type": "array"
+        },
+        "skipFields": {
+          "description": "optional colon separated list of header keys not to sign. This is useful if you want to sign all the relevant keys but your provider changes some values, ie Message-ID and Date. In this case you should use 'message-id:date' to prevent signing these values.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "keys"
+      ],
+      "type": "object"
+    },
+    "DKIM.Options": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/DKIM.SingleKeyOptions"
+        },
+        {
+          "$ref": "#/definitions/DKIM.MultipleKeysOptions"
+        }
+      ]
+    },
+    "DKIM.SingleKeyOptions": {
+      "additionalProperties": false,
+      "properties": {
+        "cacheDir": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "const": false,
+              "type": "boolean"
+            }
+          ],
+          "description": "optional location for cached messages. If not set then caching is not used."
+        },
+        "cacheTreshold": {
+          "description": "optional size in bytes, if message is larger than this treshold it gets cached to disk (assuming cacheDir is set and writable). Defaults to 131072 (128 kB).",
+          "type": "number"
+        },
+        "domainName": {
+          "description": "is the domain name to use in the signature",
+          "type": "string"
+        },
+        "hashAlgo": {
+          "description": "optional algorithm for the body hash, defaults to ‘sha256’",
+          "type": "string"
+        },
+        "headerFieldNames": {
+          "description": "an optional colon separated list of header keys to sign (eg. message-id:date:from:to...')",
+          "type": "string"
+        },
+        "keySelector": {
+          "description": "is the DKIM key selector",
+          "type": "string"
+        },
+        "privateKey": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "key": {
+                  "type": "string"
+                },
+                "passphrase": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "key",
+                "passphrase"
+              ],
+              "type": "object"
+            }
+          ],
+          "description": "is the private key for the selector in PEM format"
+        },
+        "skipFields": {
+          "description": "optional colon separated list of header keys not to sign. This is useful if you want to sign all the relevant keys but your provider changes some values, ie Message-ID and Date. In this case you should use 'message-id:date' to prevent signing these values.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "domainName",
+        "keySelector",
+        "privateKey"
+      ],
+      "type": "object"
+    },
+    "FileLoggerOptions": {
+      "additionalProperties": false,
+      "properties": {
+        "filepath": {
+          "type": "string"
+        },
+        "format": {
+          "type": "string"
+        },
+        "level": {
+          "$ref": "#/definitions/WorkerLogLevel"
+        },
+        "sizeLimit": {
+          "type": "number"
+        },
+        "type": {
+          "const": "FILE",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "filepath",
+        "sizeLimit"
+      ],
+      "type": "object"
+    },
+    "FileProcessorConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "filename": {
+          "default": "`${iso8601}.eml`",
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "path": {
+          "description": "Where to store the files",
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "type"
+      ],
+      "type": "object"
+    },
+    "GCPProcessorConfig": {
+      "additionalProperties": false,
+      "description": "Configuration for GCPProcessor",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "pubsub": {
+          "additionalProperties": false,
+          "description": "Publish a cloudevent on the topic of Google PubSub if set",
+          "properties": {
+            "topic": {
+              "description": "Topic to use for publishing",
+              "type": "string"
+            },
+            "truncate": {
+              "default": 8192,
+              "description": "Define the maximum size for subject,html,text",
+              "type": "number"
+            }
+          },
+          "required": [
+            "topic"
+          ],
+          "type": "object"
+        },
+        "storage": {
+          "additionalProperties": false,
+          "description": "Store email or part of email within a Google Storage",
+          "properties": {
+            "bucket": {
+              "description": "Bucket name",
+              "type": "string"
+            },
+            "path": {
+              "description": "Path on this bucket",
+              "type": "string"
+            },
+            "type": {
+              "default": "raw",
+              "description": "Part of the email to save\n\nraw: the whole email as received by our SMTP attachments: any files attached to the email, ignoring emails without attachments text: The text content of the email if it exists html: The html content of the email if it exists",
+              "enum": [
+                "raw",
+                "attachments",
+                "text",
+                "html"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "bucket",
+            "path"
+          ],
+          "type": "object"
+        },
+        "type": {
+          "const": "gcp",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "type": "object"
+    },
+    "Mail.Address": {
+      "additionalProperties": false,
+      "properties": {
+        "address": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "address"
+      ],
+      "type": "object"
+    },
+    "Mail.AmpAttachment": {
+      "additionalProperties": false,
+      "properties": {
+        "content": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/global.Buffer"
+            },
+            {
+              "$ref": "#/definitions/internal.Readable"
+            }
+          ],
+          "description": "String, Buffer or a Stream contents for the attachmentent"
+        },
+        "contentType": {
+          "description": "optional content type for the attachment, if not set will be derived from the filename property",
+          "type": "string"
+        },
+        "encoding": {
+          "description": "defines optional content encoding, eg. ‘base64’ or ‘hex’. This only applies if the content is a string. By default an unicode string is assumed.",
+          "type": "string"
+        },
+        "href": {
+          "description": "is an alternative for content to load the AMP4EMAIL data from an URL",
+          "type": "string"
+        },
+        "path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/Url"
+            }
+          ],
+          "description": "path to a file or an URL (data uris are allowed as well) if you want to stream the file instead of including it (better for larger attachments)"
+        },
+        "raw": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/global.Buffer"
+            },
+            {
+              "$ref": "#/definitions/internal.Readable"
+            },
+            {
+              "$ref": "#/definitions/Mail.AttachmentLike"
+            }
+          ],
+          "description": "an optional value that overrides entire node content in the mime message. If used then all other options set for this node are ignored."
+        }
+      },
+      "type": "object"
+    },
+    "Mail.Attachment": {
+      "additionalProperties": false,
+      "properties": {
+        "cid": {
+          "description": "optional content id for using inline images in HTML message source. Using cid sets the default contentDisposition to 'inline' and moves the attachment into a multipart/related mime node, so use it only if you actually want to use this attachment as an embedded image",
+          "type": "string"
+        },
+        "content": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/global.Buffer"
+            },
+            {
+              "$ref": "#/definitions/internal.Readable"
+            }
+          ],
+          "description": "String, Buffer or a Stream contents for the attachmentent"
+        },
+        "contentDisposition": {
+          "description": "optional content disposition type for the attachment, defaults to ‘attachment’",
+          "enum": [
+            "attachment",
+            "inline"
+          ],
+          "type": "string"
+        },
+        "contentTransferEncoding": {
+          "description": "optional transfer encoding for the attachment, if not set it will be derived from the contentType property. Example values: quoted-printable, base64. If it is unset then base64 encoding is used for the attachment. If it is set to false then previous default applies (base64 for most, 7bit for text).",
+          "enum": [
+            "7bit",
+            "base64",
+            "quoted-printable",
+            false
+          ],
+          "type": [
+            "string",
+            "boolean"
+          ]
+        },
+        "contentType": {
+          "description": "optional content type for the attachment, if not set will be derived from the filename property",
+          "type": "string"
+        },
+        "encoding": {
+          "description": "If set and content is string, then encodes the content to a Buffer using the specified encoding. Example values: base64, hex, binary etc. Useful if you want to use binary attachments in a JSON formatted e-mail object",
+          "type": "string"
+        },
+        "filename": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "const": false,
+              "type": "boolean"
+            }
+          ],
+          "description": "filename to be reported as the name of the attached file, use of unicode is allowed. If you do not want to use a filename, set this value as false, otherwise a filename is generated automatically"
+        },
+        "headers": {
+          "$ref": "#/definitions/Mail.Headers",
+          "description": "is an object of additional headers"
+        },
+        "path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/Url"
+            }
+          ],
+          "description": "path to a file or an URL (data uris are allowed as well) if you want to stream the file instead of including it (better for larger attachments)"
+        },
+        "raw": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/global.Buffer"
+            },
+            {
+              "$ref": "#/definitions/internal.Readable"
+            },
+            {
+              "$ref": "#/definitions/Mail.AttachmentLike"
+            }
+          ],
+          "description": "an optional value that overrides entire node content in the mime message. If used then all other options set for this node are ignored."
+        }
+      },
+      "type": "object"
+    },
+    "Mail.AttachmentLike": {
+      "additionalProperties": false,
+      "properties": {
+        "content": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/global.Buffer"
+            },
+            {
+              "$ref": "#/definitions/internal.Readable"
+            }
+          ],
+          "description": "String, Buffer or a Stream contents for the attachmentent"
+        },
+        "path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/Url"
+            }
+          ],
+          "description": "path to a file or an URL (data uris are allowed as well) if you want to stream the file instead of including it (better for larger attachments)"
+        }
+      },
+      "type": "object"
+    },
+    "Mail.Envelope": {
+      "additionalProperties": false,
+      "properties": {
+        "bcc": {
+          "description": "addresses from this value get added to RCPT TO list",
+          "type": "string"
+        },
+        "cc": {
+          "description": "addresses from this value get added to RCPT TO list",
+          "type": "string"
+        },
+        "from": {
+          "description": "the first address gets used as MAIL FROM address in SMTP",
+          "type": "string"
+        },
+        "to": {
+          "description": "addresses from this value get added to RCPT TO list",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "Mail.Headers": {
+      "anyOf": [
+        {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "prepared": {
+                    "type": "boolean"
+                  },
+                  "value": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "prepared",
+                  "value"
+                ],
+                "type": "object"
+              }
+            ]
+          },
+          "type": "object"
+        },
+        {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "key": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "key",
+              "value"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      ]
+    },
+    "Mail.IcalAttachment": {
+      "additionalProperties": false,
+      "properties": {
+        "content": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/global.Buffer"
+            },
+            {
+              "$ref": "#/definitions/internal.Readable"
+            }
+          ],
+          "description": "String, Buffer or a Stream contents for the attachmentent"
+        },
+        "encoding": {
+          "description": "defines optional content encoding, eg. ‘base64’ or ‘hex’. This only applies if the content is a string. By default an unicode string is assumed.",
+          "type": "string"
+        },
+        "filename": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "const": false,
+              "type": "boolean"
+            }
+          ],
+          "description": "optional filename, defaults to ‘invite.ics’"
+        },
+        "href": {
+          "description": "is an alternative for content to load the calendar data from an URL",
+          "type": "string"
+        },
+        "method": {
+          "description": "optional method, case insensitive, defaults to ‘publish’. Other possible values would be ‘request’, ‘reply’, ‘cancel’ or any other valid calendar method listed in RFC5546. This should match the METHOD: value in calendar event file.",
+          "type": "string"
+        },
+        "path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/Url"
+            }
+          ],
+          "description": "path to a file or an URL (data uris are allowed as well) if you want to stream the file instead of including it (better for larger attachments)"
+        }
+      },
+      "type": "object"
+    },
+    "Mail.ListHeader": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "comment": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "url",
+            "comment"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "Mail.ListHeaders": {
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "$ref": "#/definitions/Mail.ListHeader"
+          },
+          {
+            "items": {
+              "$ref": "#/definitions/Mail.ListHeader"
+            },
+            "type": "array"
+          },
+          {
+            "items": {
+              "items": {
+                "$ref": "#/definitions/Mail.ListHeader"
+              },
+              "type": "array"
+            },
+            "type": "array"
+          }
+        ]
+      },
+      "type": "object"
+    },
+    "Mail.Options": {
+      "additionalProperties": false,
+      "properties": {
+        "alternatives": {
+          "description": "An array of alternative text contents (in addition to text and html parts)",
+          "items": {
+            "$ref": "#/definitions/Mail.Attachment"
+          },
+          "type": "array"
+        },
+        "amp": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/global.Buffer"
+            },
+            {
+              "$ref": "#/definitions/internal.Readable"
+            },
+            {
+              "$ref": "#/definitions/Mail.AmpAttachment"
+            }
+          ],
+          "description": "AMP4EMAIL specific HTML version of the message, same usage as with text and html. Make sure it is a full and valid AMP4EMAIL document, otherwise the displaying email client falls back to html and ignores the amp part"
+        },
+        "attachments": {
+          "description": "An array of attachment objects",
+          "items": {
+            "$ref": "#/definitions/Mail.Attachment"
+          },
+          "type": "array"
+        },
+        "bcc": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/Mail.Address"
+            },
+            {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "$ref": "#/definitions/Mail.Address"
+                  }
+                ]
+              },
+              "type": "array"
+            }
+          ],
+          "description": "Comma separated list or an array of recipients e-mail addresses that will appear on the Bcc: field"
+        },
+        "cc": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/Mail.Address"
+            },
+            {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "$ref": "#/definitions/Mail.Address"
+                  }
+                ]
+              },
+              "type": "array"
+            }
+          ],
+          "description": "Comma separated list or an array of recipients e-mail addresses that will appear on the Cc: field"
+        },
+        "date": {
+          "description": "optional Date value, current UTC string will be used if not set",
+          "type": "string"
+        },
+        "disableFileAccess": {
+          "description": "if set to true then fails with an error when a node tries to load content from a file",
+          "type": "boolean"
+        },
+        "disableUrlAccess": {
+          "description": "if set to true then fails with an error when a node tries to load content from URL",
+          "type": "boolean"
+        },
+        "dkim": {
+          "$ref": "#/definitions/DKIM.Options",
+          "description": "is an object with DKIM options"
+        },
+        "encoding": {
+          "description": "optional transfer encoding for the textual parts",
+          "type": "string"
+        },
+        "envelope": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Mail.Envelope"
+            },
+            {
+              "$ref": "#/definitions/MimeNode.Envelope"
+            }
+          ],
+          "description": "optional SMTP envelope, if auto generated envelope is not suitable"
+        },
+        "from": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/Mail.Address"
+            }
+          ],
+          "description": "The e-mail address of the sender. All e-mail addresses can be plain 'sender@server.com' or formatted 'Sender Name <sender@server.com>'"
+        },
+        "headers": {
+          "$ref": "#/definitions/Mail.Headers",
+          "description": "An object or array of additional header fields"
+        },
+        "html": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/global.Buffer"
+            },
+            {
+              "$ref": "#/definitions/internal.Readable"
+            },
+            {
+              "$ref": "#/definitions/Mail.AttachmentLike"
+            }
+          ],
+          "description": "The HTML version of the message"
+        },
+        "icalEvent": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/global.Buffer"
+            },
+            {
+              "$ref": "#/definitions/internal.Readable"
+            },
+            {
+              "$ref": "#/definitions/Mail.IcalAttachment"
+            }
+          ],
+          "description": "iCalendar event, same usage as with text and html. Event method attribute defaults to ‘PUBLISH’ or define it yourself: {method: 'REQUEST', content: iCalString}. This value is added as an additional alternative to html or text. Only utf-8 content is allowed"
+        },
+        "inReplyTo": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/Mail.Address"
+            }
+          ],
+          "description": "The message-id this message is replying"
+        },
+        "list": {
+          "$ref": "#/definitions/Mail.ListHeaders",
+          "description": "An object where key names are converted into list headers. List key help becomes List-Help header etc."
+        },
+        "messageId": {
+          "description": "optional Message-Id value, random value will be generated if not set",
+          "type": "string"
+        },
+        "priority": {
+          "enum": [
+            "high",
+            "normal",
+            "low"
+          ],
+          "type": "string"
+        },
+        "raw": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/global.Buffer"
+            },
+            {
+              "$ref": "#/definitions/internal.Readable"
+            },
+            {
+              "$ref": "#/definitions/Mail.AttachmentLike"
+            }
+          ],
+          "description": "if set then overwrites entire message output with this value. The value is not parsed, so you should still set address headers or the envelope value for the message to work"
+        },
+        "references": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "description": "Message-id list (an array or space separated string)"
+        },
+        "replyTo": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/Mail.Address"
+            },
+            {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "$ref": "#/definitions/Mail.Address"
+                  }
+                ]
+              },
+              "type": "array"
+            }
+          ],
+          "description": "Comma separated list or an array of e-mail addresses that will appear on the Reply-To: field"
+        },
+        "sender": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/Mail.Address"
+            }
+          ],
+          "description": "An e-mail address that will appear on the Sender: field"
+        },
+        "subject": {
+          "description": "The subject of the e-mail",
+          "type": "string"
+        },
+        "text": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/global.Buffer"
+            },
+            {
+              "$ref": "#/definitions/internal.Readable"
+            },
+            {
+              "$ref": "#/definitions/Mail.AttachmentLike"
+            }
+          ],
+          "description": "The plaintext version of the message"
+        },
+        "textEncoding": {
+          "$ref": "#/definitions/Mail.TextEncoding",
+          "description": "set explicitly which encoding to use for text parts (quoted-printable or base64). If not set then encoding is detected from text content (mostly ascii means quoted-printable, otherwise base64)"
+        },
+        "to": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/Mail.Address"
+            },
+            {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "$ref": "#/definitions/Mail.Address"
+                  }
+                ]
+              },
+              "type": "array"
+            }
+          ],
+          "description": "Comma separated list or an array of recipients e-mail addresses that will appear on the To: field"
+        },
+        "watchHtml": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/global.Buffer"
+            },
+            {
+              "$ref": "#/definitions/internal.Readable"
+            },
+            {
+              "$ref": "#/definitions/Mail.AttachmentLike"
+            }
+          ],
+          "description": "Apple Watch specific HTML version of the message, same usage as with text and html"
+        }
+      },
+      "type": "object"
+    },
+    "Mail.TextEncoding": {
+      "enum": [
+        "quoted-printable",
+        "base64"
+      ],
+      "type": "string"
+    },
+    "MessageAttributeValue": {
+      "additionalProperties": false,
+      "description": "<p>The user-specified message attribute value. For string data types, the <code>Value</code> attribute has the same restrictions on the content as the message body. For more information, see <code>                <a>SendMessage</a>.</code>          </p>          <p>             <code>Name</code>, <code>type</code>, <code>value</code> and the message body must not be empty or null. All parts of the message attribute, including <code>Name</code>, <code>Type</code>, and <code>Value</code>, are part of the message size restriction (256 KB or 262,144 bytes).</p>",
+      "properties": {
+        "BinaryListValues": {
+          "description": "<p>Not implemented. Reserved for future use.</p>",
+          "items": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "properties": {
+              "BYTES_PER_ELEMENT": {
+                "type": "number"
+              },
+              "buffer": {
+                "additionalProperties": false,
+                "properties": {
+                  "byteLength": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "byteLength"
+                ],
+                "type": "object"
+              },
+              "byteLength": {
+                "type": "number"
+              },
+              "byteOffset": {
+                "type": "number"
+              },
+              "length": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "BYTES_PER_ELEMENT",
+              "buffer",
+              "byteLength",
+              "byteOffset",
+              "length"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "BinaryValue": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "description": "<p>Binary type attributes can store any binary data, such as compressed data, encrypted data, or images.</p>",
+          "properties": {
+            "BYTES_PER_ELEMENT": {
+              "type": "number"
+            },
+            "buffer": {
+              "additionalProperties": false,
+              "properties": {
+                "byteLength": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "byteLength"
+              ],
+              "type": "object"
+            },
+            "byteLength": {
+              "type": "number"
+            },
+            "byteOffset": {
+              "type": "number"
+            },
+            "length": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "BYTES_PER_ELEMENT",
+            "buffer",
+            "byteLength",
+            "byteOffset",
+            "length"
+          ],
+          "type": "object"
+        },
+        "DataType": {
+          "description": "<p>Amazon SQS supports the following logical data types: <code>String</code>, <code>Number</code>, and <code>Binary</code>. For the <code>Number</code> data type, you must use <code>StringValue</code>.</p>          <p>You can also append custom labels. For more information, see <a href=\"https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-message-metadata.html#sqs-message-attributes\">Amazon SQS Message Attributes</a> in the <i>Amazon SQS Developer Guide</i>.</p>",
+          "type": "string"
+        },
+        "StringListValues": {
+          "description": "<p>Not implemented. Reserved for future use.</p>",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "StringValue": {
+          "description": "<p>Strings are Unicode with UTF-8 binary encoding. For a list of code values, see <a href=\"http://en.wikipedia.org/wiki/ASCII#ASCII_printable_characters\">ASCII Printable Characters</a>.</p>",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "MessageSystemAttributeValue": {
+      "additionalProperties": false,
+      "description": "<p>The user-specified message system attribute value. For string data types, the <code>Value</code> attribute has the same restrictions on the content as the message body. For more information, see <code>                <a>SendMessage</a>.</code>          </p>          <p>             <code>Name</code>, <code>type</code>, <code>value</code> and the message body must not be empty or null.</p>",
+      "properties": {
+        "BinaryListValues": {
+          "description": "<p>Not implemented. Reserved for future use.</p>",
+          "items": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "properties": {
+              "BYTES_PER_ELEMENT": {
+                "type": "number"
+              },
+              "buffer": {
+                "additionalProperties": false,
+                "properties": {
+                  "byteLength": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "byteLength"
+                ],
+                "type": "object"
+              },
+              "byteLength": {
+                "type": "number"
+              },
+              "byteOffset": {
+                "type": "number"
+              },
+              "length": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "BYTES_PER_ELEMENT",
+              "buffer",
+              "byteLength",
+              "byteOffset",
+              "length"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "BinaryValue": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "description": "<p>Binary type attributes can store any binary data, such as compressed data, encrypted data, or images.</p>",
+          "properties": {
+            "BYTES_PER_ELEMENT": {
+              "type": "number"
+            },
+            "buffer": {
+              "additionalProperties": false,
+              "properties": {
+                "byteLength": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "byteLength"
+              ],
+              "type": "object"
+            },
+            "byteLength": {
+              "type": "number"
+            },
+            "byteOffset": {
+              "type": "number"
+            },
+            "length": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "BYTES_PER_ELEMENT",
+            "buffer",
+            "byteLength",
+            "byteOffset",
+            "length"
+          ],
+          "type": "object"
+        },
+        "DataType": {
+          "description": "<p>Amazon SQS supports the following logical data types: <code>String</code>, <code>Number</code>, and <code>Binary</code>. For the <code>Number</code> data type, you must use <code>StringValue</code>.</p>          <p>You can also append custom labels. For more information, see <a href=\"https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-message-metadata.html#sqs-message-attributes\">Amazon SQS Message Attributes</a> in the <i>Amazon SQS Developer Guide</i>.</p>",
+          "type": "string"
+        },
+        "StringListValues": {
+          "description": "<p>Not implemented. Reserved for future use.</p>",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "StringValue": {
+          "description": "<p>Strings are Unicode with UTF-8 binary encoding. For a list of code values, see <a href=\"http://en.wikipedia.org/wiki/ASCII#ASCII_printable_characters\">ASCII Printable Characters</a>.</p>",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "MessageTag": {
+      "additionalProperties": false,
+      "description": "<p>Contains the name and value of a tag that you can provide to <code>SendEmail</code> or                 <code>SendRawEmail</code> to apply to an email.</p>         <p>Message tags, which you use with configuration sets, enable you to publish email             sending events. For information about using configuration sets, see the <a href=\"https://docs.aws.amazon.com/ses/latest/DeveloperGuide/monitor-sending-activity.html\">Amazon SES Developer Guide</a>.</p>",
+      "properties": {
+        "Name": {
+          "description": "<p>The name of the tag. The name must:</p>         <ul>             <li>                 <p>This value can only contain ASCII letters (a-z, A-Z), numbers (0-9),                     underscores (_), or dashes (-).</p>             </li>             <li>                 <p>Contain less than 256 characters.</p>             </li>          </ul>",
+          "type": "string"
+        },
+        "Value": {
+          "description": "<p>The value of the tag. The value must:</p>         <ul>             <li>                 <p>This value can only contain ASCII letters (a-z, A-Z), numbers (0-9),                     underscores (_), or dashes (-).</p>             </li>             <li>                 <p>Contain less than 256 characters.</p>             </li>          </ul>",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "MimeNode.Envelope": {
+      "additionalProperties": false,
+      "properties": {
+        "from": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "const": false,
+              "type": "boolean"
+            }
+          ],
+          "description": "includes an address object or is set to false"
+        },
+        "to": {
+          "description": "includes an array of address objects",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "from",
+        "to"
+      ],
+      "type": "object"
+    },
+    "NodeMailerProcessorConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "nodemailer": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {}
+          ]
+        },
+        "override": {
+          "$ref": "#/definitions/Mail.Options"
+        },
+        "type": {
+          "const": "nodemailer",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "type": "object"
+    },
+    "ObjectCannedACL": {
+      "enum": [
+        "authenticated-read",
+        "aws-exec-read",
+        "bucket-owner-full-control",
+        "bucket-owner-read",
+        "private",
+        "public-read",
+        "public-read-write"
+      ],
+      "type": "string"
+    },
+    "ObjectLockLegalHoldStatus": {
+      "enum": [
+        "OFF",
+        "ON"
+      ],
+      "type": "string"
+    },
+    "ObjectLockMode": {
+      "enum": [
+        "COMPLIANCE",
+        "GOVERNANCE"
+      ],
+      "type": "string"
+    },
+    "ParsedUrlQuery": {
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "not": {}
+          },
+          {
+            "type": [
+              "string",
+              "array"
+            ]
+          }
+        ]
+      },
+      "properties": {},
+      "type": "object"
+    },
+    "PutObjectCommandInput": {
+      "additionalProperties": false,
+      "description": "This interface extends from `PutObjectRequest` interface. There are more parameters than `Body` defined in  {@link  PutObjectRequest }",
+      "properties": {
+        "ACL": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ObjectCannedACL"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "description": "<p>The canned ACL to apply to the object. For more information, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html#CannedACL\">Canned       ACL</a>.</p>          <p>This action is not supported by Amazon S3 on Outposts.</p>"
+        },
+        "Body": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/internal.Readable"
+                },
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "locked": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "locked"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "size": {
+                      "type": "number"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "size",
+                    "type"
+                  ],
+                  "type": "object"
+                }
+              ],
+              "description": "<p>Object data.</p>"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "additionalProperties": {
+                "type": "number"
+              },
+              "properties": {
+                "BYTES_PER_ELEMENT": {
+                  "type": "number"
+                },
+                "buffer": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "byteLength": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "byteLength"
+                  ],
+                  "type": "object"
+                },
+                "byteLength": {
+                  "type": "number"
+                },
+                "byteOffset": {
+                  "type": "number"
+                },
+                "length": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "BYTES_PER_ELEMENT",
+                "buffer",
+                "byteLength",
+                "byteOffset",
+                "length"
+              ],
+              "type": "object"
+            },
+            {
+              "$ref": "#/definitions/global.Buffer"
+            }
+          ],
+          "description": "For *`PutObjectRequest[\"Body\"]`*, see  {@link  PutObjectRequest.Body } ."
+        },
+        "Bucket": {
+          "description": "<p>The bucket name to which the PUT action was initiated. </p>          <p>When using this action with an access point, you must direct requests to the access point hostname. The access point hostname takes the form <i>AccessPointName</i>-<i>AccountId</i>.s3-accesspoint.<i>Region</i>.amazonaws.com. When using this action with an access point through the Amazon Web Services SDKs, you provide the access point ARN in place of the bucket name. For more information about access point ARNs, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-access-points.html\">Using access points</a> in the <i>Amazon S3 User Guide</i>.</p>          <p>When using this action with Amazon S3 on Outposts, you must direct requests to the S3 on Outposts hostname. The S3 on Outposts hostname takes the form <code>                <i>AccessPointName</i>-<i>AccountId</i>.<i>outpostID</i>.s3-outposts.<i>Region</i>.amazonaws.com</code>. When using this action with S3 on Outposts through the Amazon Web Services SDKs, you provide the Outposts bucket ARN in place of the bucket name. For more information about S3 on Outposts ARNs, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/S3onOutposts.html\">Using Amazon S3 on Outposts</a> in the <i>Amazon S3 User Guide</i>.</p> <p>Note: To supply the Multi-region Access Point (MRAP) to Bucket, you need to install the \"@aws-sdk/signature-v4-crt\" package to your project dependencies. For more information, please go to https://github.com/aws/aws-sdk-js-v3#known-issues</p>",
+          "type": "string"
+        },
+        "BucketKeyEnabled": {
+          "description": "<p>Specifies whether Amazon S3 should use an S3 Bucket Key for object encryption with server-side encryption using AWS KMS (SSE-KMS). Setting this header to <code>true</code> causes Amazon S3 to use an S3 Bucket Key for object encryption with SSE-KMS.</p>          <p>Specifying this header with a PUT action doesn’t affect bucket-level settings for S3 Bucket Key.</p>",
+          "type": "boolean"
+        },
+        "CacheControl": {
+          "description": "<p> Can be used to specify caching behavior along the request/reply chain. For more          information, see <a href=\"http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9\">http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9</a>.</p>",
+          "type": "string"
+        },
+        "ChecksumAlgorithm": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ChecksumAlgorithm"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "description": "<p>Indicates the algorithm used to create the checksum for the object when using the SDK. This header will not provide any     additional functionality if not using the SDK. When sending this header, there must be a corresponding <code>x-amz-checksum</code> or     <code>x-amz-trailer</code> header sent. Otherwise, Amazon S3 fails the request with the HTTP status code <code>400 Bad Request</code>. For more     information, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/checking-object-integrity.html\">Checking object integrity</a> in     the <i>Amazon S3 User Guide</i>.</p>         <p>If you provide an individual checksum, Amazon S3 ignores any provided             <code>ChecksumAlgorithm</code> parameter.</p>"
+        },
+        "ChecksumCRC32": {
+          "description": "<p>This header can be used as a data integrity check to verify that the data received is the same data that was originally sent.     This header specifies the base64-encoded, 32-bit CRC32 checksum of the object. For more information, see     <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/checking-object-integrity.html\">Checking object integrity</a> in the     <i>Amazon S3 User Guide</i>.</p>",
+          "type": "string"
+        },
+        "ChecksumCRC32C": {
+          "description": "<p>This header can be used as a data integrity check to verify that the data received is the same data that was originally sent.     This header specifies the base64-encoded, 32-bit CRC32C checksum of the object. For more information, see     <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/checking-object-integrity.html\">Checking object integrity</a> in the     <i>Amazon S3 User Guide</i>.</p>",
+          "type": "string"
+        },
+        "ChecksumSHA1": {
+          "description": "<p>This header can be used as a data integrity check to verify that the data received is the same data that was originally sent.     This header specifies the base64-encoded, 160-bit SHA-1 digest of the object. For more information, see     <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/checking-object-integrity.html\">Checking object integrity</a> in the     <i>Amazon S3 User Guide</i>.</p>",
+          "type": "string"
+        },
+        "ChecksumSHA256": {
+          "description": "<p>This header can be used as a data integrity check to verify that the data received is the same data that was originally sent.     This header specifies the base64-encoded, 256-bit SHA-256 digest of the object. For more information, see     <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/checking-object-integrity.html\">Checking object integrity</a> in the     <i>Amazon S3 User Guide</i>.</p>",
+          "type": "string"
+        },
+        "ContentDisposition": {
+          "description": "<p>Specifies presentational information for the object. For more information, see <a href=\"http://www.w3.org/Protocols/rfc2616/rfc2616-sec19.html#sec19.5.1\">http://www.w3.org/Protocols/rfc2616/rfc2616-sec19.html#sec19.5.1</a>.</p>",
+          "type": "string"
+        },
+        "ContentEncoding": {
+          "description": "<p>Specifies what content encodings have been applied to the object and thus what decoding          mechanisms must be applied to obtain the media-type referenced by the Content-Type header          field. For more information, see <a href=\"http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.11\">http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.11</a>.</p>",
+          "type": "string"
+        },
+        "ContentLanguage": {
+          "description": "<p>The language the content is in.</p>",
+          "type": "string"
+        },
+        "ContentLength": {
+          "description": "<p>Size of the body in bytes. This parameter is useful when the size of the body cannot be          determined automatically. For more information, see <a href=\"http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.13\">http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.13</a>.</p>",
+          "type": "number"
+        },
+        "ContentMD5": {
+          "description": "<p>The base64-encoded 128-bit MD5 digest of the message (without the headers) according to          RFC 1864. This header can be used as a message integrity check to verify that the data is          the same data that was originally sent. Although it is optional, we recommend using the          Content-MD5 mechanism as an end-to-end integrity check. For more information about REST          request authentication, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/RESTAuthentication.html\">REST             Authentication</a>.</p>",
+          "type": "string"
+        },
+        "ContentType": {
+          "description": "<p>A standard MIME type describing the format of the contents. For more information, see             <a href=\"http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.17\">http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.17</a>.</p>",
+          "type": "string"
+        },
+        "ExpectedBucketOwner": {
+          "description": "<p>The account ID of the expected bucket owner. If the bucket is owned by a different account, the request fails with the HTTP status code <code>403 Forbidden</code> (access denied).</p>",
+          "type": "string"
+        },
+        "Expires": {
+          "description": "<p>The date and time at which the object is no longer cacheable. For more information, see             <a href=\"http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.21\">http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.21</a>.</p>",
+          "type": "string"
+        },
+        "GrantFullControl": {
+          "description": "<p>Gives the grantee READ, READ_ACP, and WRITE_ACP permissions on the       object.</p>          <p>This action is not supported by Amazon S3 on Outposts.</p>",
+          "type": "string"
+        },
+        "GrantRead": {
+          "description": "<p>Allows grantee to read the object data and its       metadata.</p>          <p>This action is not supported by Amazon S3 on Outposts.</p>",
+          "type": "string"
+        },
+        "GrantReadACP": {
+          "description": "<p>Allows grantee to read the object ACL.</p>          <p>This action is not supported by Amazon S3 on Outposts.</p>",
+          "type": "string"
+        },
+        "GrantWriteACP": {
+          "description": "<p>Allows grantee to write the ACL for the applicable       object.</p>          <p>This action is not supported by Amazon S3 on Outposts.</p>",
+          "type": "string"
+        },
+        "Key": {
+          "description": "<p>Object key for which the PUT action was initiated.</p>",
+          "type": "string"
+        },
+        "Metadata": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "<p>A map of metadata to store with the object in S3.</p>",
+          "type": "object"
+        },
+        "ObjectLockLegalHoldStatus": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ObjectLockLegalHoldStatus"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "description": "<p>Specifies whether a legal hold will be applied to this object. For more information          about S3 Object Lock, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/object-lock.html\">Object          Lock</a>.</p>"
+        },
+        "ObjectLockMode": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ObjectLockMode"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "description": "<p>The Object Lock mode that you want to apply to this object.</p>"
+        },
+        "ObjectLockRetainUntilDate": {
+          "description": "<p>The date and time when you want this object's Object Lock to expire. Must be formatted          as a timestamp parameter.</p>",
+          "type": "string"
+        },
+        "RequestPayer": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/RequestPayer"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "description": "<p>Confirms that the requester knows that they will be charged for the request. Bucket          owners need not specify this parameter in their requests. For information about downloading          objects from Requester Pays buckets, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/ObjectsinRequesterPaysBuckets.html\">Downloading Objects in             Requester Pays Buckets</a> in the <i>Amazon S3 User Guide</i>.</p>"
+        },
+        "SSECustomerAlgorithm": {
+          "description": "<p>Specifies the algorithm to use to when encrypting the object (for example,          AES256).</p>",
+          "type": "string"
+        },
+        "SSECustomerKey": {
+          "description": "<p>Specifies the customer-provided encryption key for Amazon S3 to use in encrypting data. This          value is used to store the object and then it is discarded; Amazon S3 does not store the          encryption key. The key must be appropriate for use with the algorithm specified in the             <code>x-amz-server-side-encryption-customer-algorithm</code> header.</p>",
+          "type": "string"
+        },
+        "SSECustomerKeyMD5": {
+          "description": "<p>Specifies the 128-bit MD5 digest of the encryption key according to RFC 1321. Amazon S3 uses          this header for a message integrity check to ensure that the encryption key was transmitted          without error.</p>",
+          "type": "string"
+        },
+        "SSEKMSEncryptionContext": {
+          "description": "<p>Specifies the Amazon Web Services KMS Encryption Context to use for object encryption. The value of this          header is a base64-encoded UTF-8 string holding JSON with the encryption context key-value          pairs.</p>",
+          "type": "string"
+        },
+        "SSEKMSKeyId": {
+          "description": "<p>If <code>x-amz-server-side-encryption</code> is present and has the value of          <code>aws:kms</code>, this header specifies the ID of the Amazon Web Services Key Management Service          (Amazon Web Services KMS) symmetrical customer managed key that was used for the          object. If you specify <code>x-amz-server-side-encryption:aws:kms</code>, but do not          provide<code> x-amz-server-side-encryption-aws-kms-key-id</code>, Amazon S3 uses the Amazon Web Services          managed key to protect the data. If the KMS key does not exist in the same account          issuing the command, you must use the full ARN and not just the ID.       </p>",
+          "type": "string"
+        },
+        "ServerSideEncryption": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ServerSideEncryption"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "description": "<p>The server-side encryption algorithm used when storing this object in Amazon S3 (for example,          AES256, aws:kms).</p>"
+        },
+        "StorageClass": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/StorageClass"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "description": "<p>By default, Amazon S3 uses the STANDARD Storage Class to store newly created objects. The          STANDARD storage class provides high durability and high availability. Depending on          performance needs, you can specify a different Storage Class. Amazon S3 on Outposts only uses          the OUTPOSTS Storage Class. For more information, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/storage-class-intro.html\">Storage Classes</a> in the          <i>Amazon S3 User Guide</i>.</p>"
+        },
+        "Tagging": {
+          "description": "<p>The tag-set for the object. The tag-set must be encoded as URL Query parameters. (For          example, \"Key1=Value1\")</p>",
+          "type": "string"
+        },
+        "WebsiteRedirectLocation": {
+          "description": "<p>If the bucket is configured as a website, redirects requests for this object to another          object in the same bucket or to an external URL. Amazon S3 stores the value of this header in          the object metadata. For information about object metadata, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html\">Object Key and Metadata</a>.</p>\n\n         <p>In the following example, the request header sets the redirect to an object          (anotherPage.html) in the same bucket:</p>\n\n         <p>             <code>x-amz-website-redirect-location: /anotherPage.html</code>          </p>\n\n         <p>In the following example, the request header sets the object redirect to another          website:</p>\n\n         <p>             <code>x-amz-website-redirect-location: http://www.example.com/</code>          </p>\n\n         <p>For more information about website hosting in Amazon S3, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/WebsiteHosting.html\">Hosting Websites on Amazon S3</a> and <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/how-to-page-redirect.html\">How to Configure Website Page             Redirects</a>. </p>",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "RawMessage": {
+      "additionalProperties": false,
+      "description": "<p>Represents the raw data of the message.</p>",
+      "properties": {
+        "Data": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "description": "<p>The raw data of the message. This data needs to base64-encoded if you are accessing             Amazon SES directly through the HTTPS interface. If you are accessing Amazon SES using an AWS             SDK, the SDK takes care of the base 64-encoding for you. In all cases, the client must             ensure that the message format complies with Internet email standards regarding email             header fields, MIME types, and MIME encoding.</p>         <p>The To:, CC:, and BCC: headers in the raw message can contain a group list.</p>         <p>If you are using <code>SendRawEmail</code> with sending authorization, you can include             X-headers in the raw message to specify the \"Source,\" \"From,\" and \"Return-Path\"             addresses. For more information, see the documentation for <code>SendRawEmail</code>. </p>         <important>             <p>Do not include these X-headers in the DKIM signature, because they are removed by                 Amazon SES before sending the email.</p>         </important>         <p>For more information, go to the <a href=\"https://docs.aws.amazon.com/ses/latest/DeveloperGuide/send-email-raw.html\">Amazon SES Developer             Guide</a>.</p>",
+          "properties": {
+            "BYTES_PER_ELEMENT": {
+              "type": "number"
+            },
+            "buffer": {
+              "additionalProperties": false,
+              "properties": {
+                "byteLength": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "byteLength"
+              ],
+              "type": "object"
+            },
+            "byteLength": {
+              "type": "number"
+            },
+            "byteOffset": {
+              "type": "number"
+            },
+            "length": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "BYTES_PER_ELEMENT",
+            "buffer",
+            "byteLength",
+            "byteOffset",
+            "length"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "RequestPayer": {
+      "const": "requester",
+      "type": "string"
+    },
+    "SecureVersion": {
+      "enum": [
+        "TLSv1.3",
+        "TLSv1.2",
+        "TLSv1.1",
+        "TLSv1"
+      ],
+      "type": "string"
+    },
+    "SendMessageCommandInput": {
+      "additionalProperties": false,
+      "properties": {
+        "DelaySeconds": {
+          "description": "<p>           The length of time, in seconds, for which to delay a specific message. Valid values: 0 to 900. Maximum: 15 minutes. Messages with a positive <code>DelaySeconds</code> value become available for processing after the delay period is finished.           If you don't specify a value, the default value for the queue applies.     </p>          <note>             <p>When you set <code>FifoQueue</code>, you can't set <code>DelaySeconds</code> per message. You can set this parameter only on a queue level.</p>          </note>",
+          "type": "number"
+        },
+        "MessageAttributes": {
+          "additionalProperties": {
+            "$ref": "#/definitions/MessageAttributeValue"
+          },
+          "description": "<p>Each message attribute consists of a <code>Name</code>, <code>Type</code>, and <code>Value</code>. For more information, see <a href=\"https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-message-metadata.html#sqs-message-attributes\">Amazon SQS message attributes</a> in the <i>Amazon SQS Developer Guide</i>.</p>",
+          "type": "object"
+        },
+        "MessageBody": {
+          "description": "<p>The message to send. The minimum size is one character. The maximum size is 256 KB.</p>          <important>            <p>A message can include only XML, JSON, and unformatted text. The following Unicode characters are allowed:</p>            <p>                <code>#x9</code> | <code>#xA</code> | <code>#xD</code> | <code>#x20</code> to <code>#xD7FF</code> | <code>#xE000</code> to <code>#xFFFD</code> | <code>#x10000</code> to <code>#x10FFFF</code>             </p> \t           <p>Any characters not included in this list will be rejected. For more information, see the <a href=\"http://www.w3.org/TR/REC-xml/#charsets\">W3C specification for characters</a>.</p>          </important>",
+          "type": "string"
+        },
+        "MessageDeduplicationId": {
+          "description": "<p>This parameter applies only to FIFO (first-in-first-out) queues.</p>          <p>The token used for deduplication of sent messages. If a message with a particular <code>MessageDeduplicationId</code> is sent successfully, any messages sent with the same <code>MessageDeduplicationId</code>           are accepted successfully but aren't delivered during the 5-minute deduplication interval. For more information, see <a href=\"https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/FIFO-queues-exactly-once-processing.html\">           Exactly-once processing</a> in the <i>Amazon SQS Developer Guide</i>.</p>          <ul>             <li>               <p>Every message must have a unique <code>MessageDeduplicationId</code>,</p>               <ul>                   <li>                       <p>You may provide a <code>MessageDeduplicationId</code> explicitly.</p>                   </li>                   <li>                       <p>If you aren't able to provide a <code>MessageDeduplicationId</code> and you enable <code>ContentBasedDeduplication</code> for your queue,                           Amazon SQS uses a SHA-256 hash to generate the <code>MessageDeduplicationId</code> using the body of the message (but not the attributes of the message).                       </p>                   </li>                   <li>                       <p>If you don't provide a <code>MessageDeduplicationId</code> and the queue doesn't have <code>ContentBasedDeduplication</code> set,                           the action fails with an error.</p>                   </li>                   <li>                       <p>If the queue has <code>ContentBasedDeduplication</code> set, your <code>MessageDeduplicationId</code> overrides the generated one.</p>                   </li>                </ul>             </li>             <li>               <p>When <code>ContentBasedDeduplication</code> is in effect, messages with identical content sent within the deduplication interval are treated as duplicates                   and only one copy of the message is delivered.</p>             </li>             <li>               <p>If you send one message with <code>ContentBasedDeduplication</code> enabled and then another message with a <code>MessageDeduplicationId</code> that is the same                   as the one generated for the first <code>MessageDeduplicationId</code>, the two messages are treated as duplicates and only one copy of the message is delivered.               </p>             </li>          </ul>          <note>             <p>The <code>MessageDeduplicationId</code> is available to the consumer of the                 message (this can be useful for troubleshooting delivery issues).</p>             <p>If a message is sent successfully but the acknowledgement is lost and the message is resent with the same               <code>MessageDeduplicationId</code> after the deduplication interval, Amazon SQS can't detect duplicate messages.</p>             <p>Amazon SQS continues to keep track of the message deduplication ID even after the message is received and deleted.</p>          </note>          <p>The maximum length of <code>MessageDeduplicationId</code> is 128 characters. <code>MessageDeduplicationId</code> can contain alphanumeric characters (<code>a-z</code>, <code>A-Z</code>, <code>0-9</code>) and           punctuation (<code>!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~</code>).</p>          <p>For best practices of using <code>MessageDeduplicationId</code>, see           <a href=\"https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/using-messagededuplicationid-property.html\">Using the MessageDeduplicationId Property</a>           in the <i>Amazon SQS Developer Guide</i>.</p>",
+          "type": "string"
+        },
+        "MessageGroupId": {
+          "description": "<p>This parameter applies only to FIFO (first-in-first-out) queues.</p>          <p>The tag that specifies that a message belongs to a specific message group. Messages             that belong to the same message group are processed in a FIFO manner (however,             messages in different message groups might be processed out of order). To interleave             multiple ordered streams within a single queue, use <code>MessageGroupId</code> values             (for example, session data for multiple users). In this scenario, multiple consumers can             process the queue, but the session data of each user is processed in a FIFO             fashion.</p>          <ul>             <li>                <p>You must associate a non-empty <code>MessageGroupId</code> with a message. If you don't provide a <code>MessageGroupId</code>, the action fails.</p>             </li>             <li>                <p>                   <code>ReceiveMessage</code> might return messages with multiple <code>MessageGroupId</code> values. For each <code>MessageGroupId</code>, the messages are sorted by time sent. The caller can't               specify a <code>MessageGroupId</code>.</p>             </li>          </ul>          <p>The length of <code>MessageGroupId</code> is 128 characters. Valid values: alphanumeric characters and punctuation <code>(!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~)</code>.</p>          <p>For best practices of using <code>MessageGroupId</code>, see           <a href=\"https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/using-messagegroupid-property.html\">Using the MessageGroupId Property</a>           in the <i>Amazon SQS Developer Guide</i>.</p>          <important>             <p>                <code>MessageGroupId</code> is required for FIFO queues. You can't use it for Standard queues.</p>          </important>",
+          "type": "string"
+        },
+        "MessageSystemAttributes": {
+          "additionalProperties": {
+            "$ref": "#/definitions/MessageSystemAttributeValue"
+          },
+          "description": "<p>The message system attribute to send. Each message system attribute consists of a <code>Name</code>, <code>Type</code>, and <code>Value</code>.</p>          <important>             <ul>                <li>                   <p>Currently, the only supported message system attribute is <code>AWSTraceHeader</code>.                     Its type must be <code>String</code> and its value must be a correctly formatted                     X-Ray trace header string.</p>               </li>                <li>                   <p>The size of a message system attribute doesn't count towards the total size of a message.</p>               </li>             </ul>          </important>",
+          "type": "object"
+        },
+        "QueueUrl": {
+          "description": "<p>The URL of the Amazon SQS queue to which a message is sent.</p>          <p>Queue URLs and names are case-sensitive.</p>",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "SendRawEmailCommandInput": {
+      "additionalProperties": false,
+      "properties": {
+        "ConfigurationSetName": {
+          "description": "<p>The name of the configuration set to use when you send an email using                 <code>SendRawEmail</code>.</p>",
+          "type": "string"
+        },
+        "Destinations": {
+          "description": "<p>A list of destinations for the message, consisting of To:, CC:, and BCC:             addresses.</p>",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "FromArn": {
+          "description": "<p>This parameter is used only for sending authorization. It is the ARN of the identity             that is associated with the sending authorization policy that permits you to specify a             particular \"From\" address in the header of the raw email.</p>         <p>Instead of using this parameter, you can use the X-header <code>X-SES-FROM-ARN</code>             in the raw message of the email. If you use both the <code>FromArn</code> parameter and             the corresponding X-header, Amazon SES uses the value of the <code>FromArn</code>             parameter.</p>         <note>             <p>For information about when to use this parameter, see the description of                     <code>SendRawEmail</code> in this guide, or see the <a href=\"https://docs.aws.amazon.com/ses/latest/DeveloperGuide/sending-authorization-delegate-sender-tasks-email.html\">Amazon SES Developer Guide</a>.</p>         </note>",
+          "type": "string"
+        },
+        "RawMessage": {
+          "$ref": "#/definitions/RawMessage",
+          "description": "<p>The raw email message itself. The message has to meet the following criteria:</p>         <ul>             <li>                 <p>The message has to contain a header and a body, separated by a blank                     line.</p>             </li>             <li>                 <p>All of the required header fields must be present in the message.</p>             </li>             <li>                 <p>Each part of a multipart MIME message must be formatted properly.</p>             </li>             <li>                 <p>Attachments must be of a content type that Amazon SES supports. For a list on                     unsupported content types, see <a href=\"https://docs.aws.amazon.com/ses/latest/DeveloperGuide/mime-types.html\">Unsupported Attachment                         Types</a> in the <i>Amazon SES Developer Guide</i>.</p>             </li>             <li>                 <p>The entire message must be base64-encoded.</p>             </li>             <li>                 <p>If any of the MIME parts in your message contain content that is outside of                     the 7-bit ASCII character range, we highly recommend that you encode that                     content. For more information, see <a href=\"https://docs.aws.amazon.com/ses/latest/DeveloperGuide/send-email-raw.html\">Sending Raw Email</a> in the <i>Amazon SES Developer                     Guide</i>.</p>             </li>             <li>                 <p>Per <a href=\"https://tools.ietf.org/html/rfc5321#section-4.5.3.1.6\">RFC                         5321</a>, the maximum length of each line of text, including the                     <CRLF>, must not exceed 1,000 characters.</p>             </li>          </ul>"
+        },
+        "ReturnPathArn": {
+          "description": "<p>This parameter is used only for sending authorization. It is the ARN of the identity             that is associated with the sending authorization policy that permits you to use the             email address specified in the <code>ReturnPath</code> parameter.</p>         <p>For example, if the owner of <code>example.com</code> (which has ARN                 <code>arn:aws:ses:us-east-1:123456789012:identity/example.com</code>) attaches a             policy to it that authorizes you to use <code>feedback@example.com</code>, then you             would specify the <code>ReturnPathArn</code> to be                 <code>arn:aws:ses:us-east-1:123456789012:identity/example.com</code>, and the                 <code>ReturnPath</code> to be <code>feedback@example.com</code>.</p>         <p>Instead of using this parameter, you can use the X-header                 <code>X-SES-RETURN-PATH-ARN</code> in the raw message of the email. If you use both             the <code>ReturnPathArn</code> parameter and the corresponding X-header, Amazon SES uses the             value of the <code>ReturnPathArn</code> parameter.</p>         <note>             <p>For information about when to use this parameter, see the description of                     <code>SendRawEmail</code> in this guide, or see the <a href=\"https://docs.aws.amazon.com/ses/latest/DeveloperGuide/sending-authorization-delegate-sender-tasks-email.html\">Amazon SES Developer Guide</a>.</p>         </note>",
+          "type": "string"
+        },
+        "Source": {
+          "description": "<p>The identity's email address. If you do not provide a value for this parameter, you             must specify a \"From\" address in the raw text of the message. (You can also specify             both.)</p>         <note>             <p>Amazon SES does not support the SMTPUTF8 extension, as described in<a href=\"https://tools.ietf.org/html/rfc6531\">RFC6531</a>. For this reason, the                     <i>local part</i> of a source email address (the part of the email                 address that precedes the @ sign) may only contain <a href=\"https://en.wikipedia.org/wiki/Email_address#Local-part\">7-bit ASCII                     characters</a>. If the <i>domain part</i> of an address (the                 part after the @ sign) contains non-ASCII characters, they must be encoded using                 Punycode, as described in <a href=\"https://tools.ietf.org/html/rfc3492.html\">RFC3492</a>. The sender name (also known as the <i>friendly                     name</i>) may contain non-ASCII characters. These characters must be                 encoded using MIME encoded-word syntax, as described in <a href=\"https://tools.ietf.org/html/rfc2047\">RFC 2047</a>. MIME encoded-word                 syntax uses the following form:                 <code>=?charset?encoding?encoded-text?=</code>.</p>         </note>\n\n        <p>If you specify the <code>Source</code> parameter and have feedback forwarding enabled,             then bounces and complaints will be sent to this email address. This takes precedence             over any Return-Path header that you might include in the raw text of the             message.</p>",
+          "type": "string"
+        },
+        "SourceArn": {
+          "description": "<p>This parameter is used only for sending authorization. It is the ARN of the identity             that is associated with the sending authorization policy that permits you to send for             the email address specified in the <code>Source</code> parameter.</p>         <p>For example, if the owner of <code>example.com</code> (which has ARN                 <code>arn:aws:ses:us-east-1:123456789012:identity/example.com</code>) attaches a             policy to it that authorizes you to send from <code>user@example.com</code>, then you             would specify the <code>SourceArn</code> to be                 <code>arn:aws:ses:us-east-1:123456789012:identity/example.com</code>, and the                 <code>Source</code> to be <code>user@example.com</code>.</p>         <p>Instead of using this parameter, you can use the X-header                 <code>X-SES-SOURCE-ARN</code> in the raw message of the email. If you use both the                 <code>SourceArn</code> parameter and the corresponding X-header, Amazon SES uses the             value of the <code>SourceArn</code> parameter.</p>         <note>             <p>For information about when to use this parameter, see the description of                     <code>SendRawEmail</code> in this guide, or see the <a href=\"https://docs.aws.amazon.com/ses/latest/DeveloperGuide/sending-authorization-delegate-sender-tasks-email.html\">Amazon SES Developer Guide</a>.</p>         </note>",
+          "type": "string"
+        },
+        "Tags": {
+          "description": "<p>A list of tags, in the form of name/value pairs, to apply to an email that you send             using <code>SendRawEmail</code>. Tags correspond to characteristics of the email that             you define, so that you can publish email sending events.</p>",
+          "items": {
+            "$ref": "#/definitions/MessageTag"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "ServerSideEncryption": {
+      "enum": [
+        "AES256",
+        "aws:kms"
+      ],
+      "type": "string"
+    },
+    "SmtpConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "$schema": {
+          "pattern": "https:\\/\\/raw\\.githubusercontent\\.com\\/loopingz\\/smtp-relay\\/(main|v\\d+\\.\\d+\\.\\d+)\\/config\\.schema\\.json",
+          "type": "string"
+        },
+        "bind": {
+          "default": "localhost",
+          "type": "string"
+        },
+        "cachePath": {
+          "default": "`.email_${iso8601}.eml`",
+          "type": "string"
+        },
+        "flows": {
+          "additionalProperties": {
+            "$ref": "#/definitions/SmtpFlowConfig"
+          },
+          "description": "Define email flows",
+          "type": "object"
+        },
+        "keepCache": {
+          "default": false,
+          "type": "boolean"
+        },
+        "options": {
+          "additionalProperties": false,
+          "description": "options defines the behavior of the server    options.secure if true, the connection will use TLS. The default is false. If the server doesn’t start in TLS mode, it is still possible to upgrade clear text socket to TLS socket with the STARTTLS command (unless you disable support for it). If secure is true, additional tls options for tls.createServer can be added directly onto this options object.    options.name optional hostname of the server, used for identifying to the client (defaults to os.hostname())    options.banner optional greeting message. This message is appended to the default ESMTP response.    options.size optional maximum allowed message size in bytes, see details here    options.hideSize if set to true then does not expose the max allowed size to the client but keeps size related values like stream.sizeExceeded    options.authMethods optional array of allowed authentication methods, defaults to [‘PLAIN’, ‘LOGIN’]. Only the methods listed in this array are allowed, so if you set it to [‘XOAUTH2’] then PLAIN and LOGIN are not available. Use [‘PLAIN’, ‘LOGIN’, ‘XOAUTH2’] to allow all three. Authentication is only allowed in secure mode (either the server is started with secure:true option or STARTTLS command is used)    options.authOptional allow authentication, but do not require it    options.disabledCommands optional array of disabled commands (see all supported commands here). For example if you want to disable authentication, use [‘AUTH’] as this value. If you want to allow authentication in clear text, set it to [‘STARTTLS’].    options.hideSTARTTLS optional boolean, if set to true then allow using STARTTLS but do not advertise or require it. It only makes sense when creating integration test servers for testing the scenario where you want to try STARTTLS even when it is not advertised    options.hidePIPELINING optional boolean, if set to true then does not show PIPELINING in feature list    options.hide8BITMIME optional boolean, if set to true then does not show 8BITMIME in features list    options.hideSMTPUTF8 optional boolean, if set to true then does not show SMTPUTF8 in features list    options.allowInsecureAuth optional boolean, if set to true allows authentication even if connection is not secured first    options.disableReverseLookup optional boolean, if set to true then does not try to reverse resolve client hostname    options.sniOptions optional Map or an object of TLS options for SNI where servername is the key. Overrided by SNICallback.    options.logger optional bunyan compatible logger instance. If set to true then logs to console. If value is not set or is false then nothing is logged    options.maxClients sets the maximum number of concurrently connected clients, defaults to Infinity    options.useProxy boolean, if set to true expects to be behind a proxy that emits a PROXY header (version 1 only)    options.useXClient boolean, if set to true, enables usage of XCLIENT extension to override connection properties. See session.xClient (Map object) for the details provided by the client    options.useXForward boolean, if set to true, enables usage of XFORWARD extension. See session.xForward (Map object) for the details provided by the client    options.lmtp boolean, if set to true use LMTP protocol instead of SMTP    options.socketTimeout how many milliseconds of inactivity to allow before disconnecting the client (defaults to 1 minute)    options.closeTimeout how many milliseconds to wait before disconnecting pending connections once server.close() has been called (defaults to 30 seconds)",
+          "properties": {
+            "allowInsecureAuth": {
+              "description": "optional boolean, if set to true allows authentication even if connection is not secured first",
+              "type": "boolean"
+            },
+            "authMethods": {
+              "description": "optional array of allowed authentication methods, defaults to ['PLAIN', 'LOGIN']. Only the methods listed in this array are allowed, so if you set it to ['XOAUTH2'] then PLAIN and LOGIN are not available. Use ['PLAIN', 'LOGIN', 'XOAUTH2'] to allow all three. Authentication is only allowed in secure mode (either the server is started with secure: true option or STARTTLS command is used)",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "authOptional": {
+              "description": "allow authentication, but do not require it",
+              "type": "boolean"
+            },
+            "banner": {
+              "description": "optional greeting message. This message is appended to the default ESMTP response.",
+              "type": "string"
+            },
+            "closeTimeout": {
+              "$ref": "#/definitions/ms",
+              "description": "How many millisceonds to wait before disconnecting pending connections once `server.close()` has been called (defaults to 30 seconds)"
+            },
+            "disableReverseLookup": {
+              "description": "optional boolean, if set to true then does not try to reverse resolve client hostname",
+              "type": "boolean"
+            },
+            "disabledCommands": {
+              "description": "optional array of disabled commands (see all supported commands here). For example if you want to disable authentication, use ['AUTH'] as this value. If you want to allow authentication in clear text, set it to ['STARTTLS'].",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "hide8BITMIME": {
+              "description": "optional boolean, if set to true then does not show 8BITMIME in features list",
+              "type": "boolean"
+            },
+            "hidePIPELINING": {
+              "description": "optional boolean, if set to true then does not show PIPELINING in feature list",
+              "type": "boolean"
+            },
+            "hideSMTPUTF8": {
+              "description": "optional boolean, if set to true then does not show SMTPUTF8 in features list",
+              "type": "boolean"
+            },
+            "hideSTARTTLS": {
+              "description": "optional boolean, if set to true then allow using STARTTLS but do not advertise or require it. It only makes sense when creating integration test servers for testing the scenario where you want to try STARTTLS even when it is not advertised",
+              "type": "boolean"
+            },
+            "lmtp": {
+              "description": "boolean, if set to true use LMTP protocol instead of SMTP",
+              "type": "boolean"
+            },
+            "loggers": {
+              "items": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/ConsoleLoggerOptions"
+                  },
+                  {
+                    "$ref": "#/definitions/FileLoggerOptions"
+                  }
+                ]
+              },
+              "type": "array"
+            },
+            "maxClients": {
+              "description": "sets the maximum number of concurrently connected clients, defaults to Infinity",
+              "type": "number"
+            },
+            "maxVersion": {
+              "$ref": "#/definitions/SecureVersion",
+              "description": "Optionally set the maximum TLS version to allow. One of `'TLSv1.3'`, `'TLSv1.2'`, `'TLSv1.1'`, or `'TLSv1'`. Cannot be specified along with the `secureProtocol` option, use one or the other.\n**Default:** `'TLSv1.3'`, unless changed using CLI options. Using `--tls-max-v1.2` sets the default to `'TLSv1.2'`. Using `--tls-max-v1.3` sets the default to `'TLSv1.3'`. If multiple of the options are provided, the highest maximum is used."
+            },
+            "name": {
+              "description": "optional hostname of the server, used for identifying to the client (defaults to os.hostname())",
+              "type": "string"
+            },
+            "secure": {
+              "description": "if true, the connection will use TLS. The default is false. If the server doesn't start in TLS mode, it is still possible to upgrade clear text socket to TLS socket with the STARTTLS command (unless you disable support for it). If secure is true, additional tls options for tls. createServer can be added directly onto this options object.",
+              "type": "boolean"
+            },
+            "size": {
+              "description": "optional maximum allowed message size in bytes ([see details](https://github.com/andris9/smtp-server#using-size-extension))",
+              "type": "number"
+            },
+            "socketTimeout": {
+              "$ref": "#/definitions/ms",
+              "description": "How many milliseconds of inactivity to allow before disconnecting the client (defaults to 1 minute)"
+            },
+            "useProxy": {
+              "description": "boolean, if set to true expects to be behind a proxy that emits a [PROXY](http://www.haproxy.org/download/1.5/doc/proxy-protocol.txt) header (version 1 only)",
+              "type": "boolean"
+            },
+            "useXClient": {
+              "description": "boolean, if set to true, enables usage of [XCLIENT](http://www.postfix.org/XCLIENT_README.html) extension to override connection properties. See session.xClient (Map object) for the details provided by the client",
+              "type": "boolean"
+            },
+            "useXForward": {
+              "description": "boolean, if set to true, enables usage of [XFORWARD](http://www.postfix.org/XFORWARD_README.html) extension. See session.xForward (Map object) for the details provided by the client",
+              "type": "boolean"
+            }
+          },
+          "type": "object"
+        },
+        "port": {
+          "default": 10025,
+          "type": "number"
+        },
+        "prometheus": {
+          "additionalProperties": false,
+          "description": "Configure prometheus metrics",
+          "properties": {
+            "bind": {
+              "description": "Bind to a specific address",
+              "type": "string"
+            },
+            "defaultLabels": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "description": "Default labels to add to prometheus",
+              "type": "object"
+            },
+            "nodeMetrics": {
+              "description": "Collect node metrics",
+              "type": "boolean"
+            },
+            "portNumber": {
+              "description": "Port to bind to serve prometheus metrics",
+              "type": "number"
+            },
+            "url": {
+              "default": "/metrics",
+              "description": "Url to use",
+              "type": "string"
+            }
+          },
+          "required": [
+            "portNumber"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "$schema",
+        "flows",
+        "options"
+      ],
+      "type": "object"
+    },
+    "SmtpFlowConfig": {
+      "additionalProperties": false,
+      "description": "This define one flow within the SMTP Server",
+      "properties": {
+        "filters": {
+          "description": "Filters to apply to define if the connection/email should be accepted",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/StaticAuthConfiguration"
+              },
+              {
+                "$ref": "#/definitions/WhitelistFilterConfiguration"
+              }
+            ]
+          },
+          "type": "array"
+        },
+        "filtersOperator": {
+          "default": "AND",
+          "description": "Define which operator applies if several filters are applied",
+          "enum": [
+            "AND",
+            "OR"
+          ],
+          "type": "string"
+        },
+        "outputs": {
+          "description": "Define the processors to execute on the flow",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/FileProcessorConfig"
+              },
+              {
+                "$ref": "#/definitions/GCPProcessorConfig"
+              },
+              {
+                "$ref": "#/definitions/AWSProcessorConfig"
+              },
+              {
+                "$ref": "#/definitions/NodeMailerProcessorConfig"
+              }
+            ]
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "outputs"
+      ],
+      "type": "object"
+    },
+    "StaticAuthConfiguration": {
+      "additionalProperties": false,
+      "description": "Define a static auth",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "password": {
+          "description": "Staticly defined password\n\nIf not define will search for SMTP_PASSWORD environment variable",
+          "type": "string"
+        },
+        "salt": {
+          "description": "Salt for the password",
+          "type": "string"
+        },
+        "type": {
+          "const": "static-auth",
+          "type": "string"
+        },
+        "username": {
+          "description": "User to use for Authentication\n\nIf not define will search for SMTP_USERNAME environment variable",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "type": "object"
+    },
+    "StorageClass": {
+      "enum": [
+        "DEEP_ARCHIVE",
+        "GLACIER",
+        "GLACIER_IR",
+        "INTELLIGENT_TIERING",
+        "ONEZONE_IA",
+        "OUTPOSTS",
+        "REDUCED_REDUNDANCY",
+        "STANDARD",
+        "STANDARD_IA"
+      ],
+      "type": "string"
+    },
+    "Url": {
+      "additionalProperties": false,
+      "properties": {
+        "auth": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "hash": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "host": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "hostname": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "href": {
+          "type": "string"
+        },
+        "path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "pathname": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "port": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "protocol": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "query": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/ParsedUrlQuery"
+            }
+          ]
+        },
+        "search": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "slashes": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "auth",
+        "hash",
+        "host",
+        "hostname",
+        "href",
+        "path",
+        "pathname",
+        "protocol",
+        "search",
+        "slashes",
+        "port",
+        "query"
+      ],
+      "type": "object"
+    },
+    "WhitelistFilterConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "domains": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "from": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "ips": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "name": {
+          "type": "string"
+        },
+        "to": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "type": {
+          "const": "whitelist",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "type": "object"
+    },
+    "WorkerLogLevel": {
+      "description": "LogLevel as intersection to compare with integer values",
+      "enum": [
+        "ERROR",
+        "WARN",
+        "INFO",
+        "DEBUG",
+        "TRACE"
+      ],
+      "type": "string"
+    },
+    "global.Buffer": {
+      "additionalProperties": {
+        "type": "number"
+      },
+      "properties": {
+        "BYTES_PER_ELEMENT": {
+          "type": "number"
+        },
+        "buffer": {
+          "additionalProperties": false,
+          "properties": {
+            "byteLength": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "byteLength"
+          ],
+          "type": "object"
+        },
+        "byteLength": {
+          "type": "number"
+        },
+        "byteOffset": {
+          "type": "number"
+        },
+        "length": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "BYTES_PER_ELEMENT",
+        "buffer",
+        "byteLength",
+        "byteOffset",
+        "length"
+      ],
+      "type": "object"
+    },
+    "global.BufferEncoding": {
+      "enum": [
+        "ascii",
+        "utf8",
+        "utf-8",
+        "utf16le",
+        "ucs2",
+        "ucs-2",
+        "base64",
+        "base64url",
+        "latin1",
+        "binary",
+        "hex"
+      ],
+      "type": "string"
+    },
+    "internal.Readable": {
+      "additionalProperties": false,
+      "properties": {
+        "closed": {
+          "description": "Is true after 'close' has been emitted.",
+          "type": "boolean"
+        },
+        "destroyed": {
+          "description": "Is `true` after `readable.destroy()` has been called.",
+          "type": "boolean"
+        },
+        "errored": {
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "message": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "stack": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "message"
+              ],
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Returns error if the stream has been destroyed with an error."
+        },
+        "readable": {
+          "description": "Is `true` if it is safe to call `readable.read()`, which means the stream has not been destroyed or emitted `'error'` or `'end'`.",
+          "type": "boolean"
+        },
+        "readableAborted": {
+          "description": "Returns whether the stream was destroyed or errored before emitting `'end'`.",
+          "type": "boolean"
+        },
+        "readableDidRead": {
+          "description": "Returns whether `'data'` has been emitted.",
+          "type": "boolean"
+        },
+        "readableEncoding": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/global.BufferEncoding"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Getter for the property `encoding` of a given `Readable` stream. The `encoding`property can be set using the `readable.setEncoding()` method."
+        },
+        "readableEnded": {
+          "description": "Becomes `true` when `'end'` event is emitted.",
+          "type": "boolean"
+        },
+        "readableFlowing": {
+          "description": "This property reflects the current state of a `Readable` stream as described in the `Three states` section.",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "readableHighWaterMark": {
+          "description": "Returns the value of `highWaterMark` passed when creating this `Readable`.",
+          "type": "number"
+        },
+        "readableLength": {
+          "description": "This property contains the number of bytes (or objects) in the queue ready to be read. The value provides introspection data regarding the status of the `highWaterMark`.",
+          "type": "number"
+        },
+        "readableObjectMode": {
+          "description": "Getter for the property `objectMode` of a given `Readable` stream.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "closed",
+        "destroyed",
+        "errored",
+        "readable",
+        "readableAborted",
+        "readableDidRead",
+        "readableEncoding",
+        "readableEnded",
+        "readableFlowing",
+        "readableHighWaterMark",
+        "readableLength",
+        "readableObjectMode"
+      ],
+      "type": "object"
+    },
+    "ms": {
+      "type": "number"
+    }
+  }
+}

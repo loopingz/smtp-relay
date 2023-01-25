@@ -4,6 +4,7 @@ import { SmtpFilter } from "../filter";
 import { SmtpSession } from "../server";
 
 export interface WhitelistFilterConfiguration extends SmtpComponentConfig {
+  type: "whitelist";
   from?: (string | RegExp)[];
   to?: (string | RegExp)[];
   ips?: (string | RegExp)[];

@@ -7,6 +7,7 @@ import { SmtpFilter } from "../filter";
  * Define a static auth
  */
 export interface StaticAuthConfiguration extends SmtpComponentConfig {
+  type: "static-auth";
   /**
    * User to use for Authentication
    *

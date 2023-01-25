@@ -1,17 +1,18 @@
-import { PutObjectCommandInput, S3, S3ClientConfig } from "@aws-sdk/client-s3";
-import { SendRawEmailCommandInput, SES, SESClientConfig } from "@aws-sdk/client-ses";
-import { SendMessageCommandInput, SQS, SQSClientConfig } from "@aws-sdk/client-sqs";
+import { PutObjectCommandInput, S3 } from "@aws-sdk/client-s3";
+import { SendRawEmailCommandInput, SES } from "@aws-sdk/client-ses";
+import { SendMessageCommandInput, SQS } from "@aws-sdk/client-sqs";
 import * as fs from "fs";
 import { SmtpSession } from "../server";
 import { CloudProcessor, CloudProcessorConfig } from "./cloud";
 
 export interface AWSProcessorConfig extends CloudProcessorConfig {
+  type: "aws";
   ses?: boolean;
-  s3client?: S3ClientConfig;
+  s3client?: any;
   putOptions?: PutObjectCommandInput;
-  sqsclient?: SQSClientConfig;
+  sqsclient?: any;
   sendMessageOptions?: SendMessageCommandInput;
-  sesClient?: SESClientConfig;
+  sesClient?: any;
   sendRawEmailOptions?: SendRawEmailCommandInput;
 }
 
