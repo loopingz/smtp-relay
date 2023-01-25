@@ -212,7 +212,7 @@ export class SmtpServer {
       }
       this.config.prometheus.url ??= "/metrics";
       this.counter = new Counter({
-        name: "smtp-relay-emails",
+        name: "smtp_relay_emails_total",
         labelNames: ["flow", "status", "output"],
         help: "Emails counter"
       });
@@ -429,28 +429,32 @@ export class SmtpServer {
    * @param session
    */
   async onDataRead(session: SmtpSession) {
-    for (let name in session.flows) {
-      let flow = this.flows[name];
-      this.counter.inc({ status: "accepted", flow: name });
-      this.logger.log(
-        "INFO",
-        `Accepting mail from ${session.envelope.mailFrom} to ${session.envelope.rcptTo} (${session.clientHostname})`
-      );
-      for (let output of flow.outputs) {
-        this.logger.log("DEBUG", `Output[${output.name}] triggered`);
-        try {
-          await output.onMail(session);
-        } catch (err) {
-          this.logger.log("ERROR", `Flow(${name}) Output(${output.name})`, err);
-          this.counter.inc({ status: "error", flow: name, output: output.name });
+    try {
+      for (let name in session.flows) {
+        let flow = this.flows[name];
+        this.counter?.inc({ status: "accepted", flow: name });
+        this.logger.log(
+          "INFO",
+          `Accepting mail from ${session.envelope.mailFrom} to ${session.envelope.rcptTo} (${session.clientHostname})`
+        );
+        for (let output of flow.outputs) {
+          this.logger.log("DEBUG", `Output[${output.name}] triggered`);
+          try {
+            await output.onMail(session);
+          } catch (err) {
+            this.logger.log("ERROR", `Flow(${name}) Output(${output.name})`, err);
+            this.counter?.inc({ status: "error", flow: name, output: output.name });
+          }
         }
       }
+    } catch (err) {
+      this.logger.log("ERROR", err);
     }
   }
 
   manageCallback(session: SmtpSession, callback: SmtpCallback) {
     if (Object.keys(session.flows).length === 0) {
-      this.counter.inc({ status: "rejected" });
+      this.counter?.inc({ status: "rejected" });
       this.logger.log(
         "INFO",
         `Rejecting mail from ${session.envelope.mailFrom} to ${session.envelope.rcptTo} (${session.clientHostname})`

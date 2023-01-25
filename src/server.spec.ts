@@ -1,8 +1,8 @@
 import { suite, test } from "@testdeck/mocha";
-import { WorkerOutput } from "@webda/workout";
+import { MemoryLogger, WorkerOutput } from "@webda/workout";
 import * as assert from "assert";
+import axios from "axios";
 import { Socket } from "net";
-import * as sinon from "sinon";
 import { defaultModules } from ".";
 import { SmtpFilter } from "./filter";
 import { SmtpFlow } from "./flow";
@@ -217,16 +217,41 @@ class SmtpServerTest {
   @test
   async cov() {
     let server = new SmtpServer("./tests/whitelist-and.json");
-    let stub = sinon.stub(console, "error");
+    let logger = new MemoryLogger(server.logger, "ERROR");
     // Should log but not crash
-    server.onDataRead(null);
-    assert.strictEqual(stub.callCount, 1);
-    server.onConnect(null, null);
-    server.onEvent("RcptTo", null, null, null);
+    // @ts-ignore
+    await server.onDataRead(null);
+    assert.strictEqual(logger.getLogs().length, 1);
+    await server.onConnect(null, () => {});
+    await server.onEvent("RcptTo", null, null, () => {});
 
     assert.throws(() => SmtpProcessor.get(null, { type: "unknown-processor" }), /unknown-processor/);
     assert.throws(() => new SmtpServer("./tests/whitelist-and.ini"), /Configuration format not handled/);
     new SmtpServer("./tests/whitelist.yaml");
+    // Verify counter analyzing
+    server.flows["fake"] = <any>{
+      outputs: [
+        {
+          name: "fakeOutput",
+          onMail: async () => {
+            throw new Error();
+          }
+        } as any
+      ]
+    };
+    // @ts-ignore
+    await server.onDataRead({ flows: { fake: "PENDING" }, envelope: { mailFrom: "test@test.com", rcptTo: "ok.com" } });
+  }
+
+  @test
+  async prometheus() {
+    let server = new SmtpServer("./tests/whitelist-prometheus.json");
+    try {
+      await axios.get("http://localhost:8080/metrics");
+      await assert.rejects(() => axios.get("http://localhost:8080/plop"), /404/);
+    } finally {
+      server.promServer.close();
+    }
   }
 
   @test
