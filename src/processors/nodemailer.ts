@@ -1,14 +1,14 @@
 import { ParsedMail } from "mailparser";
 import * as nodemailer from "nodemailer";
 import Mail from "nodemailer/lib/mailer";
-import SMTPTransport from "nodemailer/lib/smtp-transport";
 import { SmtpComponentConfig } from "../component";
 import { SmtpProcessor } from "../processor";
 import { mapAddressObjects, SmtpSession } from "../server";
 
 export interface NodeMailerProcessorConfig extends SmtpComponentConfig {
+  type: "nodemailer";
   override?: Mail.Options;
-  nodemailer?: string | SMTPTransport | SMTPTransport.Options;
+  nodemailer?: string | any; //SMTPTransport | Omit<SMTPTransport.Options, "getSocket">;
 }
 
 export class NodeMailerProcessor<

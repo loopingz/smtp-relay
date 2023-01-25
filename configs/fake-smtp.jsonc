@@ -1,5 +1,6 @@
 // Can replace fakeSMTP.jar
 {
+  "$schema": "https://raw.githubusercontent.com/loopingz/smtp-relay/main/config.schema.json",
   "flows": {
     "localhost": {
       "filters": [

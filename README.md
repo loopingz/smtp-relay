@@ -28,11 +28,22 @@ Docker command
 docker run -p 10025:10025 loopingz/smtp-relay:latest configs/aws-smtp-relay.jsonc
 ```
 
+**Configuration file can leverage the published schema**
+
+```
+{
+  "$schema": "https://raw.githubusercontent.com/loopingz/smtp-relay/main/config.schema.json"
+}
+```
+
+Replace `main` in url by the tag version to get the configuration format of a specific version
+
 Run with a configuration file:
 
 ```
 // Replace my previous project aws-smtp-relay
 {
+  "$schema": "https://raw.githubusercontent.com/loopingz/smtp-relay/main/config.schema.json",
   "flows": {
     "localhost": {
       "filters": [

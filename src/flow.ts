@@ -1,7 +1,12 @@
 import { WorkerOutput } from "@webda/workout";
-import { SmtpComponentConfig } from "./component";
 import { SmtpFilter } from "./filter";
+import { StaticAuthConfiguration } from "./filters/static-auth";
+import { WhitelistFilterConfiguration } from "./filters/whitelist";
 import { SmtpProcessor } from "./processor";
+import { AWSProcessorConfig } from "./processors/aws";
+import { FileProcessorConfig } from "./processors/file";
+import { GCPProcessorConfig } from "./processors/gcp";
+import { NodeMailerProcessorConfig } from "./processors/nodemailer";
 
 /**
  * This define one flow within the SMTP Server
@@ -10,7 +15,7 @@ export interface SmtpFlowConfig {
   /**
    * Filters to apply to define if the connection/email should be accepted
    */
-  filters?: SmtpComponentConfig[];
+  filters?: (StaticAuthConfiguration | WhitelistFilterConfiguration)[];
   /**
    * Define which operator applies if several filters are applied
    *
@@ -20,7 +25,7 @@ export interface SmtpFlowConfig {
   /**
    * Define the processors to execute on the flow
    */
-  outputs: SmtpComponentConfig[];
+  outputs: (FileProcessorConfig | GCPProcessorConfig | AWSProcessorConfig | NodeMailerProcessorConfig)[];
 }
 
 /**

@@ -5,7 +5,9 @@ import { CloudProcessor, CloudProcessorConfig } from "./cloud";
 /**
  * Configuration for GCPProcessor
  */
-export interface GCPProcessorConfig extends CloudProcessorConfig {}
+export interface GCPProcessorConfig extends CloudProcessorConfig {
+  type: "gcp";
+}
 
 /**
  * This processor can store email within Google Storage or send a cloudevent to a topic
