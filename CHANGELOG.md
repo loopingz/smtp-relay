@@ -1,3 +1,32 @@
+# v1.1.0 (Wed Jan 25 2023)
+
+#### 🚀 Enhancement
+
+- feat: add @webda/workout logger system (Close #53) [#54](https://github.com/loopingz/smtp-relay/pull/54) ([@loopingz](https://github.com/loopingz))
+
+#### 🐛 Bug Fix
+
+- chore: update dependabot settings and add small doc [#54](https://github.com/loopingz/smtp-relay/pull/54) ([@loopingz](https://github.com/loopingz))
+
+#### 🔩 Dependency Updates
+
+- build(deps): bump @aws-sdk/client-ses from 3.234.0 to 3.235.0 [#48](https://github.com/loopingz/smtp-relay/pull/48) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- build(deps): bump @aws-sdk/client-s3 from 3.234.0 to 3.235.0 [#49](https://github.com/loopingz/smtp-relay/pull/49) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- build(deps): bump @aws-sdk/client-sqs from 3.234.0 to 3.235.0 [#51](https://github.com/loopingz/smtp-relay/pull/51) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- build(deps): bump @aws-sdk/client-sqs from 3.231.0 to 3.234.0 [#44](https://github.com/loopingz/smtp-relay/pull/44) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- build(deps): bump @aws-sdk/client-s3 from 3.231.0 to 3.234.0 [#45](https://github.com/loopingz/smtp-relay/pull/45) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- build(deps-dev): bump esbuild from 0.16.9 to 0.16.10 [#46](https://github.com/loopingz/smtp-relay/pull/46) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- build(deps): bump @aws-sdk/client-ses from 3.231.0 to 3.234.0 [#47](https://github.com/loopingz/smtp-relay/pull/47) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- build(deps-dev): bump esbuild from 0.16.7 to 0.16.9 [#42](https://github.com/loopingz/smtp-relay/pull/42) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- build(deps-dev): bump prettier-plugin-organize-imports [#41](https://github.com/loopingz/smtp-relay/pull/41) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+
+#### Authors: 2
+
+- [@dependabot[bot]](https://github.com/dependabot[bot])
+- Remi Cattiau ([@loopingz](https://github.com/loopingz))
+
+---
+
 # v1.0.2 (Fri Dec 16 2022)
 
 #### 🐛 Bug Fix
