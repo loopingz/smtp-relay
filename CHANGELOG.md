@@ -1,3 +1,15 @@
+# v1.2.2 (Thu Feb 02 2023)
+
+#### 🐛 Bug Fix
+
+- fix: update dependencies (remi@arize.com)
+
+#### Authors: 1
+
+- Remi Cattiau (remi@arize.com)
+
+---
+
 # v1.2.1 (Wed Jan 25 2023)
 
 #### 🐛 Bug Fix
