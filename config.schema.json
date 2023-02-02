@@ -763,6 +763,10 @@
           ],
           "description": "AMP4EMAIL specific HTML version of the message, same usage as with text and html. Make sure it is a full and valid AMP4EMAIL document, otherwise the displaying email client falls back to html and ignores the amp part"
         },
+        "attachDataUrls": {
+          "description": "if set to true then converts data:images in the HTML content of message to embedded attachments",
+          "type": "boolean"
+        },
         "attachments": {
           "description": "An array of attachment objects",
           "items": {
@@ -1513,7 +1517,7 @@
               "type": "string"
             }
           ],
-          "description": "<p>Indicates the algorithm used to create the checksum for the object when using the SDK. This header will not provide any     additional functionality if not using the SDK. When sending this header, there must be a corresponding <code>x-amz-checksum</code> or     <code>x-amz-trailer</code> header sent. Otherwise, Amazon S3 fails the request with the HTTP status code <code>400 Bad Request</code>. For more     information, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/checking-object-integrity.html\">Checking object integrity</a> in     the <i>Amazon S3 User Guide</i>.</p>         <p>If you provide an individual checksum, Amazon S3 ignores any provided             <code>ChecksumAlgorithm</code> parameter.</p>"
+          "description": "<p>Indicates the algorithm used to create the checksum for the object when using the SDK. This header will not provide any     additional functionality if not using the SDK. When sending this header, there must be a corresponding <code>x-amz-checksum</code> or     <code>x-amz-trailer</code> header sent. Otherwise, Amazon S3 fails the request with the HTTP status code <code>400 Bad Request</code>. For more     information, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/checking-object-integrity.html\">Checking object integrity</a> in     the <i>Amazon S3 User Guide</i>.</p>          <p>If you provide an individual checksum, Amazon S3 ignores any provided             <code>ChecksumAlgorithm</code> parameter.</p>"
         },
         "ChecksumCRC32": {
           "description": "<p>This header can be used as a data integrity check to verify that the data received is the same data that was originally sent.     This header specifies the base64-encoded, 32-bit CRC32 checksum of the object. For more information, see     <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/checking-object-integrity.html\">Checking object integrity</a> in the     <i>Amazon S3 User Guide</i>.</p>",
@@ -1674,7 +1678,7 @@
           "type": "string"
         },
         "WebsiteRedirectLocation": {
-          "description": "<p>If the bucket is configured as a website, redirects requests for this object to another          object in the same bucket or to an external URL. Amazon S3 stores the value of this header in          the object metadata. For information about object metadata, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html\">Object Key and Metadata</a>.</p>\n\n         <p>In the following example, the request header sets the redirect to an object          (anotherPage.html) in the same bucket:</p>\n\n         <p>             <code>x-amz-website-redirect-location: /anotherPage.html</code>          </p>\n\n         <p>In the following example, the request header sets the object redirect to another          website:</p>\n\n         <p>             <code>x-amz-website-redirect-location: http://www.example.com/</code>          </p>\n\n         <p>For more information about website hosting in Amazon S3, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/WebsiteHosting.html\">Hosting Websites on Amazon S3</a> and <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/how-to-page-redirect.html\">How to Configure Website Page             Redirects</a>. </p>",
+          "description": "<p>If the bucket is configured as a website, redirects requests for this object to another          object in the same bucket or to an external URL. Amazon S3 stores the value of this header in          the object metadata. For information about object metadata, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html\">Object Key and Metadata</a>.</p>          <p>In the following example, the request header sets the redirect to an object          (anotherPage.html) in the same bucket:</p>          <p>             <code>x-amz-website-redirect-location: /anotherPage.html</code>          </p>          <p>In the following example, the request header sets the object redirect to another          website:</p>          <p>             <code>x-amz-website-redirect-location: http://www.example.com/</code>          </p>          <p>For more information about website hosting in Amazon S3, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/WebsiteHosting.html\">Hosting Websites on Amazon S3</a> and <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/how-to-page-redirect.html\">How to Configure Website Page             Redirects</a>. </p>",
           "type": "string"
         }
       },
