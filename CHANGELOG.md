@@ -1,4 +1,13 @@
-# v1.2.2 (Thu Feb 02 2023)
+# Changelog
+
+## [1.3.0](https://github.com/loopingz/smtp-relay/compare/v1.2.2...v1.3.0) (2023-06-21)
+
+
+### Features
+
+* add a log processor to output received email from smtp ([98f132c](https://github.com/loopingz/smtp-relay/commit/98f132cd12423042fab1bc2a87245e42b1030f16))
+
+## v1.2.2 (Thu Feb 02 2023)
 
 #### 🐛 Bug Fix
 
@@ -10,7 +19,7 @@
 
 ---
 
-# v1.2.1 (Wed Jan 25 2023)
+## v1.2.1 (Wed Jan 25 2023)
 
 #### 🐛 Bug Fix
 
@@ -22,7 +31,7 @@
 
 ---
 
-# v1.2.0 (Wed Jan 25 2023)
+## v1.2.0 (Wed Jan 25 2023)
 
 #### 🚀 Enhancement
 
@@ -41,7 +50,7 @@
 
 ---
 
-# v1.1.0 (Wed Jan 25 2023)
+## v1.1.0 (Wed Jan 25 2023)
 
 #### 🚀 Enhancement
 
@@ -70,7 +79,7 @@
 
 ---
 
-# v1.0.2 (Fri Dec 16 2022)
+## v1.0.2 (Fri Dec 16 2022)
 
 #### 🐛 Bug Fix
 
@@ -83,7 +92,7 @@
 
 ---
 
-# v1.0.1 (Thu Dec 15 2022)
+## v1.0.1 (Thu Dec 15 2022)
 
 #### 🐛 Bug Fix
 
@@ -95,7 +104,7 @@
 
 ---
 
-# v1.0.0 (Thu Dec 15 2022)
+## v1.0.0 (Thu Dec 15 2022)
 
 :tada: This release contains work from a new contributor! :tada:
 
@@ -168,7 +177,7 @@ Thank you, Remi Cattiau ([@loopingz](https://github.com/loopingz)), for all your
 
 ---
 
-# (Thu Dec 15 2022)
+## (Thu Dec 15 2022)
 
 #### 💥 Breaking Change
 
