@@ -29,16 +29,17 @@ export class LogProcessor<
    */
   async onMail(session: SmtpSession): Promise<void> {
     const email = NodeMailerProcessor.transformEmail(session.email);
-    console.log("Email received", new Date().toISOString(), "from", session.remoteAddress);
-    console.log("-".repeat(80));
+    let content = `Email received ${new Date().toISOString()} from ${session.remoteAddress}
+${"-".repeat(80)}
+`;
     this.config.fields.filter(f => email[f] !== undefined).forEach(f => {
         let value = email[f];
         if (value instanceof Array) {
             value = email[f].join(", ");
         }
-        console.log(f +":", value)
+        content += `${f}: ${value}\n`;
     });
-    console.log("-".repeat(80));
-    console.log("");
+    content += `${"-".repeat(80)}\n`
+    this.logger.log("INFO", content);
   }
 }

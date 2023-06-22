@@ -11,7 +11,7 @@ import { LogProcessor } from "./log";
 class LogProcessorTest {
   @test
   async mailer() {
-    let nodemailer = new LogProcessor(
+    let log = new LogProcessor(
       undefined,
       {
         type: "log",
@@ -46,12 +46,12 @@ class LogProcessorTest {
       headers
     });
     let calls = [];
-    let stub = sinon.stub(console, "log").callsFake((...args) => {
+    let stub = sinon.stub(log.logger, "log").callsFake((...args) => {
         calls.push(args);
     });
-    await nodemailer.onMail(session);
+    await log.onMail(session);
     stub.restore();
-    msg = calls.map(c => c.join(" ")).join("\n").replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z/, "UTC_DATE");
+    msg = calls.map(c => c.splice(1).join(" ")).join("\n").replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z/, "UTC_DATE");
     assert.strictEqual(msg, `Email received UTC_DATE from 127.0.0.1
 --------------------------------------------------------------------------------
 from: Text content
