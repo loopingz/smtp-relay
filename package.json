@@ -86,6 +86,10 @@
     "ts-node": "^10.4.0",
     "typescript": "^4.9.3"
   },
+  "resolutions": {
+    "semver": ">=7.5.2",
+    "fast-xml-parser": ">=4.2.5"
+  },
   "auto": {
     "plugins": [
       "npm",
