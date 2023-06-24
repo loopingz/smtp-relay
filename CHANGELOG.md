@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.1](https://github.com/loopingz/smtp-relay/compare/v1.3.0...v1.3.1) (2023-06-24)
+
+
+### Bug Fixes
+
+* use latest image of distroless/nodejs18-debian11 ([6c897e8](https://github.com/loopingz/smtp-relay/commit/6c897e8ddfa0df97f3abfc876ee9ed8b744187c7))
+* use WorkerOutput instead of console.log ([d030903](https://github.com/loopingz/smtp-relay/commit/d0309036d592a61f2d82ba6a6c5d8ebb31eb587c))
+
 ## [1.3.0](https://github.com/loopingz/smtp-relay/compare/v1.2.2...v1.3.0) (2023-06-21)
 
 
