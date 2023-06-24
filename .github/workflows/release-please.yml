@@ -26,7 +26,7 @@ jobs:
         uses: redhat-actions/buildah-build@v2
         with:
           image: smtp-relay
-          tags: latest ${{ steps.release.outputs.major }} ${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }}
+          tags: latest v${{ steps.release.outputs.major }} v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }} v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }}.${{ steps.release.outputs.patch }}
           archs: amd64, arm64
           dockerfiles: |
             ./Dockerfile
