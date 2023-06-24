@@ -15,7 +15,6 @@ jobs:
         with:
           release-type: node
           package-name: smtp-relay
-          command: github-release
       - uses: actions/checkout@v2
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
