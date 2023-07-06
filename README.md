@@ -266,8 +266,7 @@ S: 235 2.7.0 Authentication successful
 ```
 
 
-Examples of ways to base64 encode:
-Encode your credentials:
+Examples of ways to base64 encode your credentials:
 
 ```
 base64 <<< password
