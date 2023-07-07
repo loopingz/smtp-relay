@@ -212,29 +212,27 @@ A `format` can be defined too
 
 By default the loggers are defined as a single `CONSOLE` logger. You can disable completely by adding a `loggers: []` property
 
-## Basic Auth
+## Static Basic Auth
 
-To enable basic auth for the smtp relay you need to set the static-auth filter, add the AND filters operator, set the authMethods and ensure secure is set to true as in the config example below.
+To enable basic auth for the smtp relay you need to set the `static-auth` filter, add the AND filters operator, set the authMethods and ensure one of `secure` or `allowInsecureAuth` is set as `true` in the config example below ([Example](https://github.com/loopingz/smtp-relay/blob/main/tests/auth.json))
 
-Set the SMTP_USERNAME, SMTP_PASSWORD as env variables. 
-Note that the password will need to be passed in with the below "plain:" prepended to your password. 
-I set them like this in the Dockerfile. Later you can set them in your helmfile if your using k8s.
+The password and username are passed either in the configuration with the field `username` and `password` or as env variables with `SMTP_USERNAME` and `SMTP_PASSWORD`
 
-Dockerfile example:
+The password is prefixed by `${hashAlgorithm}:` where hashAlgorithm is one of `plain`, `sha256`, `sha512` or `md5` (you can get the full list of hash algorithm supported by the Node with this command `node -e "console.log(require('crypto').getHashes())`)
+
+`plain` can be used to not hash the password, but it is not recommended for security reason.
+
+A `salt` parameter can be added in the configuration with the `salt` field, or env variable `SMTP_PASSWORD_SALT`.
+
+### Encrypt your password to use
+
+You can encrypt the password to use with this command:
+
 ```
-ENV SMTP_USERNAME: yourusername
-ENV SMTP_PASSWORD: plain:yourpassword
+HASH="sha256" PASSWORD="TEST" node -e 'console.log(`${process.env.HASH}:${require("crypto").createHash(process.env.HASH).update(process.env.PASSWORD).digest("hex")}`)'
 ```
 
-Helmfile example:
-
-```
-env: 
-  - name: SMTP_USERNAME
-    value: "username"
-  - name: SMTP_PASSWORD
-    value: "sha256:yourpassword"
-```
+### Raw testing with openssl and pure SMTP protocol
 
 For manual testing you will need to pass the username and password to the smtp-relay base64 encoded. If you use the SMTP auth method LOGIN you will encode and pass in the username and password seperately.
 
