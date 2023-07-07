@@ -115,7 +115,7 @@ Run with a configuration file:
 
 ### Run it locally for dev
 
-You can just leveraging the Docker image
+You can just leverage the Docker image:
 
 ```
 docker run -p 10025:10025 -v `pwd`/emails:/smtp-relay/received_emails loopingz/smtp-relay:latest ./configs/fake-smtp.jsonc
@@ -212,6 +212,113 @@ A `format` can be defined too
 
 By default the loggers are defined as a single `CONSOLE` logger. You can disable completely by adding a `loggers: []` property
 
+## Static Basic Auth
+
+To enable basic auth for the smtp relay you need to set the `static-auth` filter, add the AND filters operator, set the authMethods and ensure one of `secure` or `allowInsecureAuth` is set as `true` in the config example below ([Example](https://github.com/loopingz/smtp-relay/blob/main/tests/auth.json))
+
+The password and username are passed either in the configuration with the field `username` and `password` or as env variables with `SMTP_USERNAME` and `SMTP_PASSWORD`
+
+The password is prefixed by `${hashAlgorithm}:` where hashAlgorithm is one of `plain`, `sha256`, `sha512` or `md5` (you can get the full list of hash algorithm supported by the Node with this command `node -e "console.log(require('crypto').getHashes())`)
+
+`plain` can be used to not hash the password, but it is not recommended for security reason.
+
+A `salt` parameter can be added in the configuration with the `salt` field, or env variable `SMTP_PASSWORD_SALT`.
+
+### Encrypt your password to use
+
+You can encrypt the password to use with this command:
+
+```
+HASH="sha256" PASSWORD="TEST" node -e 'console.log(`${process.env.HASH}:${require("crypto").createHash(process.env.HASH).update(process.env.PASSWORD).digest("hex")}`)'
+```
+
+### Raw testing with openssl and pure SMTP protocol
+
+For manual testing you will need to pass the username and password to the smtp-relay base64 encoded. If you use the SMTP auth method LOGIN you will encode and pass in the username and password seperately.
+
+Example smtp test:
+
+1. Port forward your container to your localhost.
+
+```
+ docker run -p 10025:10025 loopingz/smtp-relay:latest
+ ```
+
+
+2. Connect to smtp-relay
+```
+openssl s_client -connect localhost:10025
+```
+```
+S: 220 smtp.server.com Simple Mail Transfer Service Ready
+C: EHLO client.example.com
+S: 250-smtp.server.com Hello client.example.com
+S: 250-SIZE 1000000
+S: 250 AUTH LOGIN PLAIN CRAM-MD5
+C: AUTH LOGIN
+S: 334 VXNlcm5hbWU6
+C: adlxdkej
+S: 334 UGFzc3dvcmQ6
+C: lkujsefxlj
+S: 235 2.7.0 Authentication successful
+```
+
+
+Examples of ways to base64 encode your credentials:
+
+```
+base64 <<< password
+```
+
+Gotcha: make sure to use a base64 encoder that encodes with Destination character set utf8 and Destination new line seperator LF(Unix), this online one does that, the MAC cml one is poop
+https://www.base64encode.org/
+
+Example Schema used to add basic auth to an aws-ses smtp-relay running in k8s:
+
+```
+{
+  "$schema": "https://raw.githubusercontent.com/loopingz/smtp-relay/main/config.schema.json",
+  "flows": {
+    "localhost": {
+      "filters": [
+        {
+          "type": "whitelist",
+          "ips": [
+            "regexp:.*"
+          ]
+        },
+        {
+          "type": "static-auth"
+        }
+      ],
+      "filtersOperator": "AND",
+      "outputs": [
+        {
+          "type": "aws",
+          "ses": {}
+        }
+      ]
+    }
+  },
+  "cachePath": "/tmp/.email_${iso8601}.eml",
+  "options": {
+    "authMethods": [
+      "PLAIN",
+      "LOGIN"
+    ],
+    "secure": true,
+    "disableReverseLookup": true,
+    "authOptional": true,
+    "loggers": [
+      {
+        "level": "INFO",
+        "type": "CONSOLE"
+      }
+    ]
+  }
+}
+```
+Note: Change your loggers level to DEBUG for help troubleshooting.
 ## Contributors ✨
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
