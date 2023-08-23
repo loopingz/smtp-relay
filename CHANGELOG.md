@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.2](https://github.com/loopingz/smtp-relay/compare/v1.3.1...v1.3.2) (2023-08-23)
+
+
+### Bug Fixes
+
+* protobufjs Prototype Pollution vulnerability ([#65](https://github.com/loopingz/smtp-relay/issues/65)) ([6624ba4](https://github.com/loopingz/smtp-relay/commit/6624ba4a305228e16b4ed74919232456e7f30b3d))
+
 ## [1.3.1](https://github.com/loopingz/smtp-relay/compare/v1.3.0...v1.3.1) (2023-06-24)
 
 
