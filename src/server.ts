@@ -370,12 +370,13 @@ export class SmtpServer {
       session.email = await simpleParser(fs.createReadStream(session.emailPath));
       await this.onDataRead(session);
       if (!this.config.keepCache) {
-        fs.unlinkSync(session.emailPath);
+        fs.unlink(session.emailPath, (err) => {
+          err && this.logger.log("ERROR", `Unable to delete ${session.emailPath}`, err);
+        });
       }
       callback();
     });
 
-    /* istanbul ignore next */
     stream.on("error", err => callback(`error converting stream - ${err}`));
   }
 
