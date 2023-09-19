@@ -1,8 +1,9 @@
-import { SMTPServerAddress, SMTPServerAuthentication } from "smtp-server";
+import { SMTPServerAuthentication } from "smtp-server";
 import { SmtpComponentConfig } from "../component";
 import { SmtpFilter } from "../filter";
 import { SmtpSession } from "../server";
 import { request } from "./http-auth";
+import { getCloudEvent } from "../cloudevent";
 
 export interface HttpConfig extends SmtpComponentConfig {
   /**
@@ -43,18 +44,6 @@ export interface HttpFilterConfig extends HttpConfig {
  */
 export class HttpFilter extends SmtpFilter<HttpFilterConfig> {
   type: string = "http-filter";
-  sessions: WeakMap<
-    SmtpSession,
-    {
-      remoteAddress: string;
-      clientHostname: string;
-      localPort: number;
-      remotePort: number;
-      username: string;
-      rcpts: string[];
-      from: string;
-    }
-  > = new WeakMap();
 
   /**
    * @override
@@ -67,42 +56,15 @@ export class HttpFilter extends SmtpFilter<HttpFilterConfig> {
     this.config.method ??= "POST";
   }
 
-  /**
-   * Collect data
-   * @param address
-   * @param session
-   * @returns
-   */
-  async onMailFrom(address: SMTPServerAddress, session: SmtpSession): Promise<boolean | undefined> {
-    this.sessions.get(session).from = address.address.toString();
-    return undefined;
-  }
-
-  /**
-   * Collect data
-   * @param address
-   * @param session
-   * @returns
-   */
-  async onRcptTo(address: SMTPServerAddress, session: SmtpSession): Promise<boolean | undefined> {
-    this.sessions.get(session).rcpts ??= [];
-    this.sessions.get(session).rcpts.push(address.address);
-    return undefined;
-  }
-
   async onData(session: SmtpSession): Promise<boolean> {
     let res = await request({
       ...this.config,
       headers: {
         "content-type": "application/json"
       },
-      body: JSON.stringify({
-        ...this.sessions.get(session),
-        secure: session.secure,
-        anonymous: session.user === undefined
-      })
+      body: JSON.stringify(getCloudEvent(session))
     });
-    this.sessions.delete(session);
+    console.log("onData result", res, res.ok);
     return res.ok;
   }
 
@@ -112,19 +74,6 @@ export class HttpFilter extends SmtpFilter<HttpFilterConfig> {
    * @returns
    */
   async onAuth(auth: SMTPServerAuthentication, session: SmtpSession): Promise<boolean | undefined> {
-    this.sessions.get(session).username = auth.username;
     return this.config.allowAnyUser || undefined;
-  }
-
-  async onConnect(session: SmtpSession): Promise<boolean | undefined> {
-    let info = {
-      remoteAddress: session.remoteAddress,
-      remotePort: session.remotePort,
-      clientHostname: session.clientHostname,
-      localAddress: session.localAddress,
-      localPort: session.localPort
-    };
-    this.sessions.set(session, <any>info);
-    return undefined;
   }
 }

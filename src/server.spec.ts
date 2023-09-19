@@ -7,7 +7,7 @@ import { defaultModules } from ".";
 import { SmtpFilter } from "./filter";
 import { SmtpFlow } from "./flow";
 import { SmtpProcessor } from "./processor";
-import { SmtpServer, SmtpSession } from "./server";
+import { SmtpServer, SmtpSession, mapAddressObjects } from "./server";
 
 export class SmtpTest {
   sock: Socket;
@@ -185,6 +185,7 @@ class SmtpServerTest {
     );
     server.close();
     // cov
+    assert.ok(Array.isArray(mapAddressObjects({value: [], text: "", html: ""}, () => {})), "Should always return an array");
     // @ts-ignore
     server.addFlow({ name: "Test" });
     // @ts-ignore

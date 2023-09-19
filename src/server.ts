@@ -368,6 +368,7 @@ export class SmtpServer {
       stream.pipe(fs.createWriteStream(session.emailPath));
       // @ts-ignore
       stream.on("end", async () => {
+        session.email = await simpleParser(fs.createReadStream(session.emailPath));
         await this.filter("Data", session, [session]);
         // If no decision made after RCPT TO we consider refused
         for (let name in session.flows) {
@@ -382,7 +383,6 @@ export class SmtpServer {
             return;
           }
           (async () => {
-            session.email = await simpleParser(fs.createReadStream(session.emailPath));
             await this.onDataRead(session);
             if (!this.config.keepCache) {
               fs.unlink(session.emailPath, (err) => {

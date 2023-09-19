@@ -213,6 +213,43 @@ A `format` can be defined too
 
 By default the loggers are defined as a single `CONSOLE` logger. You can disable completely by adding a `loggers: []` property
 
+## CloudEvent
+
+The cloudevent representation of an email is:
+```
+/**
+ * CloudEvent Data representation for smtp-relay
+ */
+export interface SmtpCloudEvent {
+  email: {
+    from?: AddressObject;
+    attachments: {
+      filename: string;
+      size: number;
+    }[];
+    subject?: string;
+    priority?: string;
+    to?: AddressObject[];
+    cc?: AddressObject[];
+    bcc?: AddressObject[];
+    replyTo?: string;
+    date?: Date;
+    text?: string;
+    html?: string;
+  };
+  server: {
+    clientHostname: string;
+    remoteAddress: string;
+    remotePort: number;
+    hostNameAppearAs: string;
+    id: string;
+    secure: boolean;
+    transmissionType: string;
+    username: string;
+  };
+}
+```
+
 ## Http Auth
 
 You can enable http auth for the smtp relay, it will then relay the username/password verification to an HTTP endpoint.
@@ -301,7 +338,7 @@ Sample:
 
 ## Http Filter
 
-The http filter sends all the data related to the email to an http endpoint to accept or refuse the email. If the http request return a status code < 300, it means the email is accepted otherwise it is refused.
+The http filter sends the cloudevent related to the email to an http endpoint to accept or refuse the email. If the http request return a status code < 300, it means the email is accepted otherwise it is refused.
 
 See the `tests/http-filter-with-auth.json` and `test/http-filter.json` configuration examples.
 

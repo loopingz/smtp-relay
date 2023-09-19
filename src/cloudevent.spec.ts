@@ -43,4 +43,23 @@ class CloudEventTest {
     // Should have been truncated
     assert.strictEqual(evt.data.email.subject, "1234".repeat(2048));
   }
+
+  @test
+  fallback() {
+    let session = getFakeSession();
+
+    session.envelope.mailFrom = false;
+    session.envelope.rcptTo = [
+      {
+        address: "test@test.com",
+        args: {}
+      }
+    ]
+    // @ts-ignore
+    session.email = {};
+    session.email.attachments = [];
+    let evt = getCloudEvent(session);
+    // Should have been truncated
+    assert.strictEqual(evt.data.email.to[0].value[0].address, "test@test.com");
+  }
 }
