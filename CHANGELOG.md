@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.4.0](https://github.com/loopingz/smtp-relay/compare/v1.3.3...v1.4.0) (2023-09-19)
+
+
+### Features
+
+* add http-auth and http-filter filters ([ff20417](https://github.com/loopingz/smtp-relay/commit/ff204172d110b9f4501480a976fa0a5400a58b7f)), closes [#70](https://github.com/loopingz/smtp-relay/issues/70)
+* update to node18 and drop node16 ([c414bf2](https://github.com/loopingz/smtp-relay/commit/c414bf273ea267e8e2aa76259954c12fba0ff9d4))
+* use cloudevent for http-filter payload ([d603167](https://github.com/loopingz/smtp-relay/commit/d603167d7ddaaffa9e9037514a975577dd36a613))
+
 ## [1.3.3](https://github.com/loopingz/smtp-relay/compare/v1.3.2...v1.3.3) (2023-09-12)
 
 
