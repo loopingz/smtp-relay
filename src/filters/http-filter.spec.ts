@@ -7,6 +7,7 @@ import { SmtpFlow } from "../flow";
 import { SmtpServer } from "../server";
 import { SmtpTest } from "../server.spec";
 import { HttpFilter } from "./http-filter";
+import { SmtpCloudEvent } from "../cloudevent";
 
 @suite
 class HttpSmtpServerTest extends SmtpTest {
@@ -24,13 +25,16 @@ class HttpSmtpServerTest extends SmtpTest {
         req.on("end", () => {
           body = body.trim();
           if (req.headers["content-type"] === "application/json") {
-            let info = JSON.parse(body);
-            if (info.from === "test@smtp-relay.com" && info.rcpts.includes("recipient@domain1.com")) {
+            let info: SmtpCloudEvent = JSON.parse(body).data;
+            if (
+              info.email.from.value[0].address === "test@smtp-relay.com" &&
+              info.email.to.find(a => a.value[0].address === "recipient@domain1.com")
+            ) {
               res.write("OK");
             } else if (
-              info.from === "test@smtp-relay.com" &&
-              info.rcpts.includes("recipient@domain2.com") &&
-              info.username === "authenticated"
+              info.email.from.value[0].address === "test@smtp-relay.com" &&
+              info.email.to.find(a => a.value[0].address === "recipient@domain1.com") &&
+              info.server.username === "authenticated"
             ) {
               res.write("OK");
             } else {
@@ -123,7 +127,7 @@ class HttpSmtpServerTest extends SmtpTest {
     await test.write(`YXV0aGVudGljYXRlZA==`, "334");
     await test.write(`dGVzdA==`, "235");
     await test.write("MAIL FROM: <test@smtp-relay.com>", "250");
-    await test.write("RCPT TO: <recipient@domain.com>", "250");
+    await test.write("RCPT TO: <recipient@domain1.com>", "250");
     await test.write("RCPT TO: <recipient@domain2.com>", "250");
 
     await test.write("DATA", "354");
