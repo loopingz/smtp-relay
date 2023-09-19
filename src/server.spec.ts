@@ -14,6 +14,7 @@ export class SmtpTest {
   output: string;
   waitForPromise: () => void;
   waitCode: string;
+  smtpServer: SmtpServer;
 
   async write(data, nextCode = undefined) {
     return new Promise<void>(resolve => {
@@ -31,6 +32,10 @@ export class SmtpTest {
         resolve();
       });
     });
+  }
+
+  after() {
+    this.smtpServer?.close();
   }
 
   async waitFor(code) {
@@ -77,7 +82,7 @@ export class SmtpTest {
   async failEmail(
     step: "CONNECT" | "HELO" | "MAIL" | "RCPT" | "DATA",
     from: string,
-    to: string,
+    to: string | string[],
     msgData: string,
     port: number = 10025
   ) {
@@ -106,15 +111,21 @@ export class SmtpTest {
         if (step === "MAIL") {
           return;
         }
-        await this.write(`RCPT TO: <${to}>`, step === "RCPT" ? "550" : "250");
+        if (Array.isArray(to)) {
+          for (let toEmail of to) {
+            await this.write(`RCPT TO: <${toEmail}>`, step === "RCPT" ? "550" : "250");
+          }
+        } else {
+          await this.write(`RCPT TO: <${to}>`, step === "RCPT" ? "550" : "250");
+        }
         if (step === "RCPT") {
           return;
         }
-        await this.write(`DATA`, step === "DATA" ? "550" : "354");
+        await this.write(`DATA`, "354");
+        await this.write(`${msgData}\r\n\r\n.\r\n`, step === "DATA" ? "450" : "250");
         if (step === "DATA") {
           return;
         }
-        await this.write(`${msgData}\r\n\r\n.\r\n`, "250");
         await this.write(`QUIT`, "221");
       } finally {
         this.sock.end();
@@ -199,7 +210,7 @@ class SmtpServerTest {
     server.init();
     await new SmtpTest().sendEmail("test@smtp-relay.com", "recipient@domain1.com", "Coucouc");
     await new SmtpTest().sendEmail("test@smtp-relay.com", "recipient@domain2.com", "Coucouc");
-    await new SmtpTest().failEmail("RCPT", "test@smtp-relay.com", "recipient@domain3.com", "Coucouc");
+    await new SmtpTest().failEmail("DATA", "test@smtp-relay.com", "recipient@domain3.com", "Coucouc");
     server.close();
   }
 
@@ -240,7 +251,7 @@ class SmtpServerTest {
       ]
     };
     // @ts-ignore
-    await server.onDataRead({ flows: { fake: "PENDING" }, envelope: { mailFrom: "test@test.com", rcptTo: "ok.com" } });
+    await server.onDataRead({ flows: { fake: "PENDING" }, envelope: { mailFrom: {address: "test@test.com", args: {}}, rcptTo: [{address: "ok.com", args: {}}] } });
   }
 
   @test

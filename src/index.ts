@@ -8,6 +8,8 @@ import { FileProcessor } from "./processors/file";
 import { GCPProcessor } from "./processors/gcp";
 import { NodeMailerProcessor } from "./processors/nodemailer";
 import { SmtpServer } from "./server";
+import { HttpAuthFilter } from "./filters/http-auth";
+import { HttpFilter } from "./filters/http-filter";
 
 /**
  * Define the default modules
@@ -21,6 +23,14 @@ export function defaultModules() {
    * Use a statically defined user/password
    */
   SmtpFilter.register("static-auth", StaticAuthFilter);
+  /**
+   * Use to call a url for authentication
+   */
+  SmtpFilter.register("http-auth", HttpAuthFilter);
+  /**
+   * Use to call a url for filtering on mail data
+   */
+  SmtpFilter.register("http-filter", HttpFilter);
   /**
    * Store an email flow into a file
    */
