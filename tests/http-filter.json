@@ -1,0 +1,25 @@
+{
+    "flows": {
+      "localhost": {
+        "filters": [
+          {
+            "type": "http-filter",
+            "url": "http://localhost:16662/smtp/filter"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "file",
+            "path": "./emails/"
+          }
+        ]
+      }
+    },
+    "options": {
+      "disableReverseLookup": false,
+      "authOptional": true,
+      "allowInsecureAuth": true,
+      "logger": true
+    }
+  }
+  

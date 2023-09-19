@@ -25,7 +25,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node: ["18", "16"]
+        node: ["18", "20"]
     name: Build with NodeJS v${{ matrix.node }}
     env:
       FORCE_COLOR: 1
