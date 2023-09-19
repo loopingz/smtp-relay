@@ -360,24 +360,42 @@ export class SmtpServer {
    * @param callback
    */
   async onData(stream: SMTPServerDataStream, session: SmtpSession, callback: SmtpCallback) {
-    session.emailPath = SmtpServer.replaceVariables(this.config.cachePath, { ...session });
+    
+      // Data
+      session.emailPath = SmtpServer.replaceVariables(this.config.cachePath, { ...session });
 
-    // @ts-ignore
-    stream.pipe(fs.createWriteStream(session.emailPath));
-    // @ts-ignore
-    stream.on("end", async () => {
-      await this.filter("Data", session, [session]);
-      session.email = await simpleParser(fs.createReadStream(session.emailPath));
-      await this.onDataRead(session);
-      if (!this.config.keepCache) {
-        fs.unlink(session.emailPath, (err) => {
-          err && this.logger.log("ERROR", `Unable to delete ${session.emailPath}`, err);
+      // @ts-ignore
+      stream.pipe(fs.createWriteStream(session.emailPath));
+      // @ts-ignore
+      stream.on("end", async () => {
+        await this.filter("Data", session, [session]);
+        // If no decision made after RCPT TO we consider refused
+        for (let name in session.flows) {
+          // Skip any flow that was not accepted explicitely
+          if (session.flows[name] === "PENDING") {
+            delete session.flows[name];
+          }
+        }
+        this.manageCallback(session, (err) => {
+          if (err) {
+            callback(err);
+            return;
+          }
+          (async () => {
+            session.email = await simpleParser(fs.createReadStream(session.emailPath));
+            await this.onDataRead(session);
+            if (!this.config.keepCache) {
+              fs.unlink(session.emailPath, (err) => {
+                err && this.logger.log("ERROR", `Unable to delete ${session.emailPath}`, err);
+              });
+            }
+            callback();
+          })();
         });
-      }
-      callback();
-    });
+      });
 
-    stream.on("error", err => callback(`error converting stream - ${err}`));
+      stream.on("error", err => callback(`error converting stream - ${err}`));
+    
   }
 
   /**
@@ -410,15 +428,6 @@ export class SmtpServer {
   async onEvent(evt: "MailFrom" | "RcptTo", param: SMTPServerAddress, session: SmtpSession, callback: SmtpCallback) {
     try {
       await this.filter(evt, session, [param, session]);
-      // If no decision made after RCPT TO we consider refused
-      if (evt === "RcptTo") {
-        for (let name in session.flows) {
-          // Skip any flow that was not accepted explicitely
-          if (session.flows[name] === "PENDING") {
-            delete session.flows[name];
-          }
-        }
-      }
       // Send an error if no more flows are active
       this.manageCallback(session, callback);
     } catch (err) {
@@ -432,12 +441,15 @@ export class SmtpServer {
    */
   async onDataRead(session: SmtpSession) {
     try {
+      // We filter here as we can have several RCPT TO
       for (let name in session.flows) {
         let flow = this.flows[name];
         this.counter?.inc({ status: "accepted", flow: name });
         this.logger.log(
           "INFO",
-          `Accepting mail from ${session.envelope.mailFrom} to ${session.envelope.rcptTo} (${session.clientHostname})`
+          `Accepting mail from ${
+            session.envelope.mailFrom ? session.envelope.mailFrom.address : "unknown"
+          } to ${session.envelope.rcptTo.map(a => a.address).join(",")} (${session.clientHostname})`
         );
         for (let output of flow.outputs) {
           this.logger.log("DEBUG", `Output[${output.name}] triggered`);
@@ -459,7 +471,9 @@ export class SmtpServer {
       this.counter?.inc({ status: "rejected" });
       this.logger.log(
         "INFO",
-        `Rejecting mail from ${session.envelope.mailFrom} to ${session.envelope.rcptTo} (${session.clientHostname})`
+        `Rejecting mail from ${
+          session.envelope.mailFrom ? session.envelope.mailFrom.address : "unknown"
+        } to ${session.envelope.rcptTo.map(a => a.address).join(",")} (${session.clientHostname})`
       );
       callback(new Error("Message refused"));
     } else {

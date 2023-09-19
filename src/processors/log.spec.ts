@@ -14,7 +14,7 @@ class LogProcessorTest {
     let log = new LogProcessor(
       undefined,
       {
-        type: "log",
+        type: "log"
       },
       new WorkerOutput()
     );
@@ -33,11 +33,11 @@ class LogProcessorTest {
     session.email.text = "Text content";
     session.email.subject = "Subject";
     session.email.from = {
-        html: "Html content",
-        text: "Text content",
-        value: [{ name: "Test", address: "" }]
+      html: "Html content",
+      text: "Text content",
+      value: [{ name: "Test", address: "" }]
     };
-    
+
     const headers = new Map<string, HeaderValue>();
     headers.set("plop", "test");
     // @ts-ignore
@@ -47,18 +47,24 @@ class LogProcessorTest {
     });
     let calls = [];
     let stub = sinon.stub(log.logger, "log").callsFake((...args) => {
-        calls.push(args);
+      calls.push(args);
     });
     await log.onMail(session);
     stub.restore();
-    msg = calls.map(c => c.splice(1).join(" ")).join("\n").replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z/, "UTC_DATE");
-    assert.strictEqual(msg, `Email received UTC_DATE from 127.0.0.1
+    msg = calls
+      .map(c => c.splice(1).join(" "))
+      .join("\n")
+      .replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z/, "UTC_DATE");
+    assert.strictEqual(
+      msg,
+      `Email received UTC_DATE from 127.0.0.1
 --------------------------------------------------------------------------------
 from: Text content
 to: test@plop.com
 subject: Subject
 text: Text content
 --------------------------------------------------------------------------------
-`);
+`
+    );
   }
 }

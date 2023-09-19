@@ -141,7 +141,8 @@ At each SMTP command step, they can make a decision to refuse or accept an email
 By default, 3 filters exist:
 
 - whitelist: allow emails based on regexp or exact values
-- http-auth: proxy the decision on the email to an HTTP endpoint
+- http-auth: proxy the authentication to an HTTP endpoint
+- http-filter: proxy the decision on the email to an HTTP endpoint
 - static-auth: staticly defined user/password for authentication
 
 ### Processors
@@ -211,6 +212,120 @@ The `FILE` type have a size limit defined and will increment a number at the end
 A `format` can be defined too
 
 By default the loggers are defined as a single `CONSOLE` logger. You can disable completely by adding a `loggers: []` property
+
+## Http Auth
+
+You can enable http auth for the smtp relay, it will then relay the username/password verification to an HTTP endpoint.
+
+Use the `http-auth` filter:
+ - BASIC_AUTH: It will send a `authorization` header with a Basic Auth (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization)
+ - FORM_URLENCODED: It will send a request to the url with a x-form-urlencoded containing username and password
+ - JSON: Sending a JSON body to the url with the username/password
+
+Configuration interface
+
+```
+interface HttpAuthConfiguration {
+  /**
+   * URL to call
+   */
+  url: string;
+  /**
+   * Method to use
+   */
+  method?: "PUT" | "POST" | "GET";
+  /**
+   * If not define the HTTP code is used:
+   * < 300: Allowed
+   * >= 300: Refused
+   * 
+   * If defined the response is read as JSON and test for value
+   */
+  json_result?: {
+    /**
+     * Json path to read from the response
+     */
+    path: string,
+    /**
+     * Value to compare to, if equal then authentication is accepted
+     */
+    value: string
+  };
+  /**
+   * Http method to use to pass credentials
+   * 
+   * BasicAuth: Will use the Authorization field
+   * Json: Will post/put a JSON body with the user/password
+   * FormData: Will post/put a Form body with the user/password
+   */
+  credentialsMethod: "BASIC_AUTH" | "JSON" | "FORM_URLENCODED";
+  /**
+   * Name of the field for FormData
+   * Jsonpath for Json
+   */
+  userField?: string;
+  /**
+   * Name of the field for FormData
+   * Jsonpath for Json
+   */
+  passwordField?: string;
+  /**
+   * Used to sign request
+   */
+  hmac?: {
+    /**
+     * Secret to use
+     */
+    secret: string;
+    /**
+     * @default sha256
+     */
+    algo?: string;
+    /**
+     * @default X-SMTP-RELAY
+     */
+    header?: string;
+  }
+}
+```
+
+Sample:
+
+```
+{
+  "type": "http-auth",
+  "url": "http://localhost:16662/smtp/filter",
+  "credentialsMethod": "BASIC_AUTH"
+}
+```
+
+## Http Filter
+
+The http filter sends all the data related to the email to an http endpoint to accept or refuse the email. If the http request return a status code < 300, it means the email is accepted otherwise it is refused.
+
+See the `tests/http-filter-with-auth.json` and `test/http-filter.json` configuration examples.
+
+It can also be configured to sign request with hmac.
+
+```
+export interface HttpFilterConfig extends HttpConfig {
+  /**
+   * URL to call
+   */
+  url: string;
+  /**
+   * Method to use
+   */
+  method?: "PUT" | "POST";
+  /**
+   * Accept any form of authentication to rely solely on username
+   * and filter on the http endpoint
+   *
+   * @default false
+   */
+  allowAnyUser?: boolean;
+}
+```
 
 ## Static Basic Auth
 
@@ -319,22 +434,3 @@ Example Schema used to add basic auth to an aws-ses smtp-relay running in k8s:
 }
 ```
 Note: Change your loggers level to DEBUG for help troubleshooting.
-## Contributors ✨
-
-Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
-
-<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-<!-- prettier-ignore-start -->
-<!-- markdownlint-disable -->
-<table>
-  <tr>
-    <td align="center"><a href="https://www.loopingz.com/"><img src="https://avatars.githubusercontent.com/u/3437026?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Remi Cattiau</b></sub></a><br /><a href="https://github.com/loopingz/loopingz/smtp-relay/commits?author=loopingz" title="Documentation">📖</a> <a href="https://github.com/loopingz/loopingz/smtp-relay/commits?author=loopingz" title="Code">💻</a> <a href="#infra-loopingz" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
-  </tr>
-</table>
-
-<!-- markdownlint-restore -->
-<!-- prettier-ignore-end -->
-
-<!-- ALL-CONTRIBUTORS-LIST:END -->
-
-This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
