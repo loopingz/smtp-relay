@@ -8,7 +8,7 @@ permissions:
 
 name: weekly-container-update
 jobs:
-  release-please:
+  container-update:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -24,9 +24,9 @@ jobs:
           TAG: ${{ steps.get_release.outputs.tag_name }}
         id: release
         run: |
-          echo "::set-output name=major::`echo ${TAG:1} | cut -d'.' -f1`"
-          echo "::set-output name=minor::`echo ${TAG:1} | cut -d'.' -f2`"
-          echo "::set-output name=patch::`echo ${TAG:1} | cut -d'.' -f3`"
+          echo major=`echo ${TAG:1} | cut -d'.' -f1` >> $GITHUB_OUTPUT
+          echo minor=`echo ${TAG:1} | cut -d'.' -f2` >> $GITHUB_OUTPUT
+          echo patch=`echo ${TAG:1} | cut -d'.' -f3` >> $GITHUB_OUTPUT
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
