@@ -26,7 +26,7 @@
     "@google-cloud/pubsub": "^4.0.6",
     "@google-cloud/storage": "^7.1.0",
     "@webda/workout": "^3.0.3",
-    "axios": "^1.2.4",
+    "axios": "^1.6.0",
     "cloudevents": "^8.0.0",
     "fast-xml-parser": ">=4.2.5",
     "jsonpath": "^1.1.1",
