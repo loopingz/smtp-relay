@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.1](https://github.com/loopingz/smtp-relay/compare/v1.4.0...v1.4.1) (2023-11-13)
+
+
+### Bug Fixes
+
+* **deps:** bump axios from 1.5.0 to 1.6.0 ([876817b](https://github.com/loopingz/smtp-relay/commit/876817bbe0ee43b027e7152170bf7fc7f2a0aee6))
+
 ## [1.4.0](https://github.com/loopingz/smtp-relay/compare/v1.3.3...v1.4.0) (2023-09-19)
 
 
