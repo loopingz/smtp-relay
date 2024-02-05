@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.3](https://github.com/loopingz/smtp-relay/compare/v1.4.2...v1.4.3) (2024-02-05)
+
+
+### Bug Fixes
+
+* **deps:** nodemailer ReDoS ([b07dadf](https://github.com/loopingz/smtp-relay/commit/b07dadf281455764d1be72162d42b8a338e17735))
+
 ## [1.4.2](https://github.com/loopingz/smtp-relay/compare/v1.4.1...v1.4.2) (2024-01-11)
 
 
