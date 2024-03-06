@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.4](https://github.com/loopingz/smtp-relay/compare/v1.4.3...v1.4.4) (2024-03-06)
+
+
+### Bug Fixes
+
+* **deps:** upgrade deps ([fc73eb9](https://github.com/loopingz/smtp-relay/commit/fc73eb9d88bebb0d1a89d31428365615e416a2ff))
+
 ## [1.4.3](https://github.com/loopingz/smtp-relay/compare/v1.4.2...v1.4.3) (2024-02-05)
 
 
