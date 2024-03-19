@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.5](https://github.com/loopingz/smtp-relay/compare/v1.4.4...v1.4.5) (2024-03-19)
+
+
+### Bug Fixes
+
+* **deps:** bump follow-redirects from 1.15.5 to 1.15.6 ([#82](https://github.com/loopingz/smtp-relay/issues/82)) ([f132639](https://github.com/loopingz/smtp-relay/commit/f1326390020077a6ef1d8944cb04c614b05dee43))
+
 ## [1.4.4](https://github.com/loopingz/smtp-relay/compare/v1.4.3...v1.4.4) (2024-03-06)
 
 
