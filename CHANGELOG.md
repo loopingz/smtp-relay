@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.4.6](https://github.com/loopingz/smtp-relay/compare/v1.4.5...v1.4.6) (2024-06-10)
+
+
+### Bug Fixes
+
+* **deps:** bump @grpc/grpc-js from 1.10.1 to 1.10.9 ([#85](https://github.com/loopingz/smtp-relay/issues/85)) ([f09c696](https://github.com/loopingz/smtp-relay/commit/f09c6967b7435071d8679f1f5b26098838cc046c))
+* **deps:** bump braces from 3.0.2 to 3.0.3 ([#87](https://github.com/loopingz/smtp-relay/issues/87)) ([470f44e](https://github.com/loopingz/smtp-relay/commit/470f44e05eafee876b0b9d5648bc7ce3386629e8))
+
 ## [1.4.5](https://github.com/loopingz/smtp-relay/compare/v1.4.4...v1.4.5) (2024-03-19)
 
 
