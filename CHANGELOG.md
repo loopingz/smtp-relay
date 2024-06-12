@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.0](https://github.com/loopingz/smtp-relay/compare/v1.4.6...v1.5.0) (2024-06-12)
+
+
+### Features
+
+* move to node22 ([#88](https://github.com/loopingz/smtp-relay/issues/88)) ([170d434](https://github.com/loopingz/smtp-relay/commit/170d434172a40f18623dfb4acaebedb4aae4b598))
+
 ## [1.4.6](https://github.com/loopingz/smtp-relay/compare/v1.4.5...v1.4.6) (2024-06-10)
 
 
