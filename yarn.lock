@@ -2601,10 +2601,10 @@ cliui@^8.0.1:
     strip-ansi "^6.0.1"
     wrap-ansi "^7.0.0"
 
-cloudevents@^8.0.0:
-  version "8.0.0"
-  resolved "https://registry.yarnpkg.com/cloudevents/-/cloudevents-8.0.0.tgz#d5e3f9f56fc70aad5a97f3ea272559d8b7d74317"
-  integrity sha512-G1Z/r8QMFAsP+F1PuZSHzx1ocPy4vrdQMTHD3orjDaM5kccmPU6nMmpVrF07b53aaxcrLbORUmRepY/DgvdhVw==
+cloudevents@^8.0.1:
+  version "8.0.1"
+  resolved "https://registry.yarnpkg.com/cloudevents/-/cloudevents-8.0.1.tgz#d96a2dcffb95f75501ebb02bdd4d405874dcec69"
+  integrity sha512-E8BC4CpxF60q+6jqFctWG8pnFo9S9s3nVStyg9FgVUZ5v0DEdbT+gLYcxFNJBWc2ATNZmC8CUm4FaBWbgVj1Sw==
   dependencies:
     ajv "^8.11.0"
     ajv-formats "^2.1.1"

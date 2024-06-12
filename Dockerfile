@@ -1,5 +1,5 @@
 # Build from node
-FROM node:20 as builder
+FROM node:22 as builder
 
 RUN mkdir /app
 ADD src /app/src/
@@ -9,7 +9,7 @@ ADD yarn.lock /app
 RUN cd /app && yarn --frozen-lockfile --network-timeout 600000 && yarn build && npm prune --production
 
 # Run it in distroless
-FROM gcr.io/distroless/nodejs20-debian11:latest
+FROM gcr.io/distroless/nodejs22-debian11:latest
 # Copy default config
 ADD configs /smtp-relay/configs
 COPY --from=builder /app/lib /smtp-relay/lib
