@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.1](https://github.com/loopingz/smtp-relay/compare/v1.5.0...v1.5.1) (2024-08-15)
+
+
+### Bug Fixes
+
+* update dependencies ([#91](https://github.com/loopingz/smtp-relay/issues/91)) ([dcb1e5b](https://github.com/loopingz/smtp-relay/commit/dcb1e5bd8305ffb85ebf585e2981ede55701c870))
+
 ## [1.5.0](https://github.com/loopingz/smtp-relay/compare/v1.4.6...v1.5.0) (2024-06-12)
 
 
