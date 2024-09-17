@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.5.2](https://github.com/loopingz/smtp-relay/compare/v1.5.1...v1.5.2) (2024-09-17)
+
+
+### Bug Fixes
+
+* **deps:** bump micromatch from 4.0.7 to 4.0.8 ([#93](https://github.com/loopingz/smtp-relay/issues/93)) ([10b180b](https://github.com/loopingz/smtp-relay/commit/10b180b29b2ea37c0c4e8466bc654e3e2b218555))
+* **deps:** bump path-to-regexp from 6.2.2 to 6.3.0 ([#94](https://github.com/loopingz/smtp-relay/issues/94)) ([3792f8c](https://github.com/loopingz/smtp-relay/commit/3792f8c8b03ac759b6721c9241f5f90517a5bc52))
+
 ## [1.5.1](https://github.com/loopingz/smtp-relay/compare/v1.5.0...v1.5.1) (2024-08-15)
 
 
