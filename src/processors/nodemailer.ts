@@ -37,6 +37,7 @@ export class NodeMailerProcessor<
       from: email.from.text,
       to: mapAddressObjects<string[]>(email.to, addressTransformer)?.flat(),
       cc: mapAddressObjects<string[]>(email.cc, addressTransformer)?.flat(),
+      bcc: mapAddressObjects<string[]>(email.bcc, addressTransformer)?.flat(),
       text: email.text,
       html: email.html ? email.html : undefined,
       subject: email.subject,
