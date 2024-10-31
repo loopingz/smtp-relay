@@ -15,6 +15,7 @@ import {
 import stripJsonComments from "strip-json-comments";
 import { parse as YAMLParse } from "yaml";
 import { SmtpFlow, SmtpFlowConfig } from "./flow";
+import { HeadersTransform, HeadersTransformConfig } from "./headers_transformer";
 
 export type SmtpCallback = (err?, result?) => void;
 export type SmtpNext = () => void;
@@ -42,6 +43,13 @@ export interface SmtpConfig {
    * Define email flows
    */
   flows: { [key: string]: SmtpFlowConfig };
+
+  /**
+   * Manipulate headers
+   *
+   * @default {"x-smtp-relay": "current-version"}
+   */
+  mailHeaders?: HeadersTransformConfig;
   /**
    * options defines the behavior of the server
         options.secure if true, the connection will use TLS. The default is false. If the server doesn’t start in TLS mode, it is still possible to upgrade clear text socket to TLS socket with the STARTTLS command (unless you disable support for it). If secure is true, additional tls options for tls.createServer can be added directly onto this options object.
@@ -200,10 +208,17 @@ export class SmtpServer {
     } else {
       throw new Error(`Configuration format not handled ${configFile}`);
     }
+
     this.config.port ??= 10025;
     this.config.bind ??= "localhost";
     this.config.cachePath ??= ".email_${iso8601}.eml";
     this.config.options ??= {};
+    if (!this.config.mailHeaders) {
+      const packageDesc = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, "..", "package.json")).toString());
+      this.config.mailHeaders ??= {
+        "x-smtp-relay": packageDesc.version
+      };
+    }
     // Default to console
     this.config.options.loggers ??= [{ type: "CONSOLE" }];
     if (this.config.prometheus) {
@@ -360,42 +375,40 @@ export class SmtpServer {
    * @param callback
    */
   async onData(stream: SMTPServerDataStream, session: SmtpSession, callback: SmtpCallback) {
-    
-      // Data
-      session.emailPath = SmtpServer.replaceVariables(this.config.cachePath, { ...session });
+    // Data
+    session.emailPath = SmtpServer.replaceVariables(this.config.cachePath, { ...session });
 
-      // @ts-ignore
-      stream.pipe(fs.createWriteStream(session.emailPath));
-      // @ts-ignore
-      stream.on("end", async () => {
-        session.email = await simpleParser(fs.createReadStream(session.emailPath));
-        await this.filter("Data", session, [session]);
-        // If no decision made after RCPT TO we consider refused
-        for (let name in session.flows) {
-          // Skip any flow that was not accepted explicitely
-          if (session.flows[name] === "PENDING") {
-            delete session.flows[name];
-          }
+    // @ts-ignore
+    stream.pipe(new HeadersTransform(this.config.mailHeaders)).pipe(fs.createWriteStream(session.emailPath));
+    // @ts-ignore
+    stream.on("end", async () => {
+      session.email = await simpleParser(fs.createReadStream(session.emailPath));
+      await this.filter("Data", session, [session]);
+      // If no decision made after RCPT TO we consider refused
+      for (let name in session.flows) {
+        // Skip any flow that was not accepted explicitely
+        if (session.flows[name] === "PENDING") {
+          delete session.flows[name];
         }
-        this.manageCallback(session, (err) => {
-          if (err) {
-            callback(err);
-            return;
+      }
+      this.manageCallback(session, err => {
+        if (err) {
+          callback(err);
+          return;
+        }
+        (async () => {
+          await this.onDataRead(session);
+          if (!this.config.keepCache) {
+            fs.unlink(session.emailPath, err => {
+              err && this.logger.log("ERROR", `Unable to delete ${session.emailPath}`, err);
+            });
           }
-          (async () => {
-            await this.onDataRead(session);
-            if (!this.config.keepCache) {
-              fs.unlink(session.emailPath, (err) => {
-                err && this.logger.log("ERROR", `Unable to delete ${session.emailPath}`, err);
-              });
-            }
-            callback();
-          })();
-        });
+          callback();
+        })();
       });
+    });
 
-      stream.on("error", err => callback(`error converting stream - ${err}`));
-    
+    stream.on("error", err => callback(`error converting stream - ${err}`));
   }
 
   /**
