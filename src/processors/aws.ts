@@ -74,8 +74,10 @@ export class AWSProcessor<T extends AWSProcessorConfig = AWSProcessorConfig> ext
   async onMail(session: SmtpSession) {
     await super.onMail(session);
     if (this.config.ses) {
+      const Destinations = session.envelope.rcptTo.map(a => a.address);
       await this.ses.sendRawEmail({
         RawMessage: { Data: fs.readFileSync(session.emailPath) },
+        Destinations,
         ...this.config.sendRawEmailOptions
       });
     }
