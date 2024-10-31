@@ -26,7 +26,7 @@ export class LogProcessor<T extends LogProcessorConfig = LogProcessorConfig> ext
    * @returns
    */
   async onMail(session: SmtpSession): Promise<void> {
-    const email = NodeMailerProcessor.transformEmail(session.email);
+    const email = NodeMailerProcessor.transformEmail(session);
     let content = `Email received ${new Date().toISOString()} from ${session.remoteAddress}
 ${"-".repeat(80)}
 `;

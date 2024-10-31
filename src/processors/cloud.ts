@@ -2,6 +2,7 @@ import { getCloudEvent } from "../cloudevent";
 import { SmtpComponentConfig } from "../component";
 import { SmtpProcessor } from "../processor";
 import { SmtpServer, SmtpSession } from "../server";
+import { readFile, writeFile } from "node:fs/promises";
 
 /**
  * Configuration for GCPProcessor
@@ -30,6 +31,12 @@ export interface CloudProcessorConfig extends SmtpComponentConfig {
      * @default "raw"
      */
     type?: "raw" | "attachments" | "text" | "html";
+    /**
+     * Add the raw headers to the email
+     *
+     * @default true
+     */
+    addRawHeaders?: boolean;
   };
   /**
    * Publish a cloudevent on the topic of Google PubSub if set
@@ -54,6 +61,7 @@ export abstract class CloudProcessor<T extends CloudProcessorConfig = CloudProce
   init() {
     if (this.config.storage) {
       this.config.storage.type ??= "raw";
+      this.config.storage.addRawHeaders ??= true;
       if (!this.config.storage.bucket) {
         throw new Error("Need to specify a bucket for CloudStorage");
       }
@@ -93,7 +101,26 @@ export abstract class CloudProcessor<T extends CloudProcessorConfig = CloudProce
       const destFileName = SmtpServer.replaceVariables(this.config.storage.path, session);
       if (this.config.storage.type === "raw") {
         this.logger.log("INFO", `Output[${this.name}] Storing ${this.config.type} to ${destFileName}`);
-        await this.storeFile(destFileName, session.emailPath);
+        let file = session.emailPath;
+        if (this.config.storage.addRawHeaders) {
+          // We might want to prepend
+          await readFile(session.emailPath).then(data => {
+            const prefix = `X-smtp-relay-`;
+            // Store the RCPT_TO and MAIL_FROM in the email
+            const headers = session.envelope.rcptTo.map(a => `${prefix}RCPT_TO: ${a.address}`);
+            if (session.envelope.mailFrom) {
+              headers.push(`${prefix}MAIL_FROM:${session.envelope.mailFrom.address}`);
+            }
+            if (session.user) {
+              headers.push(`${prefix}USER:${session.user}`);
+            }
+            headers.push(`${prefix}CLIENT_HOSTNAME:${session.clientHostname}`);
+            headers.push(`${prefix}HELO:${session.hostNameAppearsAs}`);
+            file = session.emailPath + ".raw";
+            return writeFile(file, `${headers.join("\n")}\n${data}`);
+          });
+        }
+        await this.storeFile(destFileName, file);
       } else {
         let data: string;
         if (this.config.storage.type === "text") {
