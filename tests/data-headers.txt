@@ -1,0 +1,11 @@
+X-Test: plop
+X-1: 1
+X-1-Header: Previous header is there to test chunk break on new line
+X-Upsert-1: test
+X-Received: whatever
+
+My data
+Should not be filtered
+X-Test: still here
+
+.
