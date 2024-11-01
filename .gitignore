@@ -6,3 +6,4 @@ reports
 *.eml
 test.log
 data-headers.txt.raw
+.DS_Store

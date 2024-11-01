@@ -184,6 +184,10 @@ export interface SmtpSession extends SMTPServerSession {
    * Current flows status within the relay
    */
   flows: { [key: string]: "PENDING" | "ACCEPTED" };
+  /**
+   * Context
+   */
+  context: { [key: string]: any };
 }
 
 export class SmtpServer {
@@ -308,8 +312,7 @@ export class SmtpServer {
         continue;
       }
       for (let filter of flow.filters) {
-        // @ts-ignore
-        let res = await filter[`on${evt}`](...args);
+        let res = await filter[`on${evt}`](...args, name);
         // If undefined the filter is not giving an answer so skipping
         if (res === undefined) {
           continue;
@@ -337,6 +340,7 @@ export class SmtpServer {
     try {
       session.time = new Date();
       session.flows = {};
+      session.context = {};
       Object.keys(this.flows).forEach(n => (session.flows[n] = "PENDING"));
       await this.filter("Connect", session, [session]);
       this.manageCallback(session, callback);

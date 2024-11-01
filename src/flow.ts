@@ -7,6 +7,9 @@ import { AWSProcessorConfig } from "./processors/aws";
 import { FileProcessorConfig } from "./processors/file";
 import { GCPProcessorConfig } from "./processors/gcp";
 import { NodeMailerProcessorConfig } from "./processors/nodemailer";
+import { MailAuthConfig } from "./filters/mail-auth";
+import { HttpAuthConfig } from "./filters/http-auth";
+import { HttpFilterConfig } from "./filters/http-filter";
 
 /**
  * This define one flow within the SMTP Server
@@ -15,7 +18,13 @@ export interface SmtpFlowConfig {
   /**
    * Filters to apply to define if the connection/email should be accepted
    */
-  filters?: (StaticAuthConfiguration | WhitelistFilterConfiguration)[];
+  filters?: (
+    | StaticAuthConfiguration
+    | WhitelistFilterConfiguration
+    | MailAuthConfig
+    | HttpAuthConfig
+    | HttpFilterConfig
+  )[];
   /**
    * Define which operator applies if several filters are applied
    *
@@ -54,7 +63,11 @@ export class SmtpFlow {
    */
   name: string;
 
-  constructor(name: string, config: SmtpFlowConfig, public logger: WorkerOutput) {
+  constructor(
+    name: string,
+    config: SmtpFlowConfig,
+    public logger: WorkerOutput
+  ) {
     this.name = name;
     this.config = config;
     config.filtersOperator ??= "AND";
