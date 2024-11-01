@@ -602,7 +602,7 @@
           "type": "string"
         },
         "socket": {
-          "$ref": "#/definitions/internal.Duplex"
+          "$ref": "#/definitions/Stream.Duplex"
         },
         "ticketKeys": {
           "$ref": "#/definitions/global.Buffer",
@@ -877,6 +877,150 @@
       "description": "Configuration for mail headers\n\nIf key is prefixed with a - then the header is removed If key is prefixed with a ? then the header is added only if not present",
       "type": "object"
     },
+    "HttpAuthConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "credentialsMethod": {
+          "description": "Http method to use to pass credentials\n\nBasicAuth: Will use the Authorization field Json: Will post/put a JSON body with the user/password FormData: Will post/put a Form body with the user/password",
+          "enum": [
+            "BASIC_AUTH",
+            "JSON",
+            "FORM_URLENCODED"
+          ],
+          "type": "string"
+        },
+        "hmac": {
+          "additionalProperties": false,
+          "description": "Used to sign request",
+          "properties": {
+            "algo": {
+              "default": "sha256",
+              "type": "string"
+            },
+            "header": {
+              "default": "X-SMTP-RELAY",
+              "type": "string"
+            },
+            "secret": {
+              "description": "Secret to use",
+              "type": "string"
+            }
+          },
+          "required": [
+            "secret"
+          ],
+          "type": "object"
+        },
+        "json_result": {
+          "additionalProperties": false,
+          "description": "If not define the HTTP code is used: < 300: Allowed >= 300: Refused\n\nIf defined the response is read as JSON and test for value",
+          "properties": {
+            "path": {
+              "description": "Json path to read from the response",
+              "type": "string"
+            },
+            "value": {
+              "description": "Value to compare to, if equal then authentication is accepted",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "value"
+          ],
+          "type": "object"
+        },
+        "method": {
+          "description": "Method to use",
+          "enum": [
+            "PUT",
+            "POST",
+            "GET"
+          ],
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "passwordField": {
+          "description": "Name of the field for FormData Jsonpath for Json",
+          "type": "string"
+        },
+        "type": {
+          "const": "http-auth",
+          "type": "string"
+        },
+        "url": {
+          "description": "URL to call",
+          "type": "string"
+        },
+        "userField": {
+          "description": "Name of the field for FormData Jsonpath for Json",
+          "type": "string"
+        }
+      },
+      "required": [
+        "credentialsMethod",
+        "type",
+        "url"
+      ],
+      "type": "object"
+    },
+    "HttpFilterConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "allowAnyUser": {
+          "default": false,
+          "description": "Accept any form of authentication to rely solely on username",
+          "type": "boolean"
+        },
+        "hmac": {
+          "additionalProperties": false,
+          "description": "Used to sign request",
+          "properties": {
+            "algo": {
+              "default": "sha256",
+              "type": "string"
+            },
+            "header": {
+              "default": "X-SMTP-RELAY",
+              "type": "string"
+            },
+            "secret": {
+              "description": "Secret to use",
+              "type": "string"
+            }
+          },
+          "required": [
+            "secret"
+          ],
+          "type": "object"
+        },
+        "method": {
+          "enum": [
+            "PUT",
+            "POST"
+          ],
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "const": "http-filter",
+          "type": "string"
+        },
+        "url": {
+          "description": "Url to request",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "url"
+      ],
+      "type": "object"
+    },
     "KeyObject": {
       "additionalProperties": false,
       "properties": {
@@ -1064,7 +1208,7 @@
               "$ref": "#/definitions/global.Buffer"
             },
             {
-              "$ref": "#/definitions/internal.Readable"
+              "$ref": "#/definitions/Stream.Readable"
             }
           ],
           "description": "String, Buffer or a Stream contents for the attachment"
@@ -1101,7 +1245,7 @@
               "$ref": "#/definitions/global.Buffer"
             },
             {
-              "$ref": "#/definitions/internal.Readable"
+              "$ref": "#/definitions/Stream.Readable"
             },
             {
               "$ref": "#/definitions/Mail.AttachmentLike"
@@ -1128,7 +1272,7 @@
               "$ref": "#/definitions/global.Buffer"
             },
             {
-              "$ref": "#/definitions/internal.Readable"
+              "$ref": "#/definitions/Stream.Readable"
             }
           ],
           "description": "String, Buffer or a Stream contents for the attachment"
@@ -1193,7 +1337,7 @@
               "$ref": "#/definitions/global.Buffer"
             },
             {
-              "$ref": "#/definitions/internal.Readable"
+              "$ref": "#/definitions/Stream.Readable"
             },
             {
               "$ref": "#/definitions/Mail.AttachmentLike"
@@ -1216,7 +1360,7 @@
               "$ref": "#/definitions/global.Buffer"
             },
             {
-              "$ref": "#/definitions/internal.Readable"
+              "$ref": "#/definitions/Stream.Readable"
             }
           ],
           "description": "String, Buffer or a Stream contents for the attachment"
@@ -1324,7 +1468,7 @@
               "$ref": "#/definitions/global.Buffer"
             },
             {
-              "$ref": "#/definitions/internal.Readable"
+              "$ref": "#/definitions/Stream.Readable"
             }
           ],
           "description": "String, Buffer or a Stream contents for the attachment"
@@ -1429,7 +1573,7 @@
               "$ref": "#/definitions/global.Buffer"
             },
             {
-              "$ref": "#/definitions/internal.Readable"
+              "$ref": "#/definitions/Stream.Readable"
             },
             {
               "$ref": "#/definitions/Mail.AmpAttachment"
@@ -1559,7 +1703,7 @@
               "$ref": "#/definitions/global.Buffer"
             },
             {
-              "$ref": "#/definitions/internal.Readable"
+              "$ref": "#/definitions/Stream.Readable"
             },
             {
               "$ref": "#/definitions/Mail.AttachmentLike"
@@ -1576,7 +1720,7 @@
               "$ref": "#/definitions/global.Buffer"
             },
             {
-              "$ref": "#/definitions/internal.Readable"
+              "$ref": "#/definitions/Stream.Readable"
             },
             {
               "$ref": "#/definitions/Mail.IcalAttachment"
@@ -1620,7 +1764,7 @@
               "$ref": "#/definitions/global.Buffer"
             },
             {
-              "$ref": "#/definitions/internal.Readable"
+              "$ref": "#/definitions/Stream.Readable"
             },
             {
               "$ref": "#/definitions/Mail.AttachmentLike"
@@ -1690,7 +1834,7 @@
               "$ref": "#/definitions/global.Buffer"
             },
             {
-              "$ref": "#/definitions/internal.Readable"
+              "$ref": "#/definitions/Stream.Readable"
             },
             {
               "$ref": "#/definitions/Mail.AttachmentLike"
@@ -1735,7 +1879,7 @@
               "$ref": "#/definitions/global.Buffer"
             },
             {
-              "$ref": "#/definitions/internal.Readable"
+              "$ref": "#/definitions/Stream.Readable"
             },
             {
               "$ref": "#/definitions/Mail.AttachmentLike"
@@ -1752,6 +1896,59 @@
         "base64"
       ],
       "type": "string"
+    },
+    "MailAuthConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "enforceDmarc": {
+          "description": "Enforce DMARC policy. If set all _dmarc records are replaced with the policy set here.s",
+          "type": "string"
+        },
+        "mailauth": {
+          "additionalProperties": false,
+          "description": "See https://www.npmjs.com/package/mailauth",
+          "properties": {
+            "disableArc": {
+              "description": "Disable ARC checks",
+              "type": "boolean"
+            },
+            "disableBimi": {
+              "description": "Disable Bimi checks",
+              "type": "boolean"
+            },
+            "disableDmarc": {
+              "description": "Disable Dmarc checks",
+              "type": "boolean"
+            },
+            "maxResolveCount": {
+              "default": 10,
+              "description": "DNS lookup limit for SPF. RFC7208 requires this limit to be 10.",
+              "type": "number"
+            },
+            "maxVoidCount": {
+              "description": "DNS lookup limit for SPF that produce an empty result. RFC7208 requires this limit to be 2.",
+              "type": "number"
+            },
+            "minBitLength": {
+              "default": 1024,
+              "description": "the minimum allowed bits of RSA public keys (defaults to 1024). If a DKIM or ARC key has fewer bits, then validation is considered as failed",
+              "type": "number"
+            }
+          },
+          "type": "object"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "const": "mail-auth",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "type": "object"
     },
     "MessageAttributeValue": {
       "additionalProperties": false,
@@ -2050,7 +2247,7 @@
           "$ref": "#/definitions/global.Buffer"
         },
         {
-          "$ref": "#/definitions/internal.Readable"
+          "$ref": "#/definitions/Stream.Readable"
         }
       ]
     },
@@ -2187,7 +2384,7 @@
                                   "$ref": "#/definitions/global.Buffer"
                                 },
                                 {
-                                  "$ref": "#/definitions/internal.Readable"
+                                  "$ref": "#/definitions/Stream.Readable"
                                 }
                               ],
                               "description": "body content for current node"
@@ -2385,7 +2582,7 @@
                       "$ref": "#/definitions/global.Buffer"
                     },
                     {
-                      "$ref": "#/definitions/internal.Readable"
+                      "$ref": "#/definitions/Stream.Readable"
                     },
                     {
                       "$ref": "#/definitions/Mail.AmpAttachment"
@@ -2555,7 +2752,7 @@
                       "$ref": "#/definitions/global.Buffer"
                     },
                     {
-                      "$ref": "#/definitions/internal.Readable"
+                      "$ref": "#/definitions/Stream.Readable"
                     },
                     {
                       "$ref": "#/definitions/Mail.AttachmentLike"
@@ -2572,7 +2769,7 @@
                       "$ref": "#/definitions/global.Buffer"
                     },
                     {
-                      "$ref": "#/definitions/internal.Readable"
+                      "$ref": "#/definitions/Stream.Readable"
                     },
                     {
                       "$ref": "#/definitions/Mail.IcalAttachment"
@@ -2651,7 +2848,7 @@
                       "$ref": "#/definitions/global.Buffer"
                     },
                     {
-                      "$ref": "#/definitions/internal.Readable"
+                      "$ref": "#/definitions/Stream.Readable"
                     },
                     {
                       "$ref": "#/definitions/Mail.AttachmentLike"
@@ -2740,7 +2937,7 @@
                       "$ref": "#/definitions/global.Buffer"
                     },
                     {
-                      "$ref": "#/definitions/internal.Readable"
+                      "$ref": "#/definitions/Stream.Readable"
                     },
                     {
                       "$ref": "#/definitions/Mail.AttachmentLike"
@@ -2796,7 +2993,7 @@
                       "$ref": "#/definitions/global.Buffer"
                     },
                     {
-                      "$ref": "#/definitions/internal.Readable"
+                      "$ref": "#/definitions/Stream.Readable"
                     },
                     {
                       "$ref": "#/definitions/Mail.AttachmentLike"
@@ -2877,7 +3074,7 @@
           "$ref": "#/definitions/StreamingBlobPayloadInputTypes"
         },
         "Bucket": {
-          "description": "<p>The bucket name to which the PUT action was initiated. </p>          <p>             <b>Directory buckets</b> -          When you use this operation with a directory bucket, you must use virtual-hosted-style requests in the format <code>                <i>Bucket-name</i>.s3express-<i>zone-id</i>.<i>region-code</i>.amazonaws.com</code>. Path-style requests are not supported.  Directory bucket names must be unique in the chosen Zone (Availability Zone or Local Zone). Bucket names must follow the format <code>                <i>bucket-base-name</i>--<i>zone-id</i>--x-s3</code> (for example, <code>                <i>DOC-EXAMPLE-BUCKET</i>--<i>usw2-az1</i>--x-s3</code>). For information about bucket naming          restrictions, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/directory-bucket-naming-rules.html\">Directory bucket naming             rules</a> in the <i>Amazon S3 User Guide</i>.</p>          <p>             <b>Access points</b> - When you use this action with an access point, you must provide the alias of the access point in place of the bucket name or specify the access point ARN. When using the access point ARN, you must direct requests to the access point hostname. The access point hostname takes the form <i>AccessPointName</i>-<i>AccountId</i>.s3-accesspoint.<i>Region</i>.amazonaws.com. When using this action with an access point through the Amazon Web Services SDKs, you provide the access point ARN in place of the bucket name. For more information about access point ARNs, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-access-points.html\">Using access points</a> in the <i>Amazon S3 User Guide</i>.</p>          <note>             <p>Access points and Object Lambda access points are not supported by directory buckets.</p>          </note>          <p>             <b>S3 on Outposts</b> - When you use this action with Amazon S3 on Outposts, you must direct requests to the S3 on Outposts hostname. The S3 on Outposts hostname takes the form <code>                <i>AccessPointName</i>-<i>AccountId</i>.<i>outpostID</i>.s3-outposts.<i>Region</i>.amazonaws.com</code>. When you use this action with S3 on Outposts through the Amazon Web Services SDKs, you provide the Outposts access point ARN in place of the bucket name. For more information about S3 on Outposts ARNs, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/S3onOutposts.html\">What is S3 on Outposts?</a> in the <i>Amazon S3 User Guide</i>.</p> <p>Note: To supply the Multi-region Access Point (MRAP) to Bucket, you need to install the \"@aws-sdk/signature-v4-crt\" package to your project dependencies. For more information, please go to https://github.com/aws/aws-sdk-js-v3#known-issues</p>",
+          "description": "<p>The bucket name to which the PUT action was initiated. </p>          <p>             <b>Directory buckets</b> -          When you use this operation with a directory bucket, you must use virtual-hosted-style requests in the format <code>                <i>Bucket-name</i>.s3express-<i>zone-id</i>.<i>region-code</i>.amazonaws.com</code>. Path-style requests are not supported.  Directory bucket names must be unique in the chosen Zone (Availability Zone or Local Zone). Bucket names must follow the format <code>                <i>bucket-base-name</i>--<i>zone-id</i>--x-s3</code> (for example, <code>                <i>amzn-s3-demo-bucket</i>--<i>usw2-az1</i>--x-s3</code>). For information about bucket naming          restrictions, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/directory-bucket-naming-rules.html\">Directory bucket naming             rules</a> in the <i>Amazon S3 User Guide</i>.</p>          <p>             <b>Access points</b> - When you use this action with an access point for general purpose buckets, you must provide the alias of the access point in place of the bucket name or specify the access point ARN. When you use this action with an access point for directory buckets, you must provide the access point name in place of the bucket name. When using the access point ARN, you must direct requests to the access point hostname. The access point hostname takes the form <i>AccessPointName</i>-<i>AccountId</i>.s3-accesspoint.<i>Region</i>.amazonaws.com. When using this action with an access point through the Amazon Web Services SDKs, you provide the access point ARN in place of the bucket name. For more information about access point ARNs, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-access-points.html\">Using access points</a> in the <i>Amazon S3 User Guide</i>.</p>          <note>             <p>Object Lambda access points are not supported by directory buckets.</p>          </note>          <p>             <b>S3 on Outposts</b> - When you use this action with S3 on Outposts, you must direct requests to the S3 on Outposts hostname. The S3 on Outposts hostname takes the                      form <code>                <i>AccessPointName</i>-<i>AccountId</i>.<i>outpostID</i>.s3-outposts.<i>Region</i>.amazonaws.com</code>. When you use this action with S3 on Outposts, the destination bucket must be the Outposts access point ARN or the access point alias. For more information about S3 on Outposts, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/S3onOutposts.html\">What is S3 on Outposts?</a> in the <i>Amazon S3 User Guide</i>.</p> <p>Note: To supply the Multi-region Access Point (MRAP) to Bucket, you need to install the \"@aws-sdk/signature-v4-crt\" package to your project dependencies. For more information, please go to https://github.com/aws/aws-sdk-js-v3#known-issues</p>",
           "type": "string"
         },
         "BucketKeyEnabled": {
@@ -2890,26 +3087,26 @@
         },
         "ChecksumAlgorithm": {
           "$ref": "#/definitions/ChecksumAlgorithm",
-          "description": "<p>Indicates the algorithm used to create the checksum for the object when you use the SDK. This header will not provide any     additional functionality if you don't use the SDK. When you send this header, there must be a corresponding <code>x-amz-checksum-<i>algorithm</i>             </code> or     <code>x-amz-trailer</code> header sent. Otherwise, Amazon S3 fails the request with the HTTP status code <code>400 Bad Request</code>.</p>          <p>For the <code>x-amz-checksum-<i>algorithm</i>             </code> header, replace <code>                <i>algorithm</i>             </code> with the supported algorithm from the following list: </p>          <ul>             <li>                <p>                   <code>CRC-32</code>                </p>             </li>             <li>                <p>                   <code>CRC-32C</code>                </p>             </li>             <li>                <p>                   <code>CRC-64NVME</code>                </p>             </li>             <li>                <p>                   <code>SHA-1</code>                </p>             </li>             <li>                <p>                   <code>SHA-256</code>                </p>             </li>          </ul>          <p>For more     information, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/checking-object-integrity.html\">Checking object integrity</a> in     the <i>Amazon S3 User Guide</i>.</p>          <p>If the individual checksum value you provide through <code>x-amz-checksum-<i>algorithm</i>             </code> doesn't match the checksum algorithm you set through <code>x-amz-sdk-checksum-algorithm</code>, Amazon S3 fails the request with a <code>BadDigest</code> error.</p>          <note>             <p>The <code>Content-MD5</code> or <code>x-amz-sdk-checksum-algorithm</code> header is             required for any request to upload an object with a retention period configured using             Amazon S3 Object Lock. For more information, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock-managing.html#object-lock-put-object\">Uploading objects to an Object Lock enabled bucket </a> in the                <i>Amazon S3 User Guide</i>.</p>          </note>          <p>For directory buckets, when you use Amazon Web Services SDKs, <code>CRC32</code> is the default checksum algorithm that's used for performance.</p>"
+          "description": "<p>Indicates the algorithm used to create the checksum for the object when you use the SDK. This header will not provide any     additional functionality if you don't use the SDK. When you send this header, there must be a corresponding <code>x-amz-checksum-<i>algorithm</i>             </code> or     <code>x-amz-trailer</code> header sent. Otherwise, Amazon S3 fails the request with the HTTP status code <code>400 Bad Request</code>.</p>          <p>For the <code>x-amz-checksum-<i>algorithm</i>             </code> header, replace <code>                <i>algorithm</i>             </code> with the supported algorithm from the following list: </p>          <ul>             <li>                <p>                   <code>CRC32</code>                </p>             </li>             <li>                <p>                   <code>CRC32C</code>                </p>             </li>             <li>                <p>                   <code>CRC64NVME</code>                </p>             </li>             <li>                <p>                   <code>SHA1</code>                </p>             </li>             <li>                <p>                   <code>SHA256</code>                </p>             </li>          </ul>          <p>For more     information, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/checking-object-integrity.html\">Checking object integrity</a> in     the <i>Amazon S3 User Guide</i>.</p>          <p>If the individual checksum value you provide through <code>x-amz-checksum-<i>algorithm</i>             </code> doesn't match the checksum algorithm you set through <code>x-amz-sdk-checksum-algorithm</code>, Amazon S3 fails the request with a <code>BadDigest</code> error.</p>          <note>             <p>The <code>Content-MD5</code> or <code>x-amz-sdk-checksum-algorithm</code> header is             required for any request to upload an object with a retention period configured using             Amazon S3 Object Lock. For more information, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock-managing.html#object-lock-put-object\">Uploading objects to an Object Lock enabled bucket </a> in the                <i>Amazon S3 User Guide</i>.</p>          </note>          <p>For directory buckets, when you use Amazon Web Services SDKs, <code>CRC32</code> is the default checksum algorithm that's used for performance.</p>"
         },
         "ChecksumCRC32": {
-          "description": "<p>This header can be used as a data integrity check to verify that the data received is the same data that was originally sent.     This header specifies the Base64 encoded, 32-bit <code>CRC-32</code> checksum of the object. For more information, see     <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/checking-object-integrity.html\">Checking object integrity</a> in the     <i>Amazon S3 User Guide</i>.</p>",
+          "description": "<p>This header can be used as a data integrity check to verify that the data received is the same data that was originally sent.     This header specifies the Base64 encoded, 32-bit <code>CRC32</code> checksum of the object. For more information, see     <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/checking-object-integrity.html\">Checking object integrity</a> in the     <i>Amazon S3 User Guide</i>.</p>",
           "type": "string"
         },
         "ChecksumCRC32C": {
-          "description": "<p>This header can be used as a data integrity check to verify that the data received is the same data that was originally sent.     This header specifies the Base64 encoded, 32-bit <code>CRC-32C</code> checksum of the object. For more information, see     <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/checking-object-integrity.html\">Checking object integrity</a> in the     <i>Amazon S3 User Guide</i>.</p>",
+          "description": "<p>This header can be used as a data integrity check to verify that the data received is the same data that was originally sent.     This header specifies the Base64 encoded, 32-bit <code>CRC32C</code> checksum of the object. For more information, see     <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/checking-object-integrity.html\">Checking object integrity</a> in the     <i>Amazon S3 User Guide</i>.</p>",
           "type": "string"
         },
         "ChecksumCRC64NVME": {
-          "description": "<p>This header can be used as a data integrity check to verify that the data received is          the same data that was originally sent. This header specifies the Base64 encoded, 64-bit             <code>CRC-64NVME</code> checksum of the object. The <code>CRC-64NVME</code> checksum is          always a full object checksum. For more information, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/checking-object-integrity.html\">Checking object integrity             in the Amazon S3 User Guide</a>.</p>",
+          "description": "<p>This header can be used as a data integrity check to verify that the data received is          the same data that was originally sent. This header specifies the Base64 encoded, 64-bit             <code>CRC64NVME</code> checksum of the object. The <code>CRC64NVME</code> checksum is          always a full object checksum. For more information, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/checking-object-integrity.html\">Checking object integrity             in the Amazon S3 User Guide</a>.</p>",
           "type": "string"
         },
         "ChecksumSHA1": {
-          "description": "<p>This header can be used as a data integrity check to verify that the data received is the same data that was originally sent.     This header specifies the Base64 encoded, 160-bit <code>SHA-1</code> digest of the object. For more information, see     <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/checking-object-integrity.html\">Checking object integrity</a> in the     <i>Amazon S3 User Guide</i>.</p>",
+          "description": "<p>This header can be used as a data integrity check to verify that the data received is the same data that was originally sent.     This header specifies the Base64 encoded, 160-bit <code>SHA1</code> digest of the object. For more information, see     <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/checking-object-integrity.html\">Checking object integrity</a> in the     <i>Amazon S3 User Guide</i>.</p>",
           "type": "string"
         },
         "ChecksumSHA256": {
-          "description": "<p>This header can be used as a data integrity check to verify that the data received is the same data that was originally sent.     This header specifies the Base64 encoded, 256-bit <code>SHA-256</code> digest of the object. For more information, see     <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/checking-object-integrity.html\">Checking object integrity</a> in the     <i>Amazon S3 User Guide</i>.</p>",
+          "description": "<p>This header can be used as a data integrity check to verify that the data received is the same data that was originally sent.     This header specifies the Base64 encoded, 256-bit <code>SHA256</code> digest of the object. For more information, see     <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/checking-object-integrity.html\">Checking object integrity</a> in the     <i>Amazon S3 User Guide</i>.</p>",
           "type": "string"
         },
         "ContentDisposition": {
@@ -3014,7 +3211,7 @@
           "type": "string"
         },
         "SSEKMSKeyId": {
-          "description": "<p>Specifies the KMS key ID (Key ID, Key ARN, or Key Alias) to use for object encryption. If the KMS key doesn't exist in the same          account that's issuing the command, you must use the full Key ARN not the Key ID.</p>          <p>             <b>General purpose buckets</b> - If you specify <code>x-amz-server-side-encryption</code> with <code>aws:kms</code> or <code>aws:kms:dsse</code>, this header specifies the ID (Key ID, Key ARN, or Key Alias) of the KMS          key to use. If you specify          <code>x-amz-server-side-encryption:aws:kms</code> or          <code>x-amz-server-side-encryption:aws:kms:dsse</code>, but do not provide <code>x-amz-server-side-encryption-aws-kms-key-id</code>, Amazon S3 uses the Amazon Web Services managed key          (<code>aws/s3</code>) to protect the data.</p>          <p>             <b>Directory buckets</b> - If you specify <code>x-amz-server-side-encryption</code> with <code>aws:kms</code>, the <code>          x-amz-server-side-encryption-aws-kms-key-id</code> header is implicitly assigned the ID of the KMS          symmetric encryption customer managed key that's configured for your directory bucket's default encryption setting.          If you want to specify the <code>          x-amz-server-side-encryption-aws-kms-key-id</code> header explicitly, you can only specify it with the ID (Key ID or Key ARN) of the KMS          customer managed key that's configured for your directory bucket's default encryption setting. Otherwise, you get an HTTP <code>400 Bad Request</code> error. Only use the key ID or key ARN. The key alias format of the KMS key isn't supported. Your SSE-KMS configuration can only support 1 <a href=\"https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#customer-cmk\">customer managed key</a> per directory bucket for the lifetime of the bucket. The <a href=\"https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#aws-managed-cmk\">Amazon Web Services managed key</a> (<code>aws/s3</code>) isn't supported. </p>",
+          "description": "<p>Specifies the KMS key ID (Key ID, Key ARN, or Key Alias) to use for object encryption. If the KMS key doesn't exist in the same          account that's issuing the command, you must use the full Key ARN not the Key ID.</p>          <p>             <b>General purpose buckets</b> - If you specify <code>x-amz-server-side-encryption</code> with <code>aws:kms</code> or <code>aws:kms:dsse</code>, this header specifies the ID (Key ID, Key ARN, or Key Alias) of the KMS          key to use. If you specify          <code>x-amz-server-side-encryption:aws:kms</code> or          <code>x-amz-server-side-encryption:aws:kms:dsse</code>, but do not provide <code>x-amz-server-side-encryption-aws-kms-key-id</code>, Amazon S3 uses the Amazon Web Services managed key          (<code>aws/s3</code>) to protect the data.</p>          <p>             <b>Directory buckets</b> - To encrypt data using SSE-KMS, it's recommended to specify the <code>x-amz-server-side-encryption</code> header to <code>aws:kms</code>. Then, the <code>x-amz-server-side-encryption-aws-kms-key-id</code> header implicitly uses the bucket's default KMS customer managed key ID. If you want to explicitly set the <code>          x-amz-server-side-encryption-aws-kms-key-id</code> header, it must match the bucket's default customer managed key (using key ID or ARN, not alias). Your SSE-KMS configuration can only support 1 <a href=\"https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#customer-cmk\">customer managed key</a> per directory bucket's lifetime. The <a href=\"https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#aws-managed-cmk\">Amazon Web Services managed key</a> (<code>aws/s3</code>) isn't supported.\n\n Incorrect key specification results in an HTTP <code>400 Bad Request</code> error. </p>",
           "type": "string"
         },
         "ServerSideEncryption": {
@@ -3023,7 +3220,7 @@
         },
         "StorageClass": {
           "$ref": "#/definitions/StorageClass",
-          "description": "<p>By default, Amazon S3 uses the STANDARD Storage Class to store newly created objects. The          STANDARD storage class provides high durability and high availability. Depending on          performance needs, you can specify a different Storage Class. For more information, see             <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/storage-class-intro.html\">Storage             Classes</a> in the <i>Amazon S3 User Guide</i>.</p>          <note>             <ul>                <li>                   <p>For directory buckets, only the S3 Express One Zone storage class is supported to store                   newly created objects.</p>                </li>                <li>                   <p>Amazon S3 on Outposts only uses the OUTPOSTS Storage Class.</p>                </li>             </ul>          </note>"
+          "description": "<p>By default, Amazon S3 uses the STANDARD Storage Class to store newly created objects. The          STANDARD storage class provides high durability and high availability. Depending on          performance needs, you can specify a different Storage Class. For more information, see             <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/storage-class-intro.html\">Storage             Classes</a> in the <i>Amazon S3 User Guide</i>.</p>          <note>             <ul>                <li>                   <p>Directory buckets only support <code>EXPRESS_ONEZONE</code> (the S3 Express One Zone storage class) in Availability Zones and <code>ONEZONE_IA</code> (the S3 One Zone-Infrequent Access storage class) in Dedicated Local Zones.</p>                </li>                <li>                   <p>Amazon S3 on Outposts only uses the OUTPOSTS Storage Class.</p>                </li>             </ul>          </note>"
         },
         "Tagging": {
           "description": "<p>The tag-set for the object. The tag-set must be encoded as URL Query parameters. (For          example, \"Key1=Value1\")</p>          <note>             <p>This functionality is not supported for directory buckets.</p>          </note>",
@@ -3519,7 +3716,7 @@
               "$ref": "#/definitions/global.Buffer"
             },
             {
-              "$ref": "#/definitions/internal.Readable"
+              "$ref": "#/definitions/Stream.Readable"
             },
             {
               "$ref": "#/definitions/Mail.AmpAttachment"
@@ -3689,7 +3886,7 @@
               "$ref": "#/definitions/global.Buffer"
             },
             {
-              "$ref": "#/definitions/internal.Readable"
+              "$ref": "#/definitions/Stream.Readable"
             },
             {
               "$ref": "#/definitions/Mail.AttachmentLike"
@@ -3706,7 +3903,7 @@
               "$ref": "#/definitions/global.Buffer"
             },
             {
-              "$ref": "#/definitions/internal.Readable"
+              "$ref": "#/definitions/Stream.Readable"
             },
             {
               "$ref": "#/definitions/Mail.IcalAttachment"
@@ -3785,7 +3982,7 @@
               "$ref": "#/definitions/global.Buffer"
             },
             {
-              "$ref": "#/definitions/internal.Readable"
+              "$ref": "#/definitions/Stream.Readable"
             },
             {
               "$ref": "#/definitions/Mail.AttachmentLike"
@@ -3874,7 +4071,7 @@
               "$ref": "#/definitions/global.Buffer"
             },
             {
-              "$ref": "#/definitions/internal.Readable"
+              "$ref": "#/definitions/Stream.Readable"
             },
             {
               "$ref": "#/definitions/Mail.AttachmentLike"
@@ -3930,7 +4127,7 @@
               "$ref": "#/definitions/global.Buffer"
             },
             {
-              "$ref": "#/definitions/internal.Readable"
+              "$ref": "#/definitions/Stream.Readable"
             },
             {
               "$ref": "#/definitions/Mail.AttachmentLike"
@@ -4257,6 +4454,15 @@
               },
               {
                 "$ref": "#/definitions/WhitelistFilterConfiguration"
+              },
+              {
+                "$ref": "#/definitions/MailAuthConfig"
+              },
+              {
+                "$ref": "#/definitions/HttpAuthConfig"
+              },
+              {
+                "$ref": "#/definitions/HttpFilterConfig"
               }
             ]
           },
@@ -4325,10 +4531,6 @@
           "description": "The amount of bytes sent.",
           "type": "number"
         },
-        "closed": {
-          "description": "Is `true` after `'close'` has been emitted.",
-          "type": "boolean"
-        },
         "connecting": {
           "description": "If `true`, `socket.connect(options[, connectListener])` was called and has not yet finished. It will stay `true` until the socket becomes connected, then it is set to `false` and the `'connect'` event is emitted. Note that the `socket.connect(options[, connectListener])` callback is a listener for the `'connect'` event.",
           "type": "boolean"
@@ -4336,33 +4538,6 @@
         "destroyed": {
           "description": "See `writable.destroyed` for further details.",
           "type": "boolean"
-        },
-        "errored": {
-          "anyOf": [
-            {
-              "additionalProperties": false,
-              "properties": {
-                "message": {
-                  "type": "string"
-                },
-                "name": {
-                  "type": "string"
-                },
-                "stack": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "name",
-                "message"
-              ],
-              "type": "object"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "description": "Returns error if the stream has been destroyed with an error."
         },
         "localAddress": {
           "description": "The string representation of the local IP address the remote client is connecting on. For example, in a server listening on `'0.0.0.0'`, if a client connects on `'192.168.1.1'`, the value of `socket.localAddress` would be`'192.168.1.1'`.",
@@ -4381,49 +4556,6 @@
           "type": "boolean"
         },
         "readable": {
-          "description": "Is `true` if it is safe to call  {@link  read } , which means the stream has not been destroyed or emitted `'error'` or `'end'`.",
-          "type": "boolean"
-        },
-        "readableAborted": {
-          "description": "Returns whether the stream was destroyed or errored before emitting `'end'`.",
-          "type": "boolean"
-        },
-        "readableDidRead": {
-          "description": "Returns whether `'data'` has been emitted.",
-          "type": "boolean"
-        },
-        "readableEncoding": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/global.BufferEncoding"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "description": "Getter for the property `encoding` of a given `Readable` stream. The `encoding` property can be set using the  {@link  setEncoding }  method."
-        },
-        "readableEnded": {
-          "description": "Becomes `true` when [`'end'`](https://nodejs.org/docs/latest-v22.x/api/stream.html#event-end) event is emitted.",
-          "type": "boolean"
-        },
-        "readableFlowing": {
-          "description": "This property reflects the current state of a `Readable` stream as described in the [Three states](https://nodejs.org/docs/latest-v22.x/api/stream.html#three-states) section.",
-          "type": [
-            "boolean",
-            "null"
-          ]
-        },
-        "readableHighWaterMark": {
-          "description": "Returns the value of `highWaterMark` passed when creating this `Readable`.",
-          "type": "number"
-        },
-        "readableLength": {
-          "description": "This property contains the number of bytes (or objects) in the queue ready to be read. The value provides introspection data regarding the status of the `highWaterMark`.",
-          "type": "number"
-        },
-        "readableObjectMode": {
-          "description": "Getter for the property `objectMode` of a given `Readable` stream.",
           "type": "boolean"
         },
         "readyState": {
@@ -4447,35 +4579,6 @@
           "type": "number"
         },
         "writable": {
-          "description": "Is `true` if it is safe to call `writable.write()`, which means the stream has not been destroyed, errored, or ended.",
-          "type": "boolean"
-        },
-        "writableCorked": {
-          "description": "Number of times `writable.uncork()` needs to be called in order to fully uncork the stream.",
-          "type": "number"
-        },
-        "writableEnded": {
-          "description": "Is `true` after `writable.end()` has been called. This property does not indicate whether the data has been flushed, for this use `writable.writableFinished` instead.",
-          "type": "boolean"
-        },
-        "writableFinished": {
-          "description": "Is set to `true` immediately before the `'finish'` event is emitted.",
-          "type": "boolean"
-        },
-        "writableHighWaterMark": {
-          "description": "Return the value of `highWaterMark` passed when creating this `Writable`.",
-          "type": "number"
-        },
-        "writableLength": {
-          "description": "This property contains the number of bytes (or objects) in the queue ready to be written. The value provides introspection data regarding the status of the `highWaterMark`.",
-          "type": "number"
-        },
-        "writableNeedDrain": {
-          "description": "Is `true` if the stream's buffer has been full and stream will emit `'drain'`.",
-          "type": "boolean"
-        },
-        "writableObjectMode": {
-          "description": "Getter for the property `objectMode` of a given `Writable` stream.",
           "type": "boolean"
         }
       },
@@ -4485,29 +4588,12 @@
         "bufferSize",
         "bytesRead",
         "bytesWritten",
-        "closed",
         "connecting",
         "destroyed",
-        "errored",
         "pending",
         "readable",
-        "readableAborted",
-        "readableDidRead",
-        "readableEncoding",
-        "readableEnded",
-        "readableFlowing",
-        "readableHighWaterMark",
-        "readableLength",
-        "readableObjectMode",
         "readyState",
-        "writable",
-        "writableCorked",
-        "writableEnded",
-        "writableFinished",
-        "writableHighWaterMark",
-        "writableLength",
-        "writableNeedDrain",
-        "writableObjectMode"
+        "writable"
       ],
       "type": "object"
     },
@@ -4565,6 +4651,129 @@
         "STANDARD_IA"
       ],
       "type": "string"
+    },
+    "Stream.Duplex": {
+      "additionalProperties": false,
+      "description": "Duplex streams are streams that implement both the `Readable` and `Writable` interfaces.\n\nExamples of `Duplex` streams include:\n\n* `TCP sockets`\n* `zlib streams`\n* `crypto streams`",
+      "properties": {
+        "allowHalfOpen": {
+          "description": "If `false` then the stream will automatically end the writable side when the readable side ends. Set initially by the `allowHalfOpen` constructor option, which defaults to `true`.\n\nThis can be changed manually to change the half-open behavior of an existing `Duplex` stream instance, but must be changed before the `'end'` event is emitted.",
+          "type": "boolean"
+        },
+        "readable": {
+          "type": "boolean"
+        },
+        "writable": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "allowHalfOpen",
+        "readable",
+        "writable"
+      ],
+      "type": "object"
+    },
+    "Stream.Readable": {
+      "additionalProperties": false,
+      "properties": {
+        "closed": {
+          "description": "Is `true` after `'close'` has been emitted.",
+          "type": "boolean"
+        },
+        "destroyed": {
+          "description": "Is `true` after `readable.destroy()` has been called.",
+          "type": "boolean"
+        },
+        "errored": {
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "message": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "stack": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "message"
+              ],
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Returns error if the stream has been destroyed with an error."
+        },
+        "readable": {
+          "description": "Is `true` if it is safe to call  {@link  read } , which means the stream has not been destroyed or emitted `'error'` or `'end'`.",
+          "type": "boolean"
+        },
+        "readableAborted": {
+          "description": "Returns whether the stream was destroyed or errored before emitting `'end'`.",
+          "type": "boolean"
+        },
+        "readableDidRead": {
+          "description": "Returns whether `'data'` has been emitted.",
+          "type": "boolean"
+        },
+        "readableEncoding": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/global.BufferEncoding"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Getter for the property `encoding` of a given `Readable` stream. The `encoding` property can be set using the  {@link  setEncoding }  method."
+        },
+        "readableEnded": {
+          "description": "Becomes `true` when [`'end'`](https://nodejs.org/docs/latest-v22.x/api/stream.html#event-end) event is emitted.",
+          "type": "boolean"
+        },
+        "readableFlowing": {
+          "description": "This property reflects the current state of a `Readable` stream as described in the [Three states](https://nodejs.org/docs/latest-v22.x/api/stream.html#three-states) section.",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "readableHighWaterMark": {
+          "description": "Returns the value of `highWaterMark` passed when creating this `Readable`.",
+          "type": "number"
+        },
+        "readableLength": {
+          "description": "This property contains the number of bytes (or objects) in the queue ready to be read. The value provides introspection data regarding the status of the `highWaterMark`.",
+          "type": "number"
+        },
+        "readableObjectMode": {
+          "description": "Getter for the property `objectMode` of a given `Readable` stream.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "closed",
+        "destroyed",
+        "errored",
+        "readable",
+        "readableAborted",
+        "readableDidRead",
+        "readableEncoding",
+        "readableEnded",
+        "readableFlowing",
+        "readableHighWaterMark",
+        "readableLength",
+        "readableObjectMode"
+      ],
+      "type": "object"
     },
     "StreamingBlobPayloadInputTypes": {
       "anyOf": [
@@ -4652,7 +4861,7 @@
                       "$ref": "#/definitions/global.Buffer"
                     },
                     {
-                      "$ref": "#/definitions/internal.Readable"
+                      "$ref": "#/definitions/Stream.Readable"
                     }
                   ],
                   "description": "body content for current node"
@@ -5095,7 +5304,7 @@
               "$ref": "#/definitions/global.Buffer"
             },
             {
-              "$ref": "#/definitions/internal.Readable"
+              "$ref": "#/definitions/Stream.Readable"
             }
           ],
           "description": "body content for current node"
@@ -5239,7 +5448,7 @@
                       "$ref": "#/definitions/global.Buffer"
                     },
                     {
-                      "$ref": "#/definitions/internal.Readable"
+                      "$ref": "#/definitions/Stream.Readable"
                     }
                   ],
                   "description": "body content for current node"
@@ -5482,254 +5691,6 @@
       "required": [
         "message",
         "name"
-      ],
-      "type": "object"
-    },
-    "internal.Duplex": {
-      "additionalProperties": false,
-      "description": "Duplex streams are streams that implement both the `Readable` and `Writable` interfaces.\n\nExamples of `Duplex` streams include:\n\n* `TCP sockets`\n* `zlib streams`\n* `crypto streams`",
-      "properties": {
-        "allowHalfOpen": {
-          "description": "If `false` then the stream will automatically end the writable side when the readable side ends. Set initially by the `allowHalfOpen` constructor option, which defaults to `true`.\n\nThis can be changed manually to change the half-open behavior of an existing `Duplex` stream instance, but must be changed before the `'end'` event is emitted.",
-          "type": "boolean"
-        },
-        "closed": {
-          "description": "Is `true` after `'close'` has been emitted.",
-          "type": "boolean"
-        },
-        "destroyed": {
-          "description": "Is `true` after `readable.destroy()` has been called.",
-          "type": "boolean"
-        },
-        "errored": {
-          "anyOf": [
-            {
-              "additionalProperties": false,
-              "properties": {
-                "message": {
-                  "type": "string"
-                },
-                "name": {
-                  "type": "string"
-                },
-                "stack": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "name",
-                "message"
-              ],
-              "type": "object"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "description": "Returns error if the stream has been destroyed with an error."
-        },
-        "readable": {
-          "description": "Is `true` if it is safe to call  {@link  read } , which means the stream has not been destroyed or emitted `'error'` or `'end'`.",
-          "type": "boolean"
-        },
-        "readableAborted": {
-          "description": "Returns whether the stream was destroyed or errored before emitting `'end'`.",
-          "type": "boolean"
-        },
-        "readableDidRead": {
-          "description": "Returns whether `'data'` has been emitted.",
-          "type": "boolean"
-        },
-        "readableEncoding": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/global.BufferEncoding"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "description": "Getter for the property `encoding` of a given `Readable` stream. The `encoding` property can be set using the  {@link  setEncoding }  method."
-        },
-        "readableEnded": {
-          "description": "Becomes `true` when [`'end'`](https://nodejs.org/docs/latest-v22.x/api/stream.html#event-end) event is emitted.",
-          "type": "boolean"
-        },
-        "readableFlowing": {
-          "description": "This property reflects the current state of a `Readable` stream as described in the [Three states](https://nodejs.org/docs/latest-v22.x/api/stream.html#three-states) section.",
-          "type": [
-            "boolean",
-            "null"
-          ]
-        },
-        "readableHighWaterMark": {
-          "description": "Returns the value of `highWaterMark` passed when creating this `Readable`.",
-          "type": "number"
-        },
-        "readableLength": {
-          "description": "This property contains the number of bytes (or objects) in the queue ready to be read. The value provides introspection data regarding the status of the `highWaterMark`.",
-          "type": "number"
-        },
-        "readableObjectMode": {
-          "description": "Getter for the property `objectMode` of a given `Readable` stream.",
-          "type": "boolean"
-        },
-        "writable": {
-          "description": "Is `true` if it is safe to call `writable.write()`, which means the stream has not been destroyed, errored, or ended.",
-          "type": "boolean"
-        },
-        "writableCorked": {
-          "description": "Number of times `writable.uncork()` needs to be called in order to fully uncork the stream.",
-          "type": "number"
-        },
-        "writableEnded": {
-          "description": "Is `true` after `writable.end()` has been called. This property does not indicate whether the data has been flushed, for this use `writable.writableFinished` instead.",
-          "type": "boolean"
-        },
-        "writableFinished": {
-          "description": "Is set to `true` immediately before the `'finish'` event is emitted.",
-          "type": "boolean"
-        },
-        "writableHighWaterMark": {
-          "description": "Return the value of `highWaterMark` passed when creating this `Writable`.",
-          "type": "number"
-        },
-        "writableLength": {
-          "description": "This property contains the number of bytes (or objects) in the queue ready to be written. The value provides introspection data regarding the status of the `highWaterMark`.",
-          "type": "number"
-        },
-        "writableNeedDrain": {
-          "description": "Is `true` if the stream's buffer has been full and stream will emit `'drain'`.",
-          "type": "boolean"
-        },
-        "writableObjectMode": {
-          "description": "Getter for the property `objectMode` of a given `Writable` stream.",
-          "type": "boolean"
-        }
-      },
-      "required": [
-        "allowHalfOpen",
-        "closed",
-        "destroyed",
-        "errored",
-        "readable",
-        "readableAborted",
-        "readableDidRead",
-        "readableEncoding",
-        "readableEnded",
-        "readableFlowing",
-        "readableHighWaterMark",
-        "readableLength",
-        "readableObjectMode",
-        "writable",
-        "writableCorked",
-        "writableEnded",
-        "writableFinished",
-        "writableHighWaterMark",
-        "writableLength",
-        "writableNeedDrain",
-        "writableObjectMode"
-      ],
-      "type": "object"
-    },
-    "internal.Readable": {
-      "additionalProperties": false,
-      "properties": {
-        "closed": {
-          "description": "Is `true` after `'close'` has been emitted.",
-          "type": "boolean"
-        },
-        "destroyed": {
-          "description": "Is `true` after `readable.destroy()` has been called.",
-          "type": "boolean"
-        },
-        "errored": {
-          "anyOf": [
-            {
-              "additionalProperties": false,
-              "properties": {
-                "message": {
-                  "type": "string"
-                },
-                "name": {
-                  "type": "string"
-                },
-                "stack": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "name",
-                "message"
-              ],
-              "type": "object"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "description": "Returns error if the stream has been destroyed with an error."
-        },
-        "readable": {
-          "description": "Is `true` if it is safe to call  {@link  read } , which means the stream has not been destroyed or emitted `'error'` or `'end'`.",
-          "type": "boolean"
-        },
-        "readableAborted": {
-          "description": "Returns whether the stream was destroyed or errored before emitting `'end'`.",
-          "type": "boolean"
-        },
-        "readableDidRead": {
-          "description": "Returns whether `'data'` has been emitted.",
-          "type": "boolean"
-        },
-        "readableEncoding": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/global.BufferEncoding"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "description": "Getter for the property `encoding` of a given `Readable` stream. The `encoding` property can be set using the  {@link  setEncoding }  method."
-        },
-        "readableEnded": {
-          "description": "Becomes `true` when [`'end'`](https://nodejs.org/docs/latest-v22.x/api/stream.html#event-end) event is emitted.",
-          "type": "boolean"
-        },
-        "readableFlowing": {
-          "description": "This property reflects the current state of a `Readable` stream as described in the [Three states](https://nodejs.org/docs/latest-v22.x/api/stream.html#three-states) section.",
-          "type": [
-            "boolean",
-            "null"
-          ]
-        },
-        "readableHighWaterMark": {
-          "description": "Returns the value of `highWaterMark` passed when creating this `Readable`.",
-          "type": "number"
-        },
-        "readableLength": {
-          "description": "This property contains the number of bytes (or objects) in the queue ready to be read. The value provides introspection data regarding the status of the `highWaterMark`.",
-          "type": "number"
-        },
-        "readableObjectMode": {
-          "description": "Getter for the property `objectMode` of a given `Readable` stream.",
-          "type": "boolean"
-        }
-      },
-      "required": [
-        "closed",
-        "destroyed",
-        "errored",
-        "readable",
-        "readableAborted",
-        "readableDidRead",
-        "readableEncoding",
-        "readableEnded",
-        "readableFlowing",
-        "readableHighWaterMark",
-        "readableLength",
-        "readableObjectMode"
       ],
       "type": "object"
     },

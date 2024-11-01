@@ -338,6 +338,7 @@ export function getFakeSession(): SmtpSession {
         args: []
       },
       rcptTo: []
-    }
+    },
+    context: {}
   };
 }

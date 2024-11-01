@@ -1,0 +1,31 @@
+{
+  "$schema": "../config.schema.json", //"https://raw.githubusercontent.com/loopingz/smtp-relay/main/config.schema.json",
+  "flows": {
+    "localhost": {
+      "filters": [
+        {
+          // Ensure that the email is from a valid domain
+          "type": "mail-auth",
+          // We enforce DMARC policy to avoid shady domains
+          "enforceDmarc": "v=DMARC1; p=reject;"
+        },
+        {
+          "type": "whitelist",
+          "to": ["regexp:.*@auto.loopingz.com"]
+        }
+      ],
+      "outputs": [
+        {
+          // We just log to the console
+          "type": "log"
+        }
+      ]
+    }
+  },
+  "options": {
+    "disableReverseLookup": false,
+    "authOptional": true,
+    "allowInsecureAuth": true,
+    "logger": true
+  }
+}

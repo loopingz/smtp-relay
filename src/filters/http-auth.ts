@@ -28,6 +28,7 @@ export async function request(options: RequestInit & HttpConfig) {
 }
 
 export interface HttpAuthConfig extends HttpConfig {
+  type: "http-auth";
   /**
    * URL to call
    */

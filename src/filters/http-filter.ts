@@ -30,6 +30,7 @@ export interface HttpConfig extends SmtpComponentConfig {
 }
 
 export interface HttpFilterConfig extends HttpConfig {
+  type: "http-filter";
   method?: "PUT" | "POST";
   /**
    * Accept any form of authentication to rely solely on username
