@@ -1,7 +1,7 @@
-import { AddressObject, ParsedMail } from "mailparser";
+import { AddressObject } from "mailparser";
 import * as nodemailer from "nodemailer";
 import Mail from "nodemailer/lib/mailer";
-import AddressParser from "nodemailer/lib/addressparser";
+import AddressParser from "nodemailer/lib/addressparser/index";
 import { SmtpComponentConfig } from "../component";
 import { SmtpProcessor } from "../processor";
 import { mapAddressObjects, SmtpSession } from "../server";
@@ -36,7 +36,7 @@ export class NodeMailerProcessor<
       return a.value.map(ad => ad.address);
     };
     // If no headers we do not fill the bcc as we have no to,cc headers
-    if (session.email.headerLines.length && !session.email.bcc) {
+    if (session.email.headerLines?.length && !session.email.bcc) {
       const noBcc = [session.email.cc, session.email.to].flat().filter(a => a);
       const bcc: AddressObject[] = session.envelope.rcptTo
         .filter(a => {

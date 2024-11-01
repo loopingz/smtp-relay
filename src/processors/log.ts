@@ -8,7 +8,7 @@ export interface LogProcessorConfig extends SmtpComponentConfig {
   /**
    * Fields to log
    *
-   * @default ["from", "to", "cc", "subject", "text"]
+   * @default ["from", "to", "cc", "bcc", "subject", "text"]
    */
   fields?: string[];
 }
@@ -17,7 +17,7 @@ export class LogProcessor<T extends LogProcessorConfig = LogProcessorConfig> ext
   type: string = "log";
 
   init(): void {
-    this.config.fields ??= ["from", "to", "cc", "subject", "text"];
+    this.config.fields ??= ["from", "to", "cc", "bcc", "subject", "text"];
   }
 
   /**
@@ -30,6 +30,7 @@ export class LogProcessor<T extends LogProcessorConfig = LogProcessorConfig> ext
     let content = `Email received ${new Date().toISOString()} from ${session.remoteAddress}
 ${"-".repeat(80)}
 `;
+
     this.config.fields
       .filter(f => email[f] !== undefined)
       .forEach(f => {
@@ -40,6 +41,6 @@ ${"-".repeat(80)}
         content += `${f}: ${value}\n`;
       });
     content += `${"-".repeat(80)}\n`;
-    this.logger.log("INFO", content);
+    (this.logger ?? console).log("INFO", content);
   }
 }
