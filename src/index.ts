@@ -10,6 +10,7 @@ import { NodeMailerProcessor } from "./processors/nodemailer";
 import { SmtpServer } from "./server";
 import { HttpAuthFilter } from "./filters/http-auth";
 import { HttpFilter } from "./filters/http-filter";
+import { LogProcessor } from "./processors/log";
 export * from "./cloudevent";
 
 /**
@@ -48,6 +49,10 @@ export function defaultModules() {
    * Send the email using PubSub or store it in a Bucket
    */
   SmtpProcessor.register("gcp", GCPProcessor);
+  /**
+   * Log the email
+   */
+  SmtpProcessor.register("log", LogProcessor);
 }
 
 // Cannot really test main module

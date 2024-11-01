@@ -6,6 +6,7 @@ import * as sinon from "sinon";
 import { SmtpSession } from "../server";
 import { getFakeSession } from "../server.spec";
 import { GCPProcessor } from "./gcp";
+import { readFileSync } from "node:fs";
 
 @suite
 class GCPProcessorTest {
@@ -71,9 +72,16 @@ class GCPProcessorTest {
         }
       };
     });
+    session.user = "LZ";
     await gcp.onMail(session);
+    delete session.user;
     assert.strictEqual(bucket, "test");
-    assert.strictEqual(filename, "unit-test-fake-path");
+    assert.ok(filename.endsWith("data-headers.txt.raw"));
+    const updatedData = readFileSync(filename).toString();
+    assert.ok(updatedData.includes("X-smtp-relay-MAIL_FROM:test@test.com\n"));
+    assert.ok(updatedData.includes("X-smtp-relay-CLIENT_HOSTNAME:localhost\n"));
+    assert.ok(updatedData.includes("X-smtp-relay-HELO:localhost\n"));
+    assert.ok(updatedData.includes("X-smtp-relay-USER:LZ\n"));
     assert.strictEqual(destination, "1234.eml");
 
     bucket = filename = destination = undefined;

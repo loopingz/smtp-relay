@@ -8,6 +8,7 @@ import { SmtpFilter } from "./filter";
 import { SmtpFlow } from "./flow";
 import { SmtpProcessor } from "./processor";
 import { SmtpServer, SmtpSession, mapAddressObjects } from "./server";
+import { readdirSync, unlinkSync } from "node:fs";
 
 export class SmtpTest {
   sock: Socket;
@@ -168,6 +169,12 @@ class OpenFilter extends SmtpFilter {
 
 @suite
 class SmtpServerTest {
+  static after() {
+    readdirSync(".")
+      .filter(f => f.startsWith(".email_") && f.endsWith(".eml"))
+      .forEach(f => unlinkSync(f));
+  }
+
   @test
   async middlewareChaining() {
     defaultModules();
@@ -185,7 +192,10 @@ class SmtpServerTest {
     );
     server.close();
     // cov
-    assert.ok(Array.isArray(mapAddressObjects({value: [], text: "", html: ""}, () => {})), "Should always return an array");
+    assert.ok(
+      Array.isArray(mapAddressObjects({ value: [], text: "", html: "" }, () => {})),
+      "Should always return an array"
+    );
     // @ts-ignore
     server.addFlow({ name: "Test" });
     // @ts-ignore
@@ -252,7 +262,10 @@ class SmtpServerTest {
       ]
     };
     // @ts-ignore
-    await server.onDataRead({ flows: { fake: "PENDING" }, envelope: { mailFrom: {address: "test@test.com", args: {}}, rcptTo: [{address: "ok.com", args: {}}] } });
+    await server.onDataRead({
+      flows: { fake: "PENDING" },
+      envelope: { mailFrom: { address: "test@test.com", args: {} }, rcptTo: [{ address: "ok.com", args: {} }] }
+    });
   }
 
   @test
@@ -318,7 +331,7 @@ export function getFakeSession(): SmtpSession {
     secure: false,
     transmissionType: "TEST",
     time: new Date(),
-    emailPath: "unit-test-fake-path",
+    emailPath: import.meta.dirname + "/../tests/data-headers.txt",
     envelope: {
       mailFrom: {
         address: "test@test.com",

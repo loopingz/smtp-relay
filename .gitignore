@@ -5,3 +5,4 @@ reports
 .env
 *.eml
 test.log
+data-headers.txt.raw
