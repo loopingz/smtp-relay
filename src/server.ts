@@ -16,6 +16,7 @@ import stripJsonComments from "strip-json-comments";
 import { parse as YAMLParse } from "yaml";
 import { SmtpFlow, SmtpFlowConfig } from "./flow";
 import { HeadersTransform, HeadersTransformConfig } from "./headers_transformer";
+import { Transform } from "node:stream";
 
 export type SmtpCallback = (err?, result?) => void;
 export type SmtpNext = () => void;
@@ -119,6 +120,46 @@ export interface SmtpConfig {
    */
   keepCache?: boolean;
   /**
+   * Sign the email with DKIM
+   */
+  dkim?: {
+    /**
+     * Default cannonicalization
+     *
+     * @default relaxed/relaxed
+     */
+    canonicalization?: string;
+    /**
+     * Default signing algorithm
+     *
+     * @default rsa-sha256
+     */
+    algorithm?: string;
+    /**
+     * Signatures to add
+     */
+    signatureData: [
+      {
+        /**
+         * Domain to sign
+         */
+        signingDomain: string;
+        /**
+         * Key selector
+         */
+        selector: string;
+        /**
+         * Path to the private key
+         */
+        privateKey: string;
+        /**
+         * Passphrase for the private key
+         */
+        passphrase?: string;
+      }
+    ];
+  };
+  /**
    * Configure prometheus metrics
    */
   prometheus?: {
@@ -193,6 +234,8 @@ export class SmtpServer {
   logger: WorkerOutput;
   counter?: Counter;
   promServer: http.Server<typeof http.IncomingMessage, typeof http.ServerResponse>;
+  dkimStream: any;
+  dkimKeys: { [key: string]: Buffer };
 
   constructor(configFile: string = undefined) {
     if (!configFile) {
@@ -252,7 +295,7 @@ export class SmtpServer {
     }
   }
 
-  init() {
+  async init() {
     this.config.options.loggers.forEach(logger => {
       if (logger.type === "CONSOLE") {
         new ConsoleLogger(this.logger, logger.level, logger.format);
@@ -260,6 +303,10 @@ export class SmtpServer {
         new FileLogger(this.logger, logger.level, logger.filepath, logger.sizeLimit, logger.format);
       }
     });
+
+    if (this.config.dkim) {
+      this.dkimStream = (await import("mailauth/lib/dkim/sign")).DkimSignStream;
+    }
 
     const logger = this.logger.getBunyanLogger();
     this.server = new SMTPServer({
@@ -369,6 +416,19 @@ export class SmtpServer {
   }
 
   /**
+   * Load and cache dkim private key
+   * @param file
+   *
+   * TODO: Move to @webda/cache when available
+   */
+  loadDkimPrivateKey(file: string) {
+    this.dkimKeys ??= {};
+    if (!this.dkimKeys[file]) {
+      this.dkimKeys[file] = fs.readFileSync(file);
+    }
+  }
+
+  /**
    * Manage the Data filter
    * @param stream
    * @param session
@@ -379,7 +439,23 @@ export class SmtpServer {
     session.emailPath = SmtpServer.replaceVariables(this.config.cachePath, { ...session });
 
     // @ts-ignore
-    stream.pipe(new HeadersTransform(this.config.mailHeaders)).pipe(fs.createWriteStream(session.emailPath));
+    stream = stream.pipe(new HeadersTransform(this.config.mailHeaders));
+
+    // Add dkim signature
+    if (this.dkimStream) {
+      // @ts-ignore
+      stream = stream.pipe(
+        new this.dkimStream({
+          ...this.config.dkim,
+          signatureData: this.config.dkim.signatureData.map(sig => ({
+            ...sig,
+            privateKey: this.loadDkimPrivateKey(sig.privateKey)
+          }))
+        })
+      );
+    }
+
+    stream.pipe(fs.createWriteStream(session.emailPath));
     // @ts-ignore
     stream.on("end", async () => {
       session.email = await simpleParser(fs.createReadStream(session.emailPath));
