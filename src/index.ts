@@ -11,12 +11,17 @@ import { SmtpServer } from "./server";
 import { HttpAuthFilter } from "./filters/http-auth";
 import { HttpFilter } from "./filters/http-filter";
 import { LogProcessor } from "./processors/log";
+import { MailAuthFilter } from "./filters/mailauth";
 export * from "./cloudevent";
 
 /**
  * Define the default modules
  */
 export function defaultModules() {
+  /**
+   * Ensure SPF, DKIM, DMARC, ARC, BIMI and Received headers are valid
+   */
+  SmtpFilter.register("mailauth", MailAuthFilter);
   /**
    * Whitelist based on "to", "from", "ips" or "domains" fields
    */

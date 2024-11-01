@@ -30,6 +30,7 @@
     "cloudevents": "^8.0.1",
     "fast-xml-parser": ">=4.2.5",
     "jsonpath": "^1.1.1",
+    "mailauth": "^4.7.3",
     "mailparser": "^3.4.0",
     "nodemailer": "^6.7.2",
     "prom-client": "^14.1.1",
