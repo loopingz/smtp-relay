@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.6.0](https://github.com/loopingz/smtp-relay/compare/v1.5.2...v1.6.0) (2024-11-01)
+
+
+### Features
+
+* add LogProcessor to the available options ([34de461](https://github.com/loopingz/smtp-relay/commit/34de46153e299affb50bbaa1dec39c93de3247b3))
+* add more headers to email in raw mode ([37f5c61](https://github.com/loopingz/smtp-relay/commit/37f5c615f01fc039b5dda730f1de8dba60737026))
+* add smtp headers manipulation ([fa67f40](https://github.com/loopingz/smtp-relay/commit/fa67f403df69caa30a0805d817f6fe74a8404185))
+
+
+### Bug Fixes
+
+* add bcc to nodemailer ([b48324e](https://github.com/loopingz/smtp-relay/commit/b48324e22cb407f249d2ccbad5cf53c88bd4e695))
+* ensure Destinations is set to match the rcptTo received ([009377f](https://github.com/loopingz/smtp-relay/commit/009377f60cdae449bf0f4fde3cfdaf6e94a46b0e))
+
 ## [1.5.2](https://github.com/loopingz/smtp-relay/compare/v1.5.1...v1.5.2) (2024-09-17)
 
 
