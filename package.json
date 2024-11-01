@@ -41,7 +41,7 @@
     "yaml": "^2.2.2"
   },
   "engines": {
-    "node": ">= 18"
+    "node": ">= 20"
   },
   "files": [
     "lib"
