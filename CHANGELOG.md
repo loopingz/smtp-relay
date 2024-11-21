@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.7.0](https://github.com/loopingz/smtp-relay/compare/v1.6.0...v1.7.0) (2024-11-21)
+
+
+### Features
+
+* drop node18 ([b35e918](https://github.com/loopingz/smtp-relay/commit/b35e91840248a3b55a97f0245badaba332d9eb0d))
+
+
+### Bug Fixes
+
+* **deps:** bump cross-spawn from 7.0.3 to 7.0.6 ([344f7dc](https://github.com/loopingz/smtp-relay/commit/344f7dc9fed3cc67c51a9057a073f7a8209114d8))
+
 ## [1.6.0](https://github.com/loopingz/smtp-relay/compare/v1.5.2...v1.6.0) (2024-11-01)
 
 
