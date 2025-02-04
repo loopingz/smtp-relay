@@ -67,7 +67,7 @@ export class WhitelistFilter extends SmtpFilter<WhitelistFilterConfiguration> {
           if (f === value) {
             return true;
           }
-        } else if (value.match(new RegExp(f))) {
+        } else if (value.match(f)) {
           return true;
         }
       }
