@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.8.0](https://github.com/loopingz/smtp-relay/compare/v1.7.0...v1.8.0) (2025-02-05)
+
+
+### Features
+
+* add subnets feature for whitelist ([3403902](https://github.com/loopingz/smtp-relay/commit/340390267f06b623123a10fde483288909f966e4))
+
+
+### Bug Fixes
+
+* add docker configuration with broader subnets whitelist ([5196bba](https://github.com/loopingz/smtp-relay/commit/5196bba7834515ea3795b32aae6874363c585858))
+
 ## [1.7.0](https://github.com/loopingz/smtp-relay/compare/v1.6.0...v1.7.0) (2024-11-21)
 
 
