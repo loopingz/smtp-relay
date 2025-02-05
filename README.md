@@ -9,7 +9,9 @@
 ![CodeQL](https://github.com/loopingz/smtp-relay/workflows/CodeQL/badge.svg)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+
 [![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 This project replace a previous project `aws-smtp-relay`
@@ -118,7 +120,7 @@ Run with a configuration file:
 You can just leverage the Docker image:
 
 ```
-docker run -p 10025:10025 -v `pwd`/emails:/smtp-relay/received_emails loopingz/smtp-relay:latest ./configs/fake-smtp.jsonc
+docker run -p 10025:10025 -v `pwd`/emails:/smtp-relay/received_emails loopingz/smtp-relay:latest ./configs/fake-smtp-docker.jsonc
 # With auth
 docker run -e SMTP_USERNAME=test -e SMTP_PASSWORD=plain:test -p 10025:10025 -v `pwd`/emails:/smtp-relay/received-emails loopingz/smtp-relay:latest configs/fake-smtp-with-auth.jsonc
 ```
@@ -216,6 +218,7 @@ By default the loggers are defined as a single `CONSOLE` logger. You can disable
 ## CloudEvent
 
 The cloudevent representation of an email is:
+
 ```
 /**
  * CloudEvent Data representation for smtp-relay
@@ -255,9 +258,10 @@ export interface SmtpCloudEvent {
 You can enable http auth for the smtp relay, it will then relay the username/password verification to an HTTP endpoint.
 
 Use the `http-auth` filter:
- - BASIC_AUTH: It will send a `authorization` header with a Basic Auth (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization)
- - FORM_URLENCODED: It will send a request to the url with a x-form-urlencoded containing username and password
- - JSON: Sending a JSON body to the url with the username/password
+
+- BASIC_AUTH: It will send a `authorization` header with a Basic Auth (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization)
+- FORM_URLENCODED: It will send a request to the url with a x-form-urlencoded containing username and password
+- JSON: Sending a JSON body to the url with the username/password
 
 Configuration interface
 
@@ -275,7 +279,7 @@ interface HttpAuthConfiguration {
    * If not define the HTTP code is used:
    * < 300: Allowed
    * >= 300: Refused
-   * 
+   *
    * If defined the response is read as JSON and test for value
    */
   json_result?: {
@@ -290,7 +294,7 @@ interface HttpAuthConfiguration {
   };
   /**
    * Http method to use to pass credentials
-   * 
+   *
    * BasicAuth: Will use the Authorization field
    * Json: Will post/put a JSON body with the user/password
    * FormData: Will post/put a Form body with the user/password
@@ -394,13 +398,14 @@ Example smtp test:
 
 ```
  docker run -p 10025:10025 loopingz/smtp-relay:latest
- ```
-
+```
 
 2. Connect to smtp-relay
+
 ```
 openssl s_client -connect localhost:10025
 ```
+
 ```
 S: 220 smtp.server.com Simple Mail Transfer Service Ready
 C: EHLO client.example.com
@@ -414,7 +419,6 @@ S: 334 UGFzc3dvcmQ6
 C: lkujsefxlj
 S: 235 2.7.0 Authentication successful
 ```
-
 
 Examples of ways to base64 encode your credentials:
 
@@ -470,4 +474,5 @@ Example Schema used to add basic auth to an aws-ses smtp-relay running in k8s:
   }
 }
 ```
+
 Note: Change your loggers level to DEBUG for help troubleshooting.
