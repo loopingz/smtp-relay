@@ -29,6 +29,7 @@
     "axios": "^1.7.4",
     "cloudevents": "^8.0.1",
     "fast-xml-parser": ">=4.2.5",
+    "is-in-subnet": "^4.0.1",
     "jsonpath": "^1.1.1",
     "mailparser": "^3.4.0",
     "nodemailer": "^6.7.2",

@@ -2,6 +2,7 @@ import { SMTPServerAddress } from "smtp-server";
 import { SmtpComponentConfig } from "../component";
 import { SmtpFilter } from "../filter";
 import { SmtpSession } from "../server";
+import { createChecker } from "is-in-subnet";
 
 export interface WhitelistFilterConfiguration extends SmtpComponentConfig {
   type: "whitelist";
@@ -9,6 +10,7 @@ export interface WhitelistFilterConfiguration extends SmtpComponentConfig {
   to?: (string | RegExp)[];
   ips?: (string | RegExp)[];
   domains?: (string | RegExp)[];
+  subnets?: string[];
 }
 
 /**
@@ -16,6 +18,7 @@ export interface WhitelistFilterConfiguration extends SmtpComponentConfig {
  */
 export class WhitelistFilter extends SmtpFilter<WhitelistFilterConfiguration> {
   type: string = "whitelist";
+  subnetChecker?: (ip: string) => boolean;
 
   init() {
     // Ensure regexps do not allow any partial match
@@ -24,6 +27,9 @@ export class WhitelistFilter extends SmtpFilter<WhitelistFilterConfiguration> {
       .forEach(attr => {
         this.config[attr] = this.config[attr].map(r => this.getRegExp(r));
       });
+    if (this.config.subnets) {
+      this.subnetChecker = createChecker(this.config.subnets);
+    }
   }
   /**
    * Filter on sender
@@ -67,7 +73,7 @@ export class WhitelistFilter extends SmtpFilter<WhitelistFilterConfiguration> {
           if (f === value) {
             return true;
           }
-        } else if (value.match(f)) {
+        } else if (f instanceof RegExp && value.match(f)) {
           return true;
         }
       }
@@ -85,9 +91,15 @@ export class WhitelistFilter extends SmtpFilter<WhitelistFilterConfiguration> {
   async onConnect(session: SmtpSession) {
     let ip = this.check("ips", session.remoteAddress);
     let domain = this.check("domains", session.clientHostname);
+    if (this.subnetChecker) {
+      ip ??= false;
+      ip ||= this.subnetChecker(session.remoteAddress);
+    }
     if (ip === undefined && domain === undefined) {
       return undefined;
     }
+    domain ??= false;
+    ip ??= false;
     return ip || domain;
   }
 
