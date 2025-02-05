@@ -73,7 +73,7 @@ export class WhitelistFilter extends SmtpFilter<WhitelistFilterConfiguration> {
           if (f === value) {
             return true;
           }
-        } else if (f instanceof RegExp && value.match(f)) {
+        } else if (f instanceof RegExp && f.exec(value)) {
           return true;
         }
       }
