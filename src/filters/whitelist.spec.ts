@@ -2,6 +2,9 @@ import { suite, test } from "@testdeck/mocha";
 import { defaultModules } from "..";
 import { SmtpServer } from "../server";
 import { SmtpTest } from "../server.spec";
+import { WhitelistFilter } from "./whitelist";
+import { MemoryLogger, WorkerOutput } from "@webda/workout";
+import * as assert from "assert";
 
 @suite
 class WhitelistSmtpServerTest {
@@ -27,5 +30,43 @@ class WhitelistSmtpServerTest {
     await new SmtpTest().sendEmail("test@smtp-relay.com", "dest@smtp-relay.com", "Coucouc");
     console.log("CLOSING SERVER");
     server.close();
+  }
+
+  @test
+  async whitelistSubnet() {
+    let output = new WorkerOutput();
+    let logger = new MemoryLogger(output);
+    const filter = new WhitelistFilter(
+      undefined,
+      {
+        type: "whitelist",
+        subnets: ["10.0.0.0/8", "127.0.0.1/32"]
+      },
+      output
+    );
+    assert.strictEqual(
+      await filter.onConnect(<any>{
+        remoteAddress: "10.1.1.1"
+      }),
+      true
+    );
+    assert.strictEqual(
+      await filter.onConnect(<any>{
+        remoteAddress: "11.1.1.1"
+      }),
+      false
+    );
+    assert.strictEqual(
+      await filter.onConnect(<any>{
+        remoteAddress: "127.0.0.1"
+      }),
+      true
+    );
+    assert.strictEqual(
+      await filter.onConnect(<any>{
+        remoteAddress: "127.0.0.2"
+      }),
+      false
+    );
   }
 }
