@@ -80,7 +80,7 @@
     "@webda/tsc-esm": "^1.0.2",
     "auto": "^11.0.4",
     "c8": "^8.0.1",
-    "esbuild": "^0.19.3",
+    "esbuild": "^0.25.0",
     "mocha": "^10.0.0",
     "prettier": "^3.0.3",
     "prettier-plugin-organize-imports": "^3.2.1",
