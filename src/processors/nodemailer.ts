@@ -14,7 +14,7 @@ export interface NodeMailerProcessorConfig extends SmtpComponentConfig {
    * You can define the nodemailer transport options here
    * @see https://nodemailer.com/usage/
    */
-  nodemailer?: string | any; //SMTPTransport | Omit<SMTPTransport.Options, "getSocket">;
+  nodemailer?: string | any;
   /**
    * Configuration DKIM per sender domain
    */
@@ -65,7 +65,7 @@ export class NodeMailerProcessor<
       to: mapAddressObjects<string[]>(email.to, addressTransformer)?.flat(),
       cc: mapAddressObjects<string[]>(email.cc, addressTransformer)?.flat(),
       text: email.text,
-      html: email.html ? email.html : undefined,
+      html: email.html === false ? undefined : email.html,
       subject: email.subject,
       //headers: email.headers.map(h => ({ key: h.key, value: h.line })),
       attachments: email.attachments.map(a => ({
