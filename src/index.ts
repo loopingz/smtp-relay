@@ -1,7 +1,6 @@
 import * as url from "node:url";
 import { SmtpFilter } from "./filter";
 import { StaticAuthFilter } from "./filters/static-auth";
-import { MailAuthFilter } from "./filters/mail-auth";
 import { WhitelistFilter } from "./filters/whitelist";
 import { SmtpProcessor } from "./processor";
 import { AWSProcessor } from "./processors/aws";
