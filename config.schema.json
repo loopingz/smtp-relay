@@ -2076,6 +2076,9 @@
               },
               {
                 "$ref": "#/definitions/WhitelistFilterConfiguration"
+              },
+              {
+                "$ref": "#/definitions/AuthFilterConfiguration"
               }
             ]
           },
@@ -2144,6 +2147,58 @@
         "type"
       ],
       "type": "object"
+    },
+    "AuthFilterConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configuration for the AuthFilter to perform DKIM and SPF checks.",
+      "properties": {
+        "type": {
+          "const": "auth",
+          "type": "string",
+          "description": "Identifies this configuration as for an 'auth' filter."
+        },
+        "name": {
+          "type": "string",
+          "description": "Optional descriptive name for this filter instance."
+        },
+        "mtaHostname": {
+          "type": "string",
+          "description": "Hostname of the server performing the authentication (e.g., 'mx.example.com'). Defaults to the OS hostname if not specified."
+        },
+        "mailauthOptions": {
+          "type": "object",
+          "description": "Additional options to pass directly to the mailauth library, e.g., for custom DNS resolver in tests. See mailauth documentation for available options.",
+          "additionalProperties": true
+        },
+        "dkim": {
+          "type": "object",
+          "description": "DKIM check policy.",
+          "properties": {
+            "policy": {
+              "type": "string",
+              "enum": ["accept", "tag", "reject"],
+              "default": "tag",
+              "description": "Policy for DKIM failures. 'accept': allow email; 'tag': add Authentication-Results header (default); 'reject': block email."
+            }
+          },
+          "additionalProperties": false
+        },
+        "spf": {
+          "type": "object",
+          "description": "SPF check policy.",
+          "properties": {
+            "policy": {
+              "type": "string",
+              "enum": ["accept", "tag", "reject"],
+              "default": "tag",
+              "description": "Policy for SPF failures. 'accept': allow email; 'tag': add Authentication-Results header (default); 'reject': block email."
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": ["type"]
     },
     "StorageClass": {
       "enum": [

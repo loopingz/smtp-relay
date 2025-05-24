@@ -375,40 +375,146 @@ export class SmtpServer {
    * @param callback
    */
   async onData(stream: SMTPServerDataStream, session: SmtpSession, callback: SmtpCallback) {
-    // Data
     session.emailPath = SmtpServer.replaceVariables(this.config.cachePath, { ...session });
 
-    // @ts-ignore
-    stream.pipe(new HeadersTransform(this.config.mailHeaders)).pipe(fs.createWriteStream(session.emailPath));
-    // @ts-ignore
-    stream.on("end", async () => {
-      session.email = await simpleParser(fs.createReadStream(session.emailPath));
-      await this.filter("Data", session, [session]);
-      // If no decision made after RCPT TO we consider refused
-      for (let name in session.flows) {
-        // Skip any flow that was not accepted explicitely
-        if (session.flows[name] === "PENDING") {
-          delete session.flows[name];
-        }
-      }
-      this.manageCallback(session, err => {
-        if (err) {
-          callback(err);
-          return;
-        }
-        (async () => {
-          await this.onDataRead(session);
-          if (!this.config.keepCache) {
-            fs.unlink(session.emailPath, err => {
-              err && this.logger.log("ERROR", `Unable to delete ${session.emailPath}`, err);
-            });
-          }
-          callback();
-        })();
-      });
-    });
+    // Separate "pre-stream" filters (like AuthFilter) from "post-stream" filters
+    const preStreamFilters: any[] = []; // Using 'any' for now, should be SmtpFilter if possible
+    const postStreamFilters: any[] = [];
 
-    stream.on("error", err => callback(`error converting stream - ${err}`));
+    for (const flowName in this.flows) {
+      const flow = this.flows[flowName];
+      if (session.flows[flowName] === "ACCEPTED" && flow.config.filtersOperator === "OR") {
+        // If flow already accepted by OR operator, might skip some filters based on logic
+        // For now, we'll collect all and let filter logic decide
+      }
+      flow.filters.forEach(filter => {
+        // TODO: Find a better way to distinguish these filters.
+        // For now, assuming 'auth' type filters are pre-stream.
+        // A more robust way would be a property on the filter class or a separate registry.
+        if (filter.config.type === "auth") { // Example: AuthFilter
+          if (!preStreamFilters.find(f => f === filter)) preStreamFilters.push(filter);
+        } else {
+          // Assuming other 'Data' filters operate on parsed email (post-stream)
+          // Or filters that don't have an onData method specific to the stream
+          if (typeof filter.onData === 'function' && filter.onData.length <= 1) { // onData(session)
+             if (!postStreamFilters.find(f => f === filter)) postStreamFilters.push(filter);
+          }
+        }
+      });
+    }
+    
+    let currentFilterIndex = 0;
+    const processNextPreStreamFilter = async () => {
+      if (currentFilterIndex >= preStreamFilters.length) {
+        // All pre-stream filters processed, continue with saving and post-stream filters
+        pipeStreamAndProcessPostStreamFilters();
+        return;
+      }
+
+      const filter = preStreamFilters[currentFilterIndex];
+      currentFilterIndex++;
+
+      try {
+        // AuthFilter's onData expects (stream, session, callback)
+        // Need to handle the stream carefully if multiple pre-stream filters consume it.
+        // For now, AuthFilter is the primary one, and it consumes the stream.
+        // This logic assumes AuthFilter is the only one, or subsequent ones get an empty stream.
+        // This needs refinement if multiple pre-stream filters need the *same* stream content.
+        if (filter.config.type === 'auth') { // Specifically AuthFilter
+            await filter.onData(stream, session, (err?: Error | null, code?: string) => {
+            if (err) {
+              this.logger.warn(`Pre-stream filter ${filter.name} (${filter.type}) rejected email for session ${session.id}: ${err.message}`);
+              // @ts-ignore - SmtpCallback can take a code
+              return callback(err, code); // Reject the email
+            }
+            processNextPreStreamFilter(); // Process next pre-stream filter
+          });
+        } else {
+          // If other pre-stream filters exist with different signatures, handle here
+          this.logger.warn(`Unsupported pre-stream filter type or signature for ${filter.name} (${filter.type})`);
+          processNextPreStreamFilter();
+        }
+      } catch (filterError: any) {
+        this.logger.error(`Error in pre-stream filter ${filter.name} (${filter.type}) for session ${session.id}: ${filterError.message}`);
+        // Decide on error handling: reject or continue? For now, continue.
+        processNextPreStreamFilter();
+      }
+    };
+    
+    const pipeStreamAndProcessPostStreamFilters = () => {
+      // @ts-ignore - HeadersTransform is a valid stream
+      const transformStream = stream.pipe(new HeadersTransform(this.config.mailHeaders));
+      transformStream.pipe(fs.createWriteStream(session.emailPath!));
+
+      transformStream.on("end", async () => {
+        try {
+          session.email = await simpleParser(fs.createReadStream(session.emailPath!));
+          
+          // Now run post-stream filters (original this.filter("Data", ...) logic)
+          // We need to ensure we are only running filters that haven't run or are meant for post-stream
+          // The current SmtpServer.filter logic might need adjustment or a new method
+          // For simplicity, we'll reuse the existing filter logic, assuming it handles 'Data' event
+          // for filters that expect a parsed email.
+          
+          // Rebuild args for post-stream filters that expect onData(session)
+          // The original filter("Data", session, [session]) would call onData(session)
+          for (const flowName in this.flows) {
+            const flow = this.flows[flowName];
+            if (session.flows[flowName] === "ACCEPTED" && flow.config.filtersOperator === "OR") {
+              continue;
+            }
+            for (const filter of flow.filters) {
+              // Only run if it's a post-stream filter and has onData(session)
+              if (postStreamFilters.includes(filter)) {
+                 // @ts-ignore filter could be any SmtpFilter
+                const res = await filter.onData(session);
+                if (res === undefined) continue;
+                if (flow.config.filtersOperator === "OR") {
+                  if (res) session.flows[flowName] = "ACCEPTED";
+                } else if (!res) {
+                  delete session.flows[flowName];
+                  break; 
+                } else {
+                  session.flows[flowName] = "ACCEPTED";
+                }
+              }
+            }
+          }
+
+          for (let name in session.flows) {
+            if (session.flows[name] === "PENDING") {
+              delete session.flows[name];
+            }
+          }
+
+          this.manageCallback(session, finalErr => {
+            if (finalErr) {
+              return callback(finalErr);
+            }
+            (async () => {
+              await this.onDataRead(session);
+              if (!this.config.keepCache) {
+                fs.unlink(session.emailPath!, errUnlink => {
+                  errUnlink && this.logger.log("ERROR", `Unable to delete ${session.emailPath}`, errUnlink);
+                });
+              }
+              callback();
+            })();
+          });
+        } catch (parseError: any) {
+          this.logger.error(`Error parsing email or in post-stream filters for session ${session.id}: ${parseError.message}`);
+          return callback(parseError);
+        }
+      });
+
+      transformStream.on("error", (streamErr: Error) => {
+        this.logger.error(`Error piping stream for session ${session.id}: ${streamErr.message}`);
+        callback(streamErr); // error converting stream
+      });
+    };
+
+    // Start processing pre-stream filters
+    await processNextPreStreamFilter();
   }
 
   /**

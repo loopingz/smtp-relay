@@ -47,3 +47,16 @@ export class SmtpFilter<T extends SmtpComponentConfig = SmtpComponentConfig> ext
     session[`${this.flow.name}_${this.name}`] = state;
   }
 }
+
+// Import and register filters
+import { WhitelistFilter } from "./filters/whitelist";
+import { StaticAuthFilter } from "./filters/static-auth";
+import { HttpAuthFilter } from "./filters/http-auth";
+import { HttpFilter } from "./filters/http-filter";
+import { AuthFilter } from "./filters/auth"; // Import the new AuthFilter
+
+SmtpFilter.register("whitelist", WhitelistFilter);
+SmtpFilter.register("static-auth", StaticAuthFilter);
+SmtpFilter.register("http-auth", HttpAuthFilter);
+SmtpFilter.register("http-filter", HttpFilter);
+SmtpFilter.register("auth", AuthFilter); // Register the new AuthFilter
