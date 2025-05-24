@@ -5,7 +5,12 @@ import AddressParser from "nodemailer/lib/addressparser/index";
 import { SmtpComponentConfig } from "../component";
 import { SmtpProcessor } from "../processor";
 import { mapAddressObjects, SmtpSession } from "../server";
-import { SingleKeyOptions } from "nodemailer/lib/dkim";
+import type { SingleKeyOptions } from "nodemailer/lib/dkim";
+import type SMTPTransport from "nodemailer/lib/smtp-transport";
+
+type Pojo<T> = {
+  [K in keyof T]: T[K] extends Function ? never : T[K];
+};
 
 export interface NodeMailerProcessorConfig extends SmtpComponentConfig {
   type: "nodemailer";
@@ -14,7 +19,7 @@ export interface NodeMailerProcessorConfig extends SmtpComponentConfig {
    * You can define the nodemailer transport options here
    * @see https://nodemailer.com/usage/
    */
-  nodemailer?: string | any;
+  nodemailer?: string | Pojo<SMTPTransport> | Pojo<SMTPTransport.Options>;
   /**
    * Configuration DKIM per sender domain
    */
