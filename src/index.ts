@@ -35,11 +35,6 @@ export function defaultModules() {
    */
   SmtpFilter.register("http-filter", HttpFilter);
   /**
-   * Use to verify SPF, DKIM, DMARC, BIMI, ARC, etc...
-   * This is needed if you plan to make your smtp-relay public
-   */
-  SmtpFilter.register("mailauth-filter", MailAuthFilter);
-  /**
    * Store an email flow into a file
    */
   SmtpProcessor.register("file", FileProcessor);
