@@ -195,18 +195,26 @@ export class SmtpServer {
   promServer: http.Server<typeof http.IncomingMessage, typeof http.ServerResponse>;
 
   constructor(configFile: string = undefined) {
-    if (!configFile) {
-      configFile = "./smtp-relay.json";
+    console.log(`[SmtpServer CONSTRUCTOR] Received configFile: ${configFile}`);
+    const effectiveConfigFile = configFile || "./smtp-relay.json";
+    console.log(`[SmtpServer CONSTRUCTOR] Effective configFile: ${effectiveConfigFile}`);
+    
+    // Resolve the configuration file path relative to the current working directory
+    const resolvedConfigFile = path.resolve(process.cwd(), effectiveConfigFile);
+    console.log(`[SmtpServer CONSTRUCTOR] Resolved configFile: ${resolvedConfigFile}, CWD: ${process.cwd()}`);
+
+    if (!fs.existsSync(resolvedConfigFile)) {
+      console.error(`[SmtpServer CONSTRUCTOR] ERROR: File not found at resolved path: ${resolvedConfigFile}`);
+      throw new Error(`Configuration '${resolvedConfigFile}' (resolved from '${effectiveConfigFile}') not found. CWD: ${process.cwd()}`);
     }
-    if (!fs.existsSync(configFile)) {
-      throw new Error(`Configuration '${configFile}' not found`);
-    }
-    if (configFile.match(/\.jsonc?$/)) {
-      this.config = JSON.parse(stripJsonComments(fs.readFileSync(configFile).toString())) || {};
-    } else if (configFile.match(/\.ya?ml$/)) {
-      this.config = YAMLParse(fs.readFileSync(configFile).toString()) || {};
+    
+    console.log(`[SmtpServer CONSTRUCTOR] Loading config from: ${resolvedConfigFile}`);
+    if (resolvedConfigFile.match(/\.jsonc?$/)) {
+      this.config = JSON.parse(stripJsonComments(fs.readFileSync(resolvedConfigFile).toString())) || {};
+    } else if (resolvedConfigFile.match(/\.ya?ml$/)) {
+      this.config = YAMLParse(fs.readFileSync(resolvedConfigFile).toString()) || {};
     } else {
-      throw new Error(`Configuration format not handled ${configFile}`);
+      throw new Error(`Configuration format not handled ${resolvedConfigFile}`);
     }
 
     this.config.port ??= 10025;
@@ -280,9 +288,20 @@ export class SmtpServer {
 
     /* c8 ignore next 3 */
     this.server.on("error", err => {
-      this.logger.log("ERROR", err.message);
+      this.logger.log("ERROR", `SMTPServer internal error: ${err.message}`, err);
+      // If init is part of a promise, this error should cause it to reject.
     });
-    this.server.listen(this.config.port);
+    // this.server.listen(this.config.port); // Will be part of the promise
+    return new Promise<void>((resolve, reject) => {
+      this.server.on('error', (err) => { // Listen for errors specifically during listen
+        this.logger.log("ERROR", `Failed to start SMTPServer: ${err.message}`);
+        reject(err);
+      });
+      this.server.listen(this.config.port, this.config.bind, () => {
+        this.logger.log("INFO", `SMTP Server listening on ${this.config.bind}:${this.config.port}`);
+        resolve();
+      });
+    });
   }
 
   /**
@@ -375,40 +394,170 @@ export class SmtpServer {
    * @param callback
    */
   async onData(stream: SMTPServerDataStream, session: SmtpSession, callback: SmtpCallback) {
-    // Data
+    this.logger.log("DEBUG", `onData called for session ${session.id}. Client: ${session.clientHostname}[${session.remoteAddress}]`);
     session.emailPath = SmtpServer.replaceVariables(this.config.cachePath, { ...session });
 
-    // @ts-ignore
-    stream.pipe(new HeadersTransform(this.config.mailHeaders)).pipe(fs.createWriteStream(session.emailPath));
-    // @ts-ignore
-    stream.on("end", async () => {
-      session.email = await simpleParser(fs.createReadStream(session.emailPath));
-      await this.filter("Data", session, [session]);
-      // If no decision made after RCPT TO we consider refused
-      for (let name in session.flows) {
-        // Skip any flow that was not accepted explicitely
-        if (session.flows[name] === "PENDING") {
-          delete session.flows[name];
-        }
-      }
-      this.manageCallback(session, err => {
-        if (err) {
-          callback(err);
-          return;
-        }
-        (async () => {
-          await this.onDataRead(session);
-          if (!this.config.keepCache) {
-            fs.unlink(session.emailPath, err => {
-              err && this.logger.log("ERROR", `Unable to delete ${session.emailPath}`, err);
-            });
-          }
-          callback();
-        })();
-      });
-    });
+    // Separate "pre-stream" filters (like AuthFilter) from "post-stream" filters
+    const preStreamFilters: any[] = []; // Using 'any' for now, should be SmtpFilter if possible
+    const postStreamFilters: any[] = [];
 
-    stream.on("error", err => callback(`error converting stream - ${err}`));
+    for (const flowName in this.flows) {
+      const flow = this.flows[flowName];
+      if (session.flows[flowName] === "ACCEPTED" && flow.config.filtersOperator === "OR") {
+        // If flow already accepted by OR operator, might skip some filters based on logic
+        // For now, we'll collect all and let filter logic decide
+      }
+      flow.filters.forEach(filter => {
+        // TODO: Find a better way to distinguish these filters.
+        // For now, assuming 'auth' type filters are pre-stream.
+        // A more robust way would be a property on the filter class or a separate registry.
+        if (filter.config.type === "auth") { // Example: AuthFilter
+          if (!preStreamFilters.find(f => f === filter)) preStreamFilters.push(filter);
+        } else {
+          // Assuming other 'Data' filters operate on parsed email (post-stream)
+          // Or filters that don't have an onData method specific to the stream
+          if (typeof filter.onData === 'function' && filter.onData.length <= 1) { // onData(session)
+             if (!postStreamFilters.find(f => f === filter)) postStreamFilters.push(filter);
+          }
+        }
+      });
+    }
+    
+    let currentFilterIndex = 0;
+    this.logger.log("DEBUG", `Session ${session.id}: Starting pre-stream filter processing. Found ${preStreamFilters.length} pre-stream filters.`);
+
+    const processNextPreStreamFilter = async () => {
+      if (currentFilterIndex >= preStreamFilters.length) {
+        this.logger.log("DEBUG", `Session ${session.id}: All pre-stream filters passed. Proceeding to save and process email content.`);
+        pipeStreamAndProcessPostStreamFilters();
+        return;
+      }
+
+      const filter = preStreamFilters[currentFilterIndex];
+      currentFilterIndex++;
+      this.logger.log("DEBUG", `Session ${session.id}: Calling pre-stream filter: ${filter.name} (type: ${filter.config.type})`);
+
+      try {
+        // AuthFilter's onData expects (stream, session, callback)
+        // Need to handle the stream carefully if multiple pre-stream filters consume it.
+        // For now, AuthFilter is the primary one, and it consumes the stream.
+        // This logic assumes AuthFilter is the only one, or subsequent ones get an empty stream.
+        // This needs refinement if multiple pre-stream filters need the *same* stream content.
+        if (filter.config.type === 'auth') { // Specifically AuthFilter
+          // Promisify the call to filter.onDataStream
+          await new Promise<void>((resolve, reject) => {
+            filter.onDataStream(stream, session, (err?: Error | null, code?: string) => {
+              if (err) {
+                this.logger.log("WARN", `Pre-stream filter ${filter.name} (${filter.type}) rejected email for session ${session.id}: ${err.message}`);
+                // @ts-ignore - SmtpCallback can take a code
+                callback(err, code); // Reject the email via SmtpServer's main callback
+                return reject(err); // Reject the promise to stop this filter chain
+              }
+              resolve(); // Resolve the promise to continue to the next filter
+            });
+          }).then(async () => { // if onDataStream's callback was called without error
+            await processNextPreStreamFilter(); // Process next pre-stream filter
+          }).catch((filterRejectionError) => {
+            // If filter.onDataStream's callback resulted in rejection (passed error to SmtpServer's callback, which then rejected this promise)
+            // We don't want to proceed to pipeStreamAndProcessPostStreamFilters if an error was already sent.
+            // The main SmtpServer callback has already been called with an error by this point.
+            this.logger.log("DEBUG", `Filter ${filter.name} rejected, preventing further pre-stream processing. Error: ${filterRejectionError?.message}`);
+          });
+        } else {
+          // If other pre-stream filters exist with different signatures, handle here
+          this.logger.log("WARN", `Unsupported pre-stream filter type or signature for ${filter.name} (${filter.type})`);
+          await processNextPreStreamFilter(); // Continue with next filter
+        }
+      } catch (filterError: any) { // Synchronous error during the setup/call of onDataStream
+        this.logger.log("ERROR", `Synchronous error executing pre-stream filter ${filter.name} (${filter.type}) for session ${session.id}: ${filterError.message}`);
+        // Decide on error handling: reject or continue? For now, continue to next filter or processing.
+        // Or, more safely, reject the email:
+        // callback(new Error(`Critical error in filter ${filter.name}`));
+        // return; 
+        await processNextPreStreamFilter();
+      }
+    };
+    
+    const pipeStreamAndProcessPostStreamFilters = () => {
+      this.logger.log("DEBUG", `Session ${session.id}: Saving email to ${session.emailPath}`);
+      // @ts-ignore - HeadersTransform is a valid stream
+      const transformStream = stream.pipe(new HeadersTransform(this.config.mailHeaders));
+      transformStream.pipe(fs.createWriteStream(session.emailPath!));
+
+      transformStream.on("end", async () => {
+        this.logger.log("DEBUG", `Session ${session.id}: Email saved. Parsing email from ${session.emailPath}`);
+        try {
+          session.email = await simpleParser(fs.createReadStream(session.emailPath!));
+          this.logger.log("DEBUG", `Session ${session.id}: Email parsed. Starting post-stream filter processing. Found ${postStreamFilters.length} post-stream filters.`);
+          
+          // Now run post-stream filters (original this.filter("Data", ...) logic)
+          // We need to ensure we are only running filters that haven't run or are meant for post-stream
+          // The current SmtpServer.filter logic might need adjustment or a new method
+          // For simplicity, we'll reuse the existing filter logic, assuming it handles 'Data' event
+          // for filters that expect a parsed email.
+          
+          // Rebuild args for post-stream filters that expect onData(session)
+          // The original filter("Data", session, [session]) would call onData(session)
+          for (const flowName in this.flows) {
+            const flow = this.flows[flowName];
+            if (session.flows[flowName] === "ACCEPTED" && flow.config.filtersOperator === "OR") {
+              continue;
+            }
+            for (const filter of flow.filters) {
+              // Only run if it's a post-stream filter and has onData(session)
+              if (postStreamFilters.includes(filter)) {
+                this.logger.log("DEBUG", `Session ${session.id}: Calling post-stream filter: ${filter.name} (type: ${filter.config.type})`);
+                 // @ts-ignore filter could be any SmtpFilter
+                const res = await filter.onData(session);
+                this.logger.log("DEBUG", `Session ${session.id}: Post-stream filter ${filter.name} result: ${res}`);
+                if (res === undefined) continue;
+                if (flow.config.filtersOperator === "OR") {
+                  if (res) session.flows[flowName] = "ACCEPTED";
+                } else if (!res) {
+                  delete session.flows[flowName];
+                  break; 
+                } else {
+                  session.flows[flowName] = "ACCEPTED";
+                }
+              }
+            }
+          }
+          this.logger.log("DEBUG", `Session ${session.id}: Post-stream filters processed. Active flows: %j`, session.flows);
+
+          for (let name in session.flows) {
+            if (session.flows[name] === "PENDING") {
+              delete session.flows[name];
+            }
+          }
+
+          this.manageCallback(session, finalErr => {
+            if (finalErr) {
+              return callback(finalErr);
+            }
+            (async () => {
+              await this.onDataRead(session);
+              if (!this.config.keepCache) {
+                fs.unlink(session.emailPath!, errUnlink => {
+                  errUnlink && this.logger.log("ERROR", `Unable to delete ${session.emailPath}`, errUnlink);
+                });
+              }
+              callback();
+            })();
+          });
+        } catch (parseError: any) {
+          this.logger.log("ERROR", `Error parsing email or in post-stream filters for session ${session.id}: ${parseError.message}`);
+          return callback(parseError);
+        }
+      });
+
+      transformStream.on("error", (streamErr: Error) => {
+        this.logger.log("ERROR", `Error piping stream for session ${session.id}: ${streamErr.message}`);
+        callback(streamErr); // error converting stream
+      });
+    };
+
+    // Start processing pre-stream filters
+    await processNextPreStreamFilter();
   }
 
   /**

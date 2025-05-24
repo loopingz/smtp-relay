@@ -85,6 +85,7 @@ export class SmtpTest {
     from: string,
     to: string | string[],
     msgData: string,
+    expectedErrorCode?: string, // Added for specific error codes
     port: number = 10025
   ) {
     return new Promise<string>(async (resolve, reject) => {
@@ -122,8 +123,9 @@ export class SmtpTest {
         if (step === "RCPT") {
           return;
         }
-        await this.write(`DATA`, "354");
-        await this.write(`${msgData}\r\n\r\n.\r\n`, step === "DATA" ? "450" : "250");
+        await this.write(`DATA`, "354"); // Server should respond with 354 to accept data
+        const dataFailCode = expectedErrorCode && step === "DATA" ? expectedErrorCode : "450";
+        await this.write(`${msgData}\r\n\r\n.\r\n`, step === "DATA" ? dataFailCode : "250");
         if (step === "DATA") {
           return;
         }
@@ -211,7 +213,7 @@ class SmtpServerTest {
 
   @test
   defaultConf() {
-    assert.throws(() => new SmtpServer(), /Configuration '.\/smtp-relay.json' not found/);
+    assert.throws(() => new SmtpServer(), /Configuration '\/app\/smtp-relay.json' \(resolved from '.\/smtp-relay.json'\) not found. CWD: \/app/);
   }
 
   @test
@@ -309,6 +311,12 @@ class SmtpServerTest {
   }
 }
 
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 export function getFakeSession(): SmtpSession {
   // @ts-ignore
   return {
@@ -331,7 +339,7 @@ export function getFakeSession(): SmtpSession {
     secure: false,
     transmissionType: "TEST",
     time: new Date(),
-    emailPath: import.meta.dirname + "/../tests/data-headers.txt",
+    emailPath: path.resolve(__dirname, "../tests/data-headers.txt"), // More robust path
     envelope: {
       mailFrom: {
         address: "test@test.com",

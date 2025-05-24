@@ -1,3 +1,6 @@
+X-smtp-relay-MAIL_FROM:test@test.com
+X-smtp-relay-CLIENT_HOSTNAME:localhost
+X-smtp-relay-HELO:localhost
 import * as url from "node:url";
 import { SmtpFilter } from "./filter"; // Base SmtpFilter
 import { SmtpProcessor } from "./processor"; // Base SmtpProcessor

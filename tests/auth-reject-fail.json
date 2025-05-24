@@ -1,0 +1,33 @@
+{
+  "$schema": "../config.schema.json",
+  "port": 10027,
+  "options": {
+    "loggers": [{ "type": "CONSOLE", "level": "DEBUG" }]
+  },
+  "flows": {
+    "default": {
+      "filtersOperator": "AND",
+      "filters": [
+        {
+          "type": "auth",
+          "name": "authTest",
+          "mtaHostname": "test-mta.example.com",
+          "dkim": {
+            "policy": "reject"
+          },
+          "spf": {
+            "policy": "reject"
+          },
+          "mailauthOptions": {}
+        }
+      ],
+      "outputs": [
+        {
+          "type": "file",
+          "path": "./test-emails",
+          "filename": "${id}.eml"
+        }
+      ]
+    }
+  }
+}

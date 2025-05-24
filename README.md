@@ -146,6 +146,7 @@ By default, 3 filters exist:
 - http-auth: proxy the authentication to an HTTP endpoint
 - http-filter: proxy the decision on the email to an HTTP endpoint
 - static-auth: staticly defined user/password for authentication
+- auth: performs email authentication checks (DKIM, SPF) on incoming emails.
 
 ### Processors
 
@@ -343,6 +344,76 @@ Sample:
 ## Http Filter
 
 The http filter sends the cloudevent related to the email to an http endpoint to accept or refuse the email. If the http request return a status code < 300, it means the email is accepted otherwise it is refused.
+
+See the `tests/http-filter-with-auth.json` and `test/http-filter.json` configuration examples.
+
+### Email Authentication Filter (`auth`)
+
+The `auth` filter allows `smtp-relay` to perform email authentication checks, specifically DKIM (DomainKeys Identified Mail) and SPF (Sender Policy Framework), on incoming emails. This helps in verifying the authenticity of emails and can be used to reject or flag suspicious messages.
+
+This filter utilizes the `mailauth` library internally.
+
+#### Configuration Options
+
+When defining a filter of `type: "auth"` in your `smtp-relay.jsonc` (or equivalent YAML) configuration, the following options are available:
+
+*   `type: "auth"` (string, required): Specifies the filter type.
+*   `name` (string, optional): An optional descriptive name for this filter instance.
+*   `mtaHostname` (string, optional): The hostname of your SMTP server that is performing the authentication (e.g., "mx.mycompany.com"). If not specified, it defaults to the operating system's hostname. This is used by `mailauth` when generating `Authentication-Results` headers.
+*   `dkim` (object, optional): Configuration for DKIM checks.
+    *   `policy` (string, enum, optional): Defines the action to take if DKIM verification fails or is inconclusive.
+        *   `"accept"`: The email is accepted regardless of the DKIM outcome.
+        *   `"tag"` (default): The email is accepted. The `mailauth` library adds an `Authentication-Results` header to the email detailing the verification outcome. The filter also logs the result.
+        *   `"reject"`: If DKIM verification fails (e.g., invalid signature, key not found), the email is rejected with an SMTP error (typically 550 5.7.24).
+*   `spf` (object, optional): Configuration for SPF checks.
+    *   `policy` (string, enum, optional): Defines the action to take if SPF verification fails.
+        *   `"accept"`: The email is accepted regardless of the SPF outcome.
+        *   `"tag"` (default): The email is accepted. The `mailauth` library adds an `Authentication-Results` header. The filter also logs the result.
+        *   `"reject"`: If SPF verification fails (e.g., "fail" result like IP not authorized), the email is rejected with an SMTP error (typically 550 5.7.23). SPF results like "none" or "neutral" are generally not causes for rejection by this policy.
+*   `mailauthOptions` (object, optional): Advanced options to pass directly to the underlying `mailauth` library. This can be used for fine-tuning, such as providing a custom DNS resolver for testing environments. Refer to the `mailauth` library's documentation for details on available options.
+
+#### Behavior of "Tag" Policy
+
+When `dkim.policy` or `spf.policy` is set to `"tag"` (which is the default if not specified):
+1.  The `AuthFilter` allows the email to proceed regardless of the DKIM/SPF outcome.
+2.  The `mailauth` library, which performs the actual checks, generates an `Authentication-Results` header (e.g., `Authentication-Results: your-mta.com; dkim=pass ...; spf=fail ...`). This header is prepended to the email content by `smtp-relay`'s header processing.
+3.  The `AuthFilter` logs the verification results.
+No custom headers are added by `AuthFilter` itself beyond what `mailauth` provides in the `Authentication-Results` header.
+
+#### Example Configuration
+
+Here's an example of how to configure the `auth` filter within a flow:
+
+```json
+{
+  "$schema": "https://raw.githubusercontent.com/loopingz/smtp-relay/main/config.schema.json",
+  "flows": {
+    "authenticatedReceiving": {
+      "filtersOperator": "AND",
+      "filters": [
+        {
+          "type": "auth",
+          "name": "EmailAuthCheck",
+          "mtaHostname": "mx.example.com",
+          "dkim": { "policy": "tag" },
+          "spf": { "policy": "reject" }
+        }
+        // You might have other filters here, e.g., whitelist, static-auth
+      ],
+      "outputs": [
+        {
+          "type": "file",
+          "path": "./verified-emails"
+        }
+      ]
+    }
+  },
+  "options": {
+    // Server options...
+  }
+}
+```
+In this example, emails processed by the "authenticatedReceiving" flow will first undergo authentication checks. DKIM failures will be tagged (header added), while SPF failures will cause the email to be rejected.
 
 See the `tests/http-filter-with-auth.json` and `test/http-filter.json` configuration examples.
 

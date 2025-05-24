@@ -31,6 +31,7 @@
     "fast-xml-parser": ">=4.4.1",
     "is-in-subnet": "^4.0.1",
     "jsonpath": "^1.1.1",
+    "mailauth": "^3.0.3",
     "mailparser": "^3.4.0",
     "nodemailer": "^6.7.2",
     "prom-client": "^14.1.1",
@@ -52,7 +53,7 @@
     "pretest": "npm run build",
     "lint": "prettier --check src/**/*",
     "lint:fix": "prettier --write src/**/*",
-    "test": "c8 mocha --recursive --exit --timeout=6000 src/**/*.spec.ts src/*.spec.ts",
+    "test": "c8 mocha --recursive --exit --timeout=6000 src/**/*.spec.ts src/*.spec.ts tests/**/*.spec.ts",
     "server": "tsc-esm && node lib/index.js",
     "release": "yarn build && yarn build:schema && auto shipit"
   },

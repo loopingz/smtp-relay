@@ -1,0 +1,33 @@
+{
+  "$schema": "../config.schema.json",
+  "port": 10027,
+  "options": {
+    "loggers": [{ "type": "CONSOLE", "level": "INFO" }]
+  },
+  "flows": {
+    "default": {
+      "filtersOperator": "AND",
+      "filters": [
+        {
+          "type": "auth",
+          "name": "authTestTag",
+          "mtaHostname": "test-mta.example.com",
+          "dkim": {
+            "policy": "tag"
+          },
+          "spf": {
+            "policy": "tag"
+          },
+          "mailauthOptions": {}
+        }
+      ],
+      "outputs": [
+        {
+          "type": "file",
+          "path": "./test-emails",
+          "filename": "${id}-tagged.eml"
+        }
+      ]
+    }
+  }
+}

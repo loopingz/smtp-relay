@@ -1,0 +1,32 @@
+{
+  "$schema": "../config.schema.json",
+  "options": {
+    "loggers": [{ "type": "CONSOLE", "level": "INFO" }]
+  },
+  "flows": {
+    "default": {
+      "filtersOperator": "AND",
+      "filters": [
+        {
+          "type": "auth",
+          "name": "authTestAccept",
+          "mtaHostname": "test-mta.example.com",
+          "dkim": {
+            "policy": "accept"
+          },
+          "spf": {
+            "policy": "accept"
+          },
+          "mailauthOptions": {}
+        }
+      ],
+      "outputs": [
+        {
+          "type": "file",
+          "path": "./test-emails",
+          "filename": "${id}-accepted.eml"
+        }
+      ]
+    }
+  }
+}

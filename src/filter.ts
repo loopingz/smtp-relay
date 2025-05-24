@@ -47,3 +47,5 @@ export class SmtpFilter<T extends SmtpComponentConfig = SmtpComponentConfig> ext
     session[`${this.flow.name}_${this.name}`] = state;
   }
 }
+
+// Filter registrations will be handled in a separate module to avoid circular dependencies.
