@@ -165,6 +165,455 @@
       ],
       "type": "string"
     },
+    "ConnectionOptions": {
+      "additionalProperties": false,
+      "properties": {
+        "ALPNCallback": {
+          "$comment": "(arg: { servername: string; protocols: string[] }) => string | undefined",
+          "description": "If set, this will be called when a client opens a connection using the ALPN extension. One argument will be passed to the callback: an object containing `servername` and `protocols` fields, respectively containing the server name from the SNI extension (if any) and an array of ALPN protocol name strings. The callback must return either one of the strings listed in `protocols`, which will be returned to the client as the selected ALPN protocol, or `undefined`, to reject the connection with a fatal alert. If a string is returned that does not match one of the client's ALPN protocols, an error will be thrown. This option cannot be used with the `ALPNProtocols` option, and setting both options will throw an error.",
+          "properties": {
+            "namedArgs": {
+              "additionalProperties": false,
+              "properties": {
+                "arg": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "protocols": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "servername": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "servername",
+                    "protocols"
+                  ],
+                  "type": "object"
+                }
+              },
+              "required": [
+                "arg"
+              ],
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "ALPNProtocols": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "items": {
+                "additionalProperties": {
+                  "type": "number"
+                },
+                "properties": {
+                  "BYTES_PER_ELEMENT": {
+                    "type": "number"
+                  },
+                  "buffer": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "byteLength": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "byteLength"
+                    ],
+                    "type": "object"
+                  },
+                  "byteLength": {
+                    "type": "number"
+                  },
+                  "byteOffset": {
+                    "type": "number"
+                  },
+                  "length": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "BYTES_PER_ELEMENT",
+                  "buffer",
+                  "byteLength",
+                  "byteOffset",
+                  "length"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            {
+              "additionalProperties": {
+                "type": "number"
+              },
+              "properties": {
+                "BYTES_PER_ELEMENT": {
+                  "type": "number"
+                },
+                "buffer": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "byteLength": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "byteLength"
+                  ],
+                  "type": "object"
+                },
+                "byteLength": {
+                  "type": "number"
+                },
+                "byteOffset": {
+                  "type": "number"
+                },
+                "length": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "BYTES_PER_ELEMENT",
+                "buffer",
+                "byteLength",
+                "byteOffset",
+                "length"
+              ],
+              "type": "object"
+            }
+          ],
+          "description": "An array of strings or a Buffer naming possible ALPN protocols. (Protocols should be ordered by their priority.)"
+        },
+        "SNICallback": {
+          "$comment": "(servername: string, cb: (err: Error | null, ctx?: SecureContext) => void) => void",
+          "description": "SNICallback(servername, cb) <Function> A function that will be called if the client supports SNI TLS extension. Two arguments will be passed when called: servername and cb. SNICallback should invoke cb(null, ctx), where ctx is a SecureContext instance. (tls.createSecureContext(...) can be used to get a proper SecureContext.) If SNICallback wasn't provided the default callback with high-level API will be used (see below).",
+          "properties": {
+            "namedArgs": {
+              "additionalProperties": false,
+              "properties": {
+                "cb": {
+                  "$comment": "(err: Error | null, ctx?: SecureContext) => void",
+                  "properties": {
+                    "namedArgs": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "ctx": {
+                          "$ref": "#/definitions/SecureContext"
+                        },
+                        "err": {
+                          "anyOf": [
+                            {
+                              "additionalProperties": false,
+                              "properties": {
+                                "message": {
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "type": "string"
+                                },
+                                "stack": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "name",
+                                "message"
+                              ],
+                              "type": "object"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "err"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "type": "object"
+                },
+                "servername": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "servername",
+                "cb"
+              ],
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "allowPartialTrustChain": {
+          "description": "Treat intermediate (non-self-signed) certificates in the trust CA certificate list as trusted.",
+          "type": "boolean"
+        },
+        "ca": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/global.Buffer"
+            },
+            {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "$ref": "#/definitions/global.Buffer"
+                  }
+                ]
+              },
+              "type": "array"
+            }
+          ],
+          "description": "Optionally override the trusted CA certificates. Default is to trust the well-known CAs curated by Mozilla. Mozilla's CAs are completely replaced when CAs are explicitly specified using this option."
+        },
+        "cert": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/global.Buffer"
+            },
+            {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "$ref": "#/definitions/global.Buffer"
+                  }
+                ]
+              },
+              "type": "array"
+            }
+          ],
+          "description": "Cert chains in PEM format. One cert chain should be provided per private key. Each cert chain should consist of the PEM formatted certificate for a provided private key, followed by the PEM formatted intermediate certificates (if any), in order, and not including the root CA (the root CA must be pre-known to the peer, see ca). When providing multiple cert chains, they do not have to be in the same order as their private keys in key. If the intermediate certificates are not provided, the peer will not be able to validate the certificate, and the handshake will fail."
+        },
+        "checkServerIdentity": {
+          "$comment": "(hostname: string, cert: PeerCertificate) => Error | undefined"
+        },
+        "ciphers": {
+          "description": "Cipher suite specification, replacing the default. For more information, see modifying the default cipher suite. Permitted ciphers can be obtained via tls.getCiphers(). Cipher names must be uppercased in order for OpenSSL to accept them.",
+          "type": "string"
+        },
+        "clientCertEngine": {
+          "deprecated": true,
+          "description": "Name of an OpenSSL engine which can provide the client certificate.",
+          "type": "string"
+        },
+        "crl": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/global.Buffer"
+            },
+            {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "$ref": "#/definitions/global.Buffer"
+                  }
+                ]
+              },
+              "type": "array"
+            }
+          ],
+          "description": "PEM formatted CRLs (Certificate Revocation Lists)."
+        },
+        "dhparam": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/global.Buffer"
+            }
+          ],
+          "description": "`'auto'` or custom Diffie-Hellman parameters, required for non-ECDHE perfect forward secrecy. If omitted or invalid, the parameters are silently discarded and DHE ciphers will not be available. ECDHE-based perfect forward secrecy will still be available."
+        },
+        "ecdhCurve": {
+          "description": "A string describing a named curve or a colon separated list of curve NIDs or names, for example P-521:P-384:P-256, to use for ECDH key agreement. Set to auto to select the curve automatically. Use crypto.getCurves() to obtain a list of available curve names. On recent releases, openssl ecparam -list_curves will also display the name and description of each available elliptic curve. Default: tls.DEFAULT_ECDH_CURVE.",
+          "type": "string"
+        },
+        "enableTrace": {
+          "default": false,
+          "description": "When enabled, TLS packet trace information is written to `stderr`. This can be used to debug TLS connection problems.",
+          "type": "boolean"
+        },
+        "honorCipherOrder": {
+          "description": "Attempt to use the server's cipher suite preferences instead of the client's. When true, causes SSL_OP_CIPHER_SERVER_PREFERENCE to be set in secureOptions",
+          "type": "boolean"
+        },
+        "host": {
+          "type": "string"
+        },
+        "key": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/global.Buffer"
+            },
+            {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "$ref": "#/definitions/global.Buffer"
+                  },
+                  {
+                    "$ref": "#/definitions/KeyObject"
+                  }
+                ]
+              },
+              "type": "array"
+            }
+          ],
+          "description": "Private keys in PEM format. PEM allows the option of private keys being encrypted. Encrypted keys will be decrypted with options.passphrase. Multiple keys using different algorithms can be provided either as an array of unencrypted key strings or buffers, or an array of objects in the form {pem: <string|buffer>[, passphrase: <string>]}. The object form can only occur in an array. object.passphrase is optional. Encrypted keys will be decrypted with object.passphrase if provided, or options.passphrase if it is not."
+        },
+        "lookup": {
+          "$ref": "#/definitions/LookupFunction"
+        },
+        "maxVersion": {
+          "$ref": "#/definitions/SecureVersion",
+          "description": "Optionally set the maximum TLS version to allow. One of `'TLSv1.3'`, `'TLSv1.2'`, `'TLSv1.1'`, or `'TLSv1'`. Cannot be specified along with the `secureProtocol` option, use one or the other.\n**Default:** `'TLSv1.3'`, unless changed using CLI options. Using `--tls-max-v1.2` sets the default to `'TLSv1.2'`. Using `--tls-max-v1.3` sets the default to `'TLSv1.3'`. If multiple of the options are provided, the highest maximum is used."
+        },
+        "minDHSize": {
+          "type": "number"
+        },
+        "minVersion": {
+          "$ref": "#/definitions/SecureVersion",
+          "description": "Optionally set the minimum TLS version to allow. One of `'TLSv1.3'`, `'TLSv1.2'`, `'TLSv1.1'`, or `'TLSv1'`. Cannot be specified along with the `secureProtocol` option, use one or the other.  It is not recommended to use less than TLSv1.2, but it may be required for interoperability.\n**Default:** `'TLSv1.2'`, unless changed using CLI options. Using `--tls-v1.0` sets the default to `'TLSv1'`. Using `--tls-v1.1` sets the default to `'TLSv1.1'`. Using `--tls-min-v1.3` sets the default to 'TLSv1.3'. If multiple of the options are provided, the lowest minimum is used."
+        },
+        "passphrase": {
+          "description": "Shared passphrase used for a single private key and/or a PFX.",
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "pfx": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/global.Buffer"
+            },
+            {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "$ref": "#/definitions/global.Buffer"
+                  },
+                  {
+                    "$ref": "#/definitions/PxfObject"
+                  }
+                ]
+              },
+              "type": "array"
+            }
+          ],
+          "description": "PFX or PKCS12 encoded private key and certificate chain. pfx is an alternative to providing key and cert individually. PFX is usually encrypted, if it is, passphrase will be used to decrypt it. Multiple PFX can be provided either as an array of unencrypted PFX buffers, or an array of objects in the form {buf: <string|buffer>[, passphrase: <string>]}. The object form can only occur in an array. object.passphrase is optional. Encrypted PFX will be decrypted with object.passphrase if provided, or options.passphrase if it is not."
+        },
+        "port": {
+          "type": "number"
+        },
+        "privateKeyEngine": {
+          "deprecated": true,
+          "description": "Name of an OpenSSL engine to get private key from. Should be used together with privateKeyIdentifier.",
+          "type": "string"
+        },
+        "privateKeyIdentifier": {
+          "deprecated": true,
+          "description": "Identifier of a private key managed by an OpenSSL engine. Should be used together with privateKeyEngine. Should not be set together with key, because both options define a private key in different ways.",
+          "type": "string"
+        },
+        "rejectUnauthorized": {
+          "default": true,
+          "description": "If true the server will reject any connection which is not authorized with the list of supplied CAs. This option only has an effect if requestCert is true.",
+          "type": "boolean"
+        },
+        "requestCert": {
+          "description": "If true the server will request a certificate from clients that connect and attempt to verify that certificate. Defaults to false.",
+          "type": "boolean"
+        },
+        "secureContext": {
+          "$ref": "#/definitions/SecureContext",
+          "description": "An optional TLS context object from tls.createSecureContext()"
+        },
+        "secureOptions": {
+          "description": "Optionally affect the OpenSSL protocol behavior, which is not usually necessary. This should be used carefully if at all! Value is a numeric bitmask of the SSL_OP_* options from OpenSSL Options",
+          "type": "number"
+        },
+        "secureProtocol": {
+          "description": "Legacy mechanism to select the TLS protocol version to use, it does not support independent control of the minimum and maximum version, and does not support limiting the protocol to TLSv1.3. Use minVersion and maxVersion instead. The possible values are listed as SSL_METHODS, use the function names as strings. For example, use 'TLSv1_1_method' to force TLS version 1.1, or 'TLS_method' to allow any TLS protocol version up to TLSv1.3. It is not recommended to use TLS versions less than 1.2, but it may be required for interoperability. Default: none, see minVersion.",
+          "type": "string"
+        },
+        "servername": {
+          "type": "string"
+        },
+        "session": {
+          "$ref": "#/definitions/global.Buffer"
+        },
+        "sessionIdContext": {
+          "description": "Opaque identifier used by servers to ensure session state is not shared between applications. Unused by clients.",
+          "type": "string"
+        },
+        "sessionTimeout": {
+          "description": "The number of seconds after which a TLS session created by the server will no longer be resumable. See Session Resumption for more information. Default: 300.",
+          "type": "number"
+        },
+        "sigalgs": {
+          "description": "Colon-separated list of supported signature algorithms. The list can contain digest algorithms (SHA256, MD5 etc.), public key algorithms (RSA-PSS, ECDSA etc.), combination of both (e.g 'RSA+SHA384') or TLS v1.3 scheme names (e.g. rsa_pss_pss_sha512).",
+          "type": "string"
+        },
+        "socket": {
+          "$ref": "#/definitions/internal.Duplex"
+        },
+        "ticketKeys": {
+          "$ref": "#/definitions/global.Buffer",
+          "description": "48-bytes of cryptographically strong pseudo-random data. See Session Resumption for more information."
+        },
+        "timeout": {
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
     "ConsoleLoggerOptions": {
       "additionalProperties": false,
       "properties": {
@@ -188,16 +637,11 @@
       "additionalProperties": false,
       "properties": {
         "cacheDir": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "const": false,
-              "type": "boolean"
-            }
+          "description": "optional location for cached messages. If not set then caching is not used.",
+          "enum": [
+            false
           ],
-          "description": "optional location for cached messages. If not set then caching is not used."
+          "type": "boolean"
         },
         "cacheTreshold": {
           "description": "optional size in bytes, if message is larger than this treshold it gets cached to disk (assuming cacheDir is set and writable). Defaults to 131072 (128 kB).",
@@ -242,16 +686,11 @@
       "additionalProperties": false,
       "properties": {
         "cacheDir": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "const": false,
-              "type": "boolean"
-            }
+          "description": "optional location for cached messages. If not set then caching is not used.",
+          "enum": [
+            false
           ],
-          "description": "optional location for cached messages. If not set then caching is not used."
+          "type": "boolean"
         },
         "cacheTreshold": {
           "description": "optional size in bytes, if message is larger than this treshold it gets cached to disk (assuming cacheDir is set and writable). Defaults to 131072 (128 kB).",
@@ -438,6 +877,165 @@
       "description": "Configuration for mail headers\n\nIf key is prefixed with a - then the header is removed If key is prefixed with a ? then the header is added only if not present",
       "type": "object"
     },
+    "KeyObject": {
+      "additionalProperties": false,
+      "properties": {
+        "passphrase": {
+          "description": "Optional passphrase.",
+          "type": "string"
+        },
+        "pem": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/global.Buffer"
+            }
+          ],
+          "description": "Private keys in PEM format."
+        }
+      },
+      "required": [
+        "pem"
+      ],
+      "type": "object"
+    },
+    "Logger": {
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "LookupAddress": {
+      "additionalProperties": false,
+      "properties": {
+        "address": {
+          "description": "A string representation of an IPv4 or IPv6 address.",
+          "type": "string"
+        },
+        "family": {
+          "description": "`4` or `6`, denoting the family of `address`, or `0` if the address is not an IPv4 or IPv6 address. `0` is a likely indicator of a bug in the name resolution service used by the operating system.",
+          "type": "number"
+        }
+      },
+      "required": [
+        "address",
+        "family"
+      ],
+      "type": "object"
+    },
+    "LookupFunction": {
+      "$comment": "(\n        hostname: string,\n        options: dns.LookupOptions,\n        callback: (err: NodeJS.ErrnoException | null, address: string | dns.LookupAddress[], family?: number) => void) => void",
+      "properties": {
+        "namedArgs": {
+          "additionalProperties": false,
+          "properties": {
+            "callback": {
+              "$comment": "(err: NodeJS.ErrnoException | null, address: string | dns.LookupAddress[], family?: number) => void",
+              "properties": {
+                "namedArgs": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "address": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "items": {
+                            "$ref": "#/definitions/LookupAddress"
+                          },
+                          "type": "array"
+                        }
+                      ]
+                    },
+                    "err": {
+                      "anyOf": [
+                        {
+                          "$ref": "#/definitions/global.NodeJS.ErrnoException"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "family": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "err",
+                    "address"
+                  ],
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            },
+            "hostname": {
+              "type": "string"
+            },
+            "options": {
+              "$ref": "#/definitions/LookupOptions"
+            }
+          },
+          "required": [
+            "hostname",
+            "options",
+            "callback"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "LookupOptions": {
+      "additionalProperties": false,
+      "properties": {
+        "all": {
+          "default": false,
+          "description": "When `true`, the callback returns all resolved addresses in an array. Otherwise, returns a single address.",
+          "type": "boolean"
+        },
+        "family": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "const": "IPv4",
+              "type": "string"
+            },
+            {
+              "const": "IPv6",
+              "type": "string"
+            }
+          ],
+          "default": 0,
+          "description": "The record family. Must be `4`, `6`, or `0`. For backward compatibility reasons, `'IPv4'` and `'IPv6'` are interpreted as `4` and `6` respectively. The value 0 indicates that either an IPv4 or IPv6 address is returned. If the value `0` is used with `{ all: true } (see below)`, both IPv4 and IPv6 addresses are returned."
+        },
+        "hints": {
+          "description": "One or more [supported `getaddrinfo`](https://nodejs.org/docs/latest-v22.x/api/dns.html#supported-getaddrinfo-flags) flags. Multiple flags may be passed by bitwise `OR`ing their values.",
+          "type": "number"
+        },
+        "order": {
+          "default": "`verbatim` (addresses are not reordered)",
+          "description": "When `verbatim`, the resolved addresses are return unsorted. When `ipv4first`, the resolved addresses are sorted by placing IPv4 addresses before IPv6 addresses. When `ipv6first`, the resolved addresses are sorted by placing IPv6 addresses before IPv4 addresses. Default value is configurable using  {@link  setDefaultResultOrder }  or [`--dns-result-order`](https://nodejs.org/docs/latest-v22.x/api/cli.html#--dns-result-orderorder).",
+          "enum": [
+            "ipv4first",
+            "ipv6first",
+            "verbatim"
+          ],
+          "type": "string"
+        },
+        "verbatim": {
+          "default": "true (addresses are not reordered)",
+          "deprecated": "Please use `order` option",
+          "description": "When `true`, the callback receives IPv4 and IPv6 addresses in the order the DNS resolver returned them. When `false`, IPv4 addresses are placed before IPv6 addresses. This option will be deprecated in favor of `order`. When both are specified, `order` has higher precedence. New code should only use `order`. Default value is configurable using  {@link  setDefaultResultOrder }",
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
     "Mail.Address": {
       "additionalProperties": false,
       "properties": {
@@ -565,16 +1163,11 @@
           "type": "string"
         },
         "filename": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "const": false,
-              "type": "boolean"
-            }
+          "description": "filename to be reported as the name of the attached file, use of unicode is allowed. If you do not want to use a filename, set this value as false, otherwise a filename is generated automatically",
+          "enum": [
+            false
           ],
-          "description": "filename to be reported as the name of the attached file, use of unicode is allowed. If you do not want to use a filename, set this value as false, otherwise a filename is generated automatically"
+          "type": "boolean"
         },
         "headers": {
           "$ref": "#/definitions/Mail.Headers",
@@ -741,16 +1334,11 @@
           "type": "string"
         },
         "filename": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "const": false,
-              "type": "boolean"
-            }
+          "description": "optional filename, defaults to ‘invite.ics’",
+          "enum": [
+            false
           ],
-          "description": "optional filename, defaults to ‘invite.ics’"
+          "type": "boolean"
         },
         "href": {
           "description": "is an alternative for content to load the calendar data from an URL",
@@ -909,8 +1497,16 @@
           "description": "Comma separated list or an array of recipients e-mail addresses that will appear on the Cc: field"
         },
         "date": {
-          "description": "optional Date value, current UTC string will be used if not set",
-          "type": "string"
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "description": "optional Date value, current UTC string will be used if not set"
         },
         "disableFileAccess": {
           "description": "if set to true then fails with an error when a node tries to load content from a file",
@@ -1386,16 +1982,11 @@
       "additionalProperties": false,
       "properties": {
         "from": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "const": false,
-              "type": "boolean"
-            }
+          "description": "includes an address object or is set to false",
+          "enum": [
+            false
           ],
-          "description": "includes an address object or is set to false"
+          "type": "boolean"
         },
         "to": {
           "description": "includes an array of address objects",
@@ -1466,6 +2057,71 @@
     "NodeMailerProcessorConfig": {
       "additionalProperties": false,
       "properties": {
+        "dkims": {
+          "additionalProperties": {
+            "additionalProperties": false,
+            "properties": {
+              "cacheDir": {
+                "description": "optional location for cached messages. If not set then caching is not used.",
+                "enum": [
+                  false
+                ],
+                "type": "boolean"
+              },
+              "cacheTreshold": {
+                "description": "optional size in bytes, if message is larger than this treshold it gets cached to disk (assuming cacheDir is set and writable). Defaults to 131072 (128 kB).",
+                "type": "number"
+              },
+              "hashAlgo": {
+                "description": "optional algorithm for the body hash, defaults to ‘sha256’",
+                "type": "string"
+              },
+              "headerFieldNames": {
+                "description": "an optional colon separated list of header keys to sign (eg. message-id:date:from:to...')",
+                "type": "string"
+              },
+              "keySelector": {
+                "description": "is the DKIM key selector",
+                "type": "string"
+              },
+              "privateKey": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "additionalProperties": false,
+                    "properties": {
+                      "key": {
+                        "type": "string"
+                      },
+                      "passphrase": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "key",
+                      "passphrase"
+                    ],
+                    "type": "object"
+                  }
+                ],
+                "description": "is the private key for the selector in PEM format"
+              },
+              "skipFields": {
+                "description": "optional colon separated list of header keys not to sign. This is useful if you want to sign all the relevant keys but your provider changes some values, ie Message-ID and Date. In this case you should use 'message-id:date' to prevent signing these values.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "keySelector",
+              "privateKey"
+            ],
+            "type": "object"
+          },
+          "description": "Configuration DKIM per sender domain",
+          "type": "object"
+        },
         "name": {
           "type": "string"
         },
@@ -1474,8 +2130,685 @@
             {
               "type": "string"
             },
-            {}
-          ]
+            {
+              "additionalProperties": false,
+              "properties": {
+                "auth": {
+                  "$ref": "#/definitions/SMTPTransport.AuthenticationType"
+                },
+                "logger": {
+                  "$ref": "#/definitions/Logger"
+                },
+                "mailer": {
+                  "additionalProperties": false,
+                  "description": "Creates an object for exposing the Mail API",
+                  "properties": {
+                    "MailMessage": {
+                      "additionalProperties": false,
+                      "description": "Usage: typeof transporter.MailMessage",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/definitions/Mail.Options"
+                        },
+                        "mailer": {
+                          "$ref": "#/definitions/class-637931294-10050-14090-637931294-0-14107%3Cdef-interface-645803888-1460-1888-645803888-459-1890-645803888-426-1890-645803888-0-3925%3E1448600842"
+                        },
+                        "message": {
+                          "additionalProperties": false,
+                          "description": "Creates a new mime tree node. Assumes 'multipart/*' as the content type if it is a branch, anything else counts as leaf. If rootNode is missing from the options, assumes this is the root.",
+                          "properties": {
+                            "baseBoundary": {
+                              "description": "shared part of the unique multipart boundary",
+                              "type": "string"
+                            },
+                            "boundary": {
+                              "description": "a multipart boundary value",
+                              "enum": [
+                                false
+                              ],
+                              "type": "boolean"
+                            },
+                            "boundaryPrefix": {
+                              "description": "Undocumented",
+                              "type": "string"
+                            },
+                            "childNodes": {
+                              "items": {
+                                "$ref": "#/definitions/class-1301605675-1861-7188-1301605675-0-72091760475569"
+                              },
+                              "type": "array"
+                            },
+                            "content": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "$ref": "#/definitions/global.Buffer"
+                                },
+                                {
+                                  "$ref": "#/definitions/internal.Readable"
+                                }
+                              ],
+                              "description": "body content for current node"
+                            },
+                            "contentType": {
+                              "description": "Undocumented",
+                              "type": "string"
+                            },
+                            "date": {
+                              "description": "If date headers is missing and current node is the root, this value is used instead",
+                              "format": "date-time",
+                              "type": "string"
+                            },
+                            "disableFileAccess": {
+                              "description": "Undocumented",
+                              "type": "boolean"
+                            },
+                            "disableUrlAccess": {
+                              "description": "Undocumented",
+                              "type": "boolean"
+                            },
+                            "filename": {
+                              "description": "filename for an attachment node",
+                              "type": "string"
+                            },
+                            "hostname": {
+                              "description": "Hostname for default message-id values",
+                              "type": "string"
+                            },
+                            "keepBcc": {
+                              "description": "If true, do not exclude Bcc from the generated headers",
+                              "type": "boolean"
+                            },
+                            "multipart": {
+                              "description": "Undocumented",
+                              "type": "boolean"
+                            },
+                            "newline": {
+                              "description": "If set to 'win' then uses \\r\\n, if 'linux' then \\n. If not set (or `raw` is used) then newlines are kept as is.",
+                              "type": "string"
+                            },
+                            "nodeCounter": {
+                              "description": "Undocumented",
+                              "type": "number"
+                            },
+                            "normalizeHeaderKey": {
+                              "$comment": "(key: string) => string",
+                              "description": "method to normalize header keys for custom caseing",
+                              "properties": {
+                                "namedArgs": {
+                                  "additionalProperties": false,
+                                  "properties": {
+                                    "key": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "key"
+                                  ],
+                                  "type": "object"
+                                }
+                              },
+                              "type": "object"
+                            },
+                            "parentNode": {
+                              "$ref": "#/definitions/class-1301605675-1861-7188-1301605675-0-72091760475569"
+                            },
+                            "rootNode": {
+                              "$ref": "#/definitions/class-1301605675-1861-7188-1301605675-0-72091760475569",
+                              "description": "root node for this tree"
+                            },
+                            "textEncoding": {
+                              "description": "either 'Q' (the default) or 'B'",
+                              "enum": [
+                                "B",
+                                "Q",
+                                ""
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "baseBoundary",
+                            "boundaryPrefix",
+                            "childNodes",
+                            "date",
+                            "disableFileAccess",
+                            "disableUrlAccess",
+                            "keepBcc",
+                            "nodeCounter",
+                            "rootNode",
+                            "textEncoding"
+                          ],
+                          "type": "object"
+                        }
+                      },
+                      "required": [
+                        "mailer",
+                        "data",
+                        "message"
+                      ],
+                      "type": "object"
+                    },
+                    "_defaults": {
+                      "$ref": "#/definitions/TransportOptions"
+                    },
+                    "dkim": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "keys": {
+                          "items": {
+                            "$ref": "#/definitions/DKIM.SingleKeyOptions"
+                          },
+                          "type": "array"
+                        },
+                        "options": {
+                          "$ref": "#/definitions/DKIM.Options"
+                        }
+                      },
+                      "required": [
+                        "options",
+                        "keys"
+                      ],
+                      "type": "object"
+                    },
+                    "logger": {
+                      "$ref": "#/definitions/Logger"
+                    },
+                    "meta": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "size": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "size"
+                      ],
+                      "type": "object"
+                    },
+                    "options": {
+                      "$ref": "#/definitions/Mail.Options"
+                    },
+                    "transporter": {
+                      "$ref": "#/definitions/Transport%3CSMTPTransport.SentMessageInfo%3E"
+                    }
+                  },
+                  "required": [
+                    "options",
+                    "meta",
+                    "dkim",
+                    "transporter",
+                    "logger",
+                    "MailMessage",
+                    "_defaults"
+                  ],
+                  "type": "object"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "options": {
+                  "$ref": "#/definitions/SMTPTransport.Options"
+                },
+                "version": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "options",
+                "mailer",
+                "logger",
+                "name",
+                "version",
+                "auth"
+              ],
+              "type": "object"
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "alternatives": {
+                  "description": "An array of alternative text contents (in addition to text and html parts)",
+                  "items": {
+                    "$ref": "#/definitions/Mail.Attachment"
+                  },
+                  "type": "array"
+                },
+                "amp": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "$ref": "#/definitions/global.Buffer"
+                    },
+                    {
+                      "$ref": "#/definitions/internal.Readable"
+                    },
+                    {
+                      "$ref": "#/definitions/Mail.AmpAttachment"
+                    }
+                  ],
+                  "description": "AMP4EMAIL specific HTML version of the message, same usage as with text and html. Make sure it is a full and valid AMP4EMAIL document, otherwise the displaying email client falls back to html and ignores the amp part"
+                },
+                "attachDataUrls": {
+                  "description": "if set to true then converts data:images in the HTML content of message to embedded attachments",
+                  "type": "boolean"
+                },
+                "attachments": {
+                  "description": "An array of attachment objects",
+                  "items": {
+                    "$ref": "#/definitions/Mail.Attachment"
+                  },
+                  "type": "array"
+                },
+                "auth": {
+                  "$ref": "#/definitions/SMTPConnection.AuthenticationType"
+                },
+                "authMethod": {
+                  "description": "defines preferred authentication method, e.g. ‘PLAIN’",
+                  "type": "string"
+                },
+                "bcc": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "$ref": "#/definitions/Mail.Address"
+                    },
+                    {
+                      "items": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "$ref": "#/definitions/Mail.Address"
+                          }
+                        ]
+                      },
+                      "type": "array"
+                    }
+                  ],
+                  "description": "Comma separated list or an array of recipients e-mail addresses that will appear on the Bcc: field"
+                },
+                "cc": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "$ref": "#/definitions/Mail.Address"
+                    },
+                    {
+                      "items": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "$ref": "#/definitions/Mail.Address"
+                          }
+                        ]
+                      },
+                      "type": "array"
+                    }
+                  ],
+                  "description": "Comma separated list or an array of recipients e-mail addresses that will appear on the Cc: field"
+                },
+                "component": {
+                  "type": "string"
+                },
+                "connection": {
+                  "$ref": "#/definitions/Socket",
+                  "description": "connected socket to use instead of creating and connecting a new one. If secure option is true, then socket is upgraded from plaintext to ciphertext"
+                },
+                "connectionTimeout": {
+                  "description": "how many milliseconds to wait for the connection to establish",
+                  "type": "number"
+                },
+                "customAuth": {
+                  "$ref": "#/definitions/SMTPConnection.CustomAuthenticationHandlers"
+                },
+                "date": {
+                  "anyOf": [
+                    {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    {
+                      "type": "string"
+                    }
+                  ],
+                  "description": "optional Date value, current UTC string will be used if not set"
+                },
+                "debug": {
+                  "description": "if set to true, then logs SMTP traffic and message content, otherwise logs only transaction events",
+                  "type": "boolean"
+                },
+                "disableFileAccess": {
+                  "description": "if set to true then fails with an error when a node tries to load content from a file",
+                  "type": "boolean"
+                },
+                "disableUrlAccess": {
+                  "description": "if set to true then fails with an error when a node tries to load content from URL",
+                  "type": "boolean"
+                },
+                "dkim": {
+                  "$ref": "#/definitions/DKIM.Options",
+                  "description": "is an object with DKIM options"
+                },
+                "dnsTimeout": {
+                  "description": "how many milliseconds to wait for the DNS requests to be resolved",
+                  "type": "number"
+                },
+                "dsn": {
+                  "$ref": "#/definitions/SMTPConnection.DSNOptions"
+                },
+                "encoding": {
+                  "description": "optional transfer encoding for the textual parts",
+                  "type": "string"
+                },
+                "envelope": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/definitions/Mail.Envelope"
+                    },
+                    {
+                      "$ref": "#/definitions/MimeNode.Envelope"
+                    }
+                  ],
+                  "description": "optional SMTP envelope, if auto generated envelope is not suitable"
+                },
+                "from": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "$ref": "#/definitions/Mail.Address"
+                    }
+                  ],
+                  "description": "The e-mail address of the sender. All e-mail addresses can be plain 'sender@server.com' or formatted 'Sender Name <sender@server.com>'"
+                },
+                "greetingTimeout": {
+                  "description": "how many milliseconds to wait for the greeting after connection is established",
+                  "type": "number"
+                },
+                "headers": {
+                  "$ref": "#/definitions/Mail.Headers",
+                  "description": "An object or array of additional header fields"
+                },
+                "host": {
+                  "description": "the hostname or IP address to connect to (defaults to ‘localhost’)",
+                  "type": "string"
+                },
+                "html": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "$ref": "#/definitions/global.Buffer"
+                    },
+                    {
+                      "$ref": "#/definitions/internal.Readable"
+                    },
+                    {
+                      "$ref": "#/definitions/Mail.AttachmentLike"
+                    }
+                  ],
+                  "description": "The HTML version of the message"
+                },
+                "icalEvent": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "$ref": "#/definitions/global.Buffer"
+                    },
+                    {
+                      "$ref": "#/definitions/internal.Readable"
+                    },
+                    {
+                      "$ref": "#/definitions/Mail.IcalAttachment"
+                    }
+                  ],
+                  "description": "iCalendar event, same usage as with text and html. Event method attribute defaults to ‘PUBLISH’ or define it yourself: {method: 'REQUEST', content: iCalString}. This value is added as an additional alternative to html or text. Only utf-8 content is allowed"
+                },
+                "ignoreTLS": {
+                  "description": "turns off STARTTLS support if true",
+                  "type": "boolean"
+                },
+                "inReplyTo": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "$ref": "#/definitions/Mail.Address"
+                    }
+                  ],
+                  "description": "The message-id this message is replying"
+                },
+                "list": {
+                  "$ref": "#/definitions/Mail.ListHeaders",
+                  "description": "An object where key names are converted into list headers. List key help becomes List-Help header etc."
+                },
+                "lmtp": {
+                  "description": "if true, uses LMTP instead of SMTP protocol",
+                  "type": "boolean"
+                },
+                "localAddress": {
+                  "description": "the local interface to bind to for network connections",
+                  "type": "string"
+                },
+                "logger": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/definitions/Logger"
+                    },
+                    {
+                      "type": "boolean"
+                    }
+                  ],
+                  "description": "optional bunyan compatible logger instance. If set to true then logs to console. If value is not set or is false then nothing is logged"
+                },
+                "messageId": {
+                  "description": "optional Message-Id value, random value will be generated if not set",
+                  "type": "string"
+                },
+                "name": {
+                  "description": "optional hostname of the client, used for identifying to the server",
+                  "type": "string"
+                },
+                "opportunisticTLS": {
+                  "description": "tries to use STARTTLS and continues normally if it fails",
+                  "type": "boolean"
+                },
+                "port": {
+                  "description": "the port to connect to (defaults to 25 or 465)",
+                  "type": "number"
+                },
+                "priority": {
+                  "enum": [
+                    "high",
+                    "normal",
+                    "low"
+                  ],
+                  "type": "string"
+                },
+                "raw": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "$ref": "#/definitions/global.Buffer"
+                    },
+                    {
+                      "$ref": "#/definitions/internal.Readable"
+                    },
+                    {
+                      "$ref": "#/definitions/Mail.AttachmentLike"
+                    }
+                  ],
+                  "description": "if set then overwrites entire message output with this value. The value is not parsed, so you should still set address headers or the envelope value for the message to work"
+                },
+                "references": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  ],
+                  "description": "Message-id list (an array or space separated string)"
+                },
+                "replyTo": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "$ref": "#/definitions/Mail.Address"
+                    },
+                    {
+                      "items": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "$ref": "#/definitions/Mail.Address"
+                          }
+                        ]
+                      },
+                      "type": "array"
+                    }
+                  ],
+                  "description": "Comma separated list or an array of e-mail addresses that will appear on the Reply-To: field"
+                },
+                "requireTLS": {
+                  "description": "forces the client to use STARTTLS. Returns an error if upgrading the connection is not possible or fails.",
+                  "type": "boolean"
+                },
+                "secure": {
+                  "description": "defines if the connection should use SSL (if true) or not (if false)",
+                  "type": "boolean"
+                },
+                "sender": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "$ref": "#/definitions/Mail.Address"
+                    }
+                  ],
+                  "description": "An e-mail address that will appear on the Sender: field"
+                },
+                "service": {
+                  "type": "string"
+                },
+                "socket": {
+                  "$ref": "#/definitions/Socket",
+                  "description": "initialized socket to use instead of creating a new one"
+                },
+                "socketTimeout": {
+                  "description": "how many milliseconds of inactivity to allow",
+                  "type": "number"
+                },
+                "subject": {
+                  "description": "The subject of the e-mail",
+                  "type": "string"
+                },
+                "text": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "$ref": "#/definitions/global.Buffer"
+                    },
+                    {
+                      "$ref": "#/definitions/internal.Readable"
+                    },
+                    {
+                      "$ref": "#/definitions/Mail.AttachmentLike"
+                    }
+                  ],
+                  "description": "The plaintext version of the message"
+                },
+                "textEncoding": {
+                  "$ref": "#/definitions/Mail.TextEncoding",
+                  "description": "set explicitly which encoding to use for text parts (quoted-printable or base64). If not set then encoding is detected from text content (mostly ascii means quoted-printable, otherwise base64)"
+                },
+                "tls": {
+                  "$ref": "#/definitions/ConnectionOptions",
+                  "description": "defines additional options to be passed to the socket constructor, e.g. {rejectUnauthorized: true}"
+                },
+                "to": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "$ref": "#/definitions/Mail.Address"
+                    },
+                    {
+                      "items": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "$ref": "#/definitions/Mail.Address"
+                          }
+                        ]
+                      },
+                      "type": "array"
+                    }
+                  ],
+                  "description": "Comma separated list or an array of recipients e-mail addresses that will appear on the To: field"
+                },
+                "transactionLog": {
+                  "description": "if set to true, then logs SMTP traffic without message content",
+                  "type": "boolean"
+                },
+                "url": {
+                  "type": "string"
+                },
+                "watchHtml": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "$ref": "#/definitions/global.Buffer"
+                    },
+                    {
+                      "$ref": "#/definitions/internal.Readable"
+                    },
+                    {
+                      "$ref": "#/definitions/Mail.AttachmentLike"
+                    }
+                  ],
+                  "description": "Apple Watch specific HTML version of the message, same usage as with text and html"
+                }
+              },
+              "type": "object"
+            }
+          ],
+          "description": "You can define the nodemailer transport options here"
         },
         "override": {
           "$ref": "#/definitions/Mail.Options"
@@ -1707,6 +3040,30 @@
       },
       "type": "object"
     },
+    "PxfObject": {
+      "additionalProperties": false,
+      "properties": {
+        "buf": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/global.Buffer"
+            }
+          ],
+          "description": "PFX or PKCS12 encoded private key and certificate chain."
+        },
+        "passphrase": {
+          "description": "Optional passphrase.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "buf"
+      ],
+      "type": "object"
+    },
     "RawMessage": {
       "additionalProperties": false,
       "description": "<p>Represents the raw data of the message.</p>",
@@ -1769,6 +3126,830 @@
     "RequestPayer": {
       "const": "requester",
       "type": "string"
+    },
+    "SMTPConnection.AuthenticationCredentials": {
+      "additionalProperties": false,
+      "properties": {
+        "credentials": {
+          "$ref": "#/definitions/SMTPConnection.Credentials",
+          "description": "normal authentication object"
+        }
+      },
+      "required": [
+        "credentials"
+      ],
+      "type": "object"
+    },
+    "SMTPConnection.AuthenticationType": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/SMTPConnection.AuthenticationTypeCustom"
+        },
+        {
+          "$ref": "#/definitions/SMTPConnection.AuthenticationTypeLogin"
+        },
+        {
+          "$ref": "#/definitions/SMTPConnection.AuthenticationTypeOAuth2"
+        }
+      ]
+    },
+    "SMTPConnection.AuthenticationTypeCustom": {
+      "additionalProperties": false,
+      "properties": {
+        "method": {
+          "type": "string"
+        },
+        "pass": {
+          "description": "then password",
+          "type": "string"
+        },
+        "type": {
+          "description": "indicates the authetication type, defaults to ‘login’, other option is ‘oauth2’ or ‘custom’",
+          "enum": [
+            "custom",
+            "Custom",
+            "CUSTOM"
+          ],
+          "type": "string"
+        },
+        "user": {
+          "description": "the username",
+          "type": "string"
+        }
+      },
+      "required": [
+        "method",
+        "pass",
+        "type",
+        "user"
+      ],
+      "type": "object"
+    },
+    "SMTPConnection.AuthenticationTypeLogin": {
+      "additionalProperties": false,
+      "properties": {
+        "pass": {
+          "description": "then password",
+          "type": "string"
+        },
+        "type": {
+          "description": "indicates the authetication type, defaults to ‘login’, other option is ‘oauth2’ or ‘custom’",
+          "enum": [
+            "login",
+            "Login",
+            "LOGIN"
+          ],
+          "type": "string"
+        },
+        "user": {
+          "description": "the username",
+          "type": "string"
+        }
+      },
+      "required": [
+        "pass",
+        "user"
+      ],
+      "type": "object"
+    },
+    "SMTPConnection.AuthenticationTypeOAuth2": {
+      "additionalProperties": false,
+      "properties": {
+        "accessToken": {
+          "description": "An existing valid accessToken",
+          "type": "string"
+        },
+        "accessUrl": {
+          "description": "Endpoint for token generation, defaults to 'https://accounts.google.com/o/oauth2/token'",
+          "type": "string"
+        },
+        "clientId": {
+          "description": "Client ID value",
+          "type": "string"
+        },
+        "clientSecret": {
+          "description": "Client secret value",
+          "type": "string"
+        },
+        "expires": {
+          "description": "Optional Access Token expire time in ms",
+          "type": "number"
+        },
+        "privateKey": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "key": {
+                  "type": "string"
+                },
+                "passphrase": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "key",
+                "passphrase"
+              ],
+              "type": "object"
+            }
+          ],
+          "description": "Private key for JSW"
+        },
+        "refreshToken": {
+          "description": "Refresh token for an user",
+          "type": "string"
+        },
+        "serviceClient": {
+          "type": "string"
+        },
+        "timeout": {
+          "description": "Optional TTL for Access Token in seconds",
+          "type": "number"
+        },
+        "type": {
+          "description": "indicates the authetication type, defaults to ‘login’, other option is ‘oauth2’ or ‘custom’",
+          "enum": [
+            "oauth2",
+            "OAuth2",
+            "OAUTH2"
+          ],
+          "type": "string"
+        },
+        "user": {
+          "description": "User e-mail address",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "SMTPConnection.Credentials": {
+      "additionalProperties": false,
+      "properties": {
+        "pass": {
+          "description": "then password",
+          "type": "string"
+        },
+        "user": {
+          "description": "the username",
+          "type": "string"
+        }
+      },
+      "required": [
+        "user",
+        "pass"
+      ],
+      "type": "object"
+    },
+    "SMTPConnection.CustomAuthenticationContext": {
+      "additionalProperties": false,
+      "properties": {
+        "auth": {
+          "$ref": "#/definitions/SMTPConnection.AuthenticationCredentials"
+        },
+        "authMethod": {
+          "type": "string"
+        },
+        "authMethods": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "extensions": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "maxAllowedSize": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "const": false,
+              "type": "boolean"
+            }
+          ]
+        }
+      },
+      "required": [
+        "auth",
+        "authMethod",
+        "extensions",
+        "authMethods",
+        "maxAllowedSize"
+      ],
+      "type": "object"
+    },
+    "SMTPConnection.CustomAuthenticationHandlers": {
+      "additionalProperties": {
+        "$comment": "(ctx: CustomAuthenticationContext) => Promise<boolean> | unknown",
+        "properties": {
+          "namedArgs": {
+            "additionalProperties": false,
+            "properties": {
+              "ctx": {
+                "$ref": "#/definitions/SMTPConnection.CustomAuthenticationContext"
+              }
+            },
+            "required": [
+              "ctx"
+            ],
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "type": "object"
+    },
+    "SMTPConnection.DSNOption": {
+      "enum": [
+        "NEVER",
+        "SUCCESS",
+        "FAILURE",
+        "DELAY"
+      ],
+      "type": "string"
+    },
+    "SMTPConnection.DSNOptions": {
+      "additionalProperties": false,
+      "properties": {
+        "envid": {
+          "description": "sender’s ‘envelope identifier’ for tracking",
+          "type": "string"
+        },
+        "notify": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/SMTPConnection.DSNOption"
+            },
+            {
+              "items": {
+                "$ref": "#/definitions/SMTPConnection.DSNOption"
+              },
+              "type": "array"
+            }
+          ],
+          "description": "when to send a DSN. Multiple options are OK - array or comma delimited. NEVER must appear by itself."
+        },
+        "orcpt": {
+          "description": "original recipient",
+          "type": "string"
+        },
+        "ret": {
+          "description": "return either the full message ‘FULL’ or only headers ‘HDRS’",
+          "enum": [
+            "Full",
+            "HDRS"
+          ],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "SMTPTransport.AuthenticationType": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/SMTPTransport.AuthenticationTypeLogin"
+        },
+        {
+          "$ref": "#/definitions/SMTPTransport.AuthenticationTypeOAuth2"
+        }
+      ]
+    },
+    "SMTPTransport.AuthenticationTypeLogin": {
+      "additionalProperties": false,
+      "properties": {
+        "credentials": {
+          "$ref": "#/definitions/SMTPConnection.Credentials"
+        },
+        "method": {
+          "enum": [
+            false
+          ],
+          "type": "boolean"
+        },
+        "type": {
+          "const": "LOGIN",
+          "type": "string"
+        },
+        "user": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "user",
+        "credentials",
+        "method"
+      ],
+      "type": "object"
+    },
+    "SMTPTransport.AuthenticationTypeOAuth2": {
+      "additionalProperties": false,
+      "properties": {
+        "method": {
+          "const": "XOAUTH2",
+          "type": "string"
+        },
+        "oauth2": {
+          "additionalProperties": false,
+          "properties": {
+            "accessToken": {
+              "enum": [
+                false
+              ],
+              "type": "boolean"
+            },
+            "expires": {
+              "type": "number"
+            },
+            "logger": {
+              "$ref": "#/definitions/Logger"
+            },
+            "options": {
+              "$ref": "#/definitions/XOAuth2.Options"
+            }
+          },
+          "required": [
+            "options",
+            "logger",
+            "accessToken",
+            "expires"
+          ],
+          "type": "object"
+        },
+        "type": {
+          "const": "OAUTH2",
+          "type": "string"
+        },
+        "user": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "user",
+        "oauth2",
+        "method"
+      ],
+      "type": "object"
+    },
+    "SMTPTransport.Options": {
+      "additionalProperties": false,
+      "properties": {
+        "alternatives": {
+          "description": "An array of alternative text contents (in addition to text and html parts)",
+          "items": {
+            "$ref": "#/definitions/Mail.Attachment"
+          },
+          "type": "array"
+        },
+        "amp": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/global.Buffer"
+            },
+            {
+              "$ref": "#/definitions/internal.Readable"
+            },
+            {
+              "$ref": "#/definitions/Mail.AmpAttachment"
+            }
+          ],
+          "description": "AMP4EMAIL specific HTML version of the message, same usage as with text and html. Make sure it is a full and valid AMP4EMAIL document, otherwise the displaying email client falls back to html and ignores the amp part"
+        },
+        "attachDataUrls": {
+          "description": "if set to true then converts data:images in the HTML content of message to embedded attachments",
+          "type": "boolean"
+        },
+        "attachments": {
+          "description": "An array of attachment objects",
+          "items": {
+            "$ref": "#/definitions/Mail.Attachment"
+          },
+          "type": "array"
+        },
+        "auth": {
+          "$ref": "#/definitions/SMTPConnection.AuthenticationType"
+        },
+        "authMethod": {
+          "description": "defines preferred authentication method, e.g. ‘PLAIN’",
+          "type": "string"
+        },
+        "bcc": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/Mail.Address"
+            },
+            {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "$ref": "#/definitions/Mail.Address"
+                  }
+                ]
+              },
+              "type": "array"
+            }
+          ],
+          "description": "Comma separated list or an array of recipients e-mail addresses that will appear on the Bcc: field"
+        },
+        "cc": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/Mail.Address"
+            },
+            {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "$ref": "#/definitions/Mail.Address"
+                  }
+                ]
+              },
+              "type": "array"
+            }
+          ],
+          "description": "Comma separated list or an array of recipients e-mail addresses that will appear on the Cc: field"
+        },
+        "component": {
+          "type": "string"
+        },
+        "connection": {
+          "$ref": "#/definitions/Socket",
+          "description": "connected socket to use instead of creating and connecting a new one. If secure option is true, then socket is upgraded from plaintext to ciphertext"
+        },
+        "connectionTimeout": {
+          "description": "how many milliseconds to wait for the connection to establish",
+          "type": "number"
+        },
+        "customAuth": {
+          "$ref": "#/definitions/SMTPConnection.CustomAuthenticationHandlers"
+        },
+        "date": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "description": "optional Date value, current UTC string will be used if not set"
+        },
+        "debug": {
+          "description": "if set to true, then logs SMTP traffic and message content, otherwise logs only transaction events",
+          "type": "boolean"
+        },
+        "disableFileAccess": {
+          "description": "if set to true then fails with an error when a node tries to load content from a file",
+          "type": "boolean"
+        },
+        "disableUrlAccess": {
+          "description": "if set to true then fails with an error when a node tries to load content from URL",
+          "type": "boolean"
+        },
+        "dkim": {
+          "$ref": "#/definitions/DKIM.Options",
+          "description": "is an object with DKIM options"
+        },
+        "dnsTimeout": {
+          "description": "how many milliseconds to wait for the DNS requests to be resolved",
+          "type": "number"
+        },
+        "dsn": {
+          "$ref": "#/definitions/SMTPConnection.DSNOptions"
+        },
+        "encoding": {
+          "description": "optional transfer encoding for the textual parts",
+          "type": "string"
+        },
+        "envelope": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Mail.Envelope"
+            },
+            {
+              "$ref": "#/definitions/MimeNode.Envelope"
+            }
+          ],
+          "description": "optional SMTP envelope, if auto generated envelope is not suitable"
+        },
+        "from": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/Mail.Address"
+            }
+          ],
+          "description": "The e-mail address of the sender. All e-mail addresses can be plain 'sender@server.com' or formatted 'Sender Name <sender@server.com>'"
+        },
+        "greetingTimeout": {
+          "description": "how many milliseconds to wait for the greeting after connection is established",
+          "type": "number"
+        },
+        "headers": {
+          "$ref": "#/definitions/Mail.Headers",
+          "description": "An object or array of additional header fields"
+        },
+        "host": {
+          "description": "the hostname or IP address to connect to (defaults to ‘localhost’)",
+          "type": "string"
+        },
+        "html": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/global.Buffer"
+            },
+            {
+              "$ref": "#/definitions/internal.Readable"
+            },
+            {
+              "$ref": "#/definitions/Mail.AttachmentLike"
+            }
+          ],
+          "description": "The HTML version of the message"
+        },
+        "icalEvent": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/global.Buffer"
+            },
+            {
+              "$ref": "#/definitions/internal.Readable"
+            },
+            {
+              "$ref": "#/definitions/Mail.IcalAttachment"
+            }
+          ],
+          "description": "iCalendar event, same usage as with text and html. Event method attribute defaults to ‘PUBLISH’ or define it yourself: {method: 'REQUEST', content: iCalString}. This value is added as an additional alternative to html or text. Only utf-8 content is allowed"
+        },
+        "ignoreTLS": {
+          "description": "turns off STARTTLS support if true",
+          "type": "boolean"
+        },
+        "inReplyTo": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/Mail.Address"
+            }
+          ],
+          "description": "The message-id this message is replying"
+        },
+        "list": {
+          "$ref": "#/definitions/Mail.ListHeaders",
+          "description": "An object where key names are converted into list headers. List key help becomes List-Help header etc."
+        },
+        "lmtp": {
+          "description": "if true, uses LMTP instead of SMTP protocol",
+          "type": "boolean"
+        },
+        "localAddress": {
+          "description": "the local interface to bind to for network connections",
+          "type": "string"
+        },
+        "logger": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Logger"
+            },
+            {
+              "type": "boolean"
+            }
+          ],
+          "description": "optional bunyan compatible logger instance. If set to true then logs to console. If value is not set or is false then nothing is logged"
+        },
+        "messageId": {
+          "description": "optional Message-Id value, random value will be generated if not set",
+          "type": "string"
+        },
+        "name": {
+          "description": "optional hostname of the client, used for identifying to the server",
+          "type": "string"
+        },
+        "opportunisticTLS": {
+          "description": "tries to use STARTTLS and continues normally if it fails",
+          "type": "boolean"
+        },
+        "port": {
+          "description": "the port to connect to (defaults to 25 or 465)",
+          "type": "number"
+        },
+        "priority": {
+          "enum": [
+            "high",
+            "normal",
+            "low"
+          ],
+          "type": "string"
+        },
+        "raw": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/global.Buffer"
+            },
+            {
+              "$ref": "#/definitions/internal.Readable"
+            },
+            {
+              "$ref": "#/definitions/Mail.AttachmentLike"
+            }
+          ],
+          "description": "if set then overwrites entire message output with this value. The value is not parsed, so you should still set address headers or the envelope value for the message to work"
+        },
+        "references": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "description": "Message-id list (an array or space separated string)"
+        },
+        "replyTo": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/Mail.Address"
+            },
+            {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "$ref": "#/definitions/Mail.Address"
+                  }
+                ]
+              },
+              "type": "array"
+            }
+          ],
+          "description": "Comma separated list or an array of e-mail addresses that will appear on the Reply-To: field"
+        },
+        "requireTLS": {
+          "description": "forces the client to use STARTTLS. Returns an error if upgrading the connection is not possible or fails.",
+          "type": "boolean"
+        },
+        "secure": {
+          "description": "defines if the connection should use SSL (if true) or not (if false)",
+          "type": "boolean"
+        },
+        "sender": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/Mail.Address"
+            }
+          ],
+          "description": "An e-mail address that will appear on the Sender: field"
+        },
+        "service": {
+          "type": "string"
+        },
+        "socket": {
+          "$ref": "#/definitions/Socket",
+          "description": "initialized socket to use instead of creating a new one"
+        },
+        "socketTimeout": {
+          "description": "how many milliseconds of inactivity to allow",
+          "type": "number"
+        },
+        "subject": {
+          "description": "The subject of the e-mail",
+          "type": "string"
+        },
+        "text": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/global.Buffer"
+            },
+            {
+              "$ref": "#/definitions/internal.Readable"
+            },
+            {
+              "$ref": "#/definitions/Mail.AttachmentLike"
+            }
+          ],
+          "description": "The plaintext version of the message"
+        },
+        "textEncoding": {
+          "$ref": "#/definitions/Mail.TextEncoding",
+          "description": "set explicitly which encoding to use for text parts (quoted-printable or base64). If not set then encoding is detected from text content (mostly ascii means quoted-printable, otherwise base64)"
+        },
+        "tls": {
+          "$ref": "#/definitions/ConnectionOptions",
+          "description": "defines additional options to be passed to the socket constructor, e.g. {rejectUnauthorized: true}"
+        },
+        "to": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/Mail.Address"
+            },
+            {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "$ref": "#/definitions/Mail.Address"
+                  }
+                ]
+              },
+              "type": "array"
+            }
+          ],
+          "description": "Comma separated list or an array of recipients e-mail addresses that will appear on the To: field"
+        },
+        "transactionLog": {
+          "description": "if set to true, then logs SMTP traffic without message content",
+          "type": "boolean"
+        },
+        "url": {
+          "type": "string"
+        },
+        "watchHtml": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/global.Buffer"
+            },
+            {
+              "$ref": "#/definitions/internal.Readable"
+            },
+            {
+              "$ref": "#/definitions/Mail.AttachmentLike"
+            }
+          ],
+          "description": "Apple Watch specific HTML version of the message, same usage as with text and html"
+        }
+      },
+      "type": "object"
+    },
+    "SecureContext": {
+      "additionalProperties": false,
+      "properties": {
+        "context": {}
+      },
+      "required": [
+        "context"
+      ],
+      "type": "object"
     },
     "SecureVersion": {
       "enum": [
@@ -2116,6 +4297,230 @@
       ],
       "type": "object"
     },
+    "Socket": {
+      "additionalProperties": false,
+      "description": "This class is an abstraction of a TCP socket or a streaming `IPC` endpoint (uses named pipes on Windows, and Unix domain sockets otherwise). It is also an `EventEmitter`.\n\nA `net.Socket` can be created by the user and used directly to interact with a server. For example, it is returned by  {@link  createConnection } , so the user can use it to talk to the server.\n\nIt can also be created by Node.js and passed to the user when a connection is received. For example, it is passed to the listeners of a `'connection'` event emitted on a  {@link  Server } , so the user can use it to interact with the client.",
+      "properties": {
+        "allowHalfOpen": {
+          "description": "If `false` then the stream will automatically end the writable side when the readable side ends. Set initially by the `allowHalfOpen` constructor option, which defaults to `true`.\n\nThis can be changed manually to change the half-open behavior of an existing `Duplex` stream instance, but must be changed before the `'end'` event is emitted.",
+          "type": "boolean"
+        },
+        "autoSelectFamilyAttemptedAddresses": {
+          "description": "This property is only present if the family autoselection algorithm is enabled in `socket.connect(options)` and it is an array of the addresses that have been attempted.\n\nEach address is a string in the form of `$IP:$PORT`. If the connection was successful, then the last address is the one that the socket is currently connected to.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "bufferSize": {
+          "deprecated": "Since v14.6.0 - Use `writableLength` instead.",
+          "description": "This property shows the number of characters buffered for writing. The buffer may contain strings whose length after encoding is not yet known. So this number is only an approximation of the number of bytes in the buffer.\n\n`net.Socket` has the property that `socket.write()` always works. This is to help users get up and running quickly. The computer cannot always keep up with the amount of data that is written to a socket. The network connection simply might be too slow. Node.js will internally queue up the data written to a socket and send it out over the wire when it is possible.\n\nThe consequence of this internal buffering is that memory may grow. Users who experience large or growing `bufferSize` should attempt to \"throttle\" the data flows in their program with `socket.pause()` and `socket.resume()`.",
+          "type": "number"
+        },
+        "bytesRead": {
+          "description": "The amount of received bytes.",
+          "type": "number"
+        },
+        "bytesWritten": {
+          "description": "The amount of bytes sent.",
+          "type": "number"
+        },
+        "closed": {
+          "description": "Is `true` after `'close'` has been emitted.",
+          "type": "boolean"
+        },
+        "connecting": {
+          "description": "If `true`, `socket.connect(options[, connectListener])` was called and has not yet finished. It will stay `true` until the socket becomes connected, then it is set to `false` and the `'connect'` event is emitted. Note that the `socket.connect(options[, connectListener])` callback is a listener for the `'connect'` event.",
+          "type": "boolean"
+        },
+        "destroyed": {
+          "description": "See `writable.destroyed` for further details.",
+          "type": "boolean"
+        },
+        "errored": {
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "message": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "stack": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "message"
+              ],
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Returns error if the stream has been destroyed with an error."
+        },
+        "localAddress": {
+          "description": "The string representation of the local IP address the remote client is connecting on. For example, in a server listening on `'0.0.0.0'`, if a client connects on `'192.168.1.1'`, the value of `socket.localAddress` would be`'192.168.1.1'`.",
+          "type": "string"
+        },
+        "localFamily": {
+          "description": "The string representation of the local IP family. `'IPv4'` or `'IPv6'`.",
+          "type": "string"
+        },
+        "localPort": {
+          "description": "The numeric representation of the local port. For example, `80` or `21`.",
+          "type": "number"
+        },
+        "pending": {
+          "description": "This is `true` if the socket is not connected yet, either because `.connect()`has not yet been called or because it is still in the process of connecting (see `socket.connecting`).",
+          "type": "boolean"
+        },
+        "readable": {
+          "description": "Is `true` if it is safe to call  {@link  read } , which means the stream has not been destroyed or emitted `'error'` or `'end'`.",
+          "type": "boolean"
+        },
+        "readableAborted": {
+          "description": "Returns whether the stream was destroyed or errored before emitting `'end'`.",
+          "type": "boolean"
+        },
+        "readableDidRead": {
+          "description": "Returns whether `'data'` has been emitted.",
+          "type": "boolean"
+        },
+        "readableEncoding": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/global.BufferEncoding"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Getter for the property `encoding` of a given `Readable` stream. The `encoding` property can be set using the  {@link  setEncoding }  method."
+        },
+        "readableEnded": {
+          "description": "Becomes `true` when [`'end'`](https://nodejs.org/docs/latest-v22.x/api/stream.html#event-end) event is emitted.",
+          "type": "boolean"
+        },
+        "readableFlowing": {
+          "description": "This property reflects the current state of a `Readable` stream as described in the [Three states](https://nodejs.org/docs/latest-v22.x/api/stream.html#three-states) section.",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "readableHighWaterMark": {
+          "description": "Returns the value of `highWaterMark` passed when creating this `Readable`.",
+          "type": "number"
+        },
+        "readableLength": {
+          "description": "This property contains the number of bytes (or objects) in the queue ready to be read. The value provides introspection data regarding the status of the `highWaterMark`.",
+          "type": "number"
+        },
+        "readableObjectMode": {
+          "description": "Getter for the property `objectMode` of a given `Readable` stream.",
+          "type": "boolean"
+        },
+        "readyState": {
+          "$ref": "#/definitions/SocketReadyState",
+          "description": "This property represents the state of the connection as a string.\n\n* If the stream is connecting `socket.readyState` is `opening`.\n* If the stream is readable and writable, it is `open`.\n* If the stream is readable and not writable, it is `readOnly`.\n* If the stream is not readable and writable, it is `writeOnly`."
+        },
+        "remoteAddress": {
+          "description": "The string representation of the remote IP address. For example,`'74.125.127.100'` or `'2001:4860:a005::68'`. Value may be `undefined` if the socket is destroyed (for example, if the client disconnected).",
+          "type": "string"
+        },
+        "remoteFamily": {
+          "description": "The string representation of the remote IP family. `'IPv4'` or `'IPv6'`. Value may be `undefined` if the socket is destroyed (for example, if the client disconnected).",
+          "type": "string"
+        },
+        "remotePort": {
+          "description": "The numeric representation of the remote port. For example, `80` or `21`. Value may be `undefined` if the socket is destroyed (for example, if the client disconnected).",
+          "type": "number"
+        },
+        "timeout": {
+          "description": "The socket timeout in milliseconds as set by `socket.setTimeout()`. It is `undefined` if a timeout has not been set.",
+          "type": "number"
+        },
+        "writable": {
+          "description": "Is `true` if it is safe to call `writable.write()`, which means the stream has not been destroyed, errored, or ended.",
+          "type": "boolean"
+        },
+        "writableCorked": {
+          "description": "Number of times `writable.uncork()` needs to be called in order to fully uncork the stream.",
+          "type": "number"
+        },
+        "writableEnded": {
+          "description": "Is `true` after `writable.end()` has been called. This property does not indicate whether the data has been flushed, for this use `writable.writableFinished` instead.",
+          "type": "boolean"
+        },
+        "writableFinished": {
+          "description": "Is set to `true` immediately before the `'finish'` event is emitted.",
+          "type": "boolean"
+        },
+        "writableHighWaterMark": {
+          "description": "Return the value of `highWaterMark` passed when creating this `Writable`.",
+          "type": "number"
+        },
+        "writableLength": {
+          "description": "This property contains the number of bytes (or objects) in the queue ready to be written. The value provides introspection data regarding the status of the `highWaterMark`.",
+          "type": "number"
+        },
+        "writableNeedDrain": {
+          "description": "Is `true` if the stream's buffer has been full and stream will emit `'drain'`.",
+          "type": "boolean"
+        },
+        "writableObjectMode": {
+          "description": "Getter for the property `objectMode` of a given `Writable` stream.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "allowHalfOpen",
+        "autoSelectFamilyAttemptedAddresses",
+        "bufferSize",
+        "bytesRead",
+        "bytesWritten",
+        "closed",
+        "connecting",
+        "destroyed",
+        "errored",
+        "pending",
+        "readable",
+        "readableAborted",
+        "readableDidRead",
+        "readableEncoding",
+        "readableEnded",
+        "readableFlowing",
+        "readableHighWaterMark",
+        "readableLength",
+        "readableObjectMode",
+        "readyState",
+        "writable",
+        "writableCorked",
+        "writableEnded",
+        "writableFinished",
+        "writableHighWaterMark",
+        "writableLength",
+        "writableNeedDrain",
+        "writableObjectMode"
+      ],
+      "type": "object"
+    },
+    "SocketReadyState": {
+      "enum": [
+        "opening",
+        "open",
+        "readOnly",
+        "writeOnly",
+        "closed"
+      ],
+      "type": "string"
+    },
     "StaticAuthConfiguration": {
       "additionalProperties": false,
       "description": "Define a static auth",
@@ -2170,6 +4575,241 @@
           "$ref": "#/definitions/BrowserRuntimeStreamingBlobPayloadInputTypes"
         }
       ]
+    },
+    "Transport<SMTPTransport.SentMessageInfo>": {
+      "additionalProperties": false,
+      "properties": {
+        "mailer": {
+          "$ref": "#/definitions/Transporter%3CSMTPTransport.SentMessageInfo%2CTransportOptions%3E"
+        },
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "version"
+      ],
+      "type": "object"
+    },
+    "TransportOptions": {
+      "additionalProperties": false,
+      "properties": {
+        "component": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "Transporter<SMTPTransport.SentMessageInfo,TransportOptions>": {
+      "additionalProperties": false,
+      "description": "Creates an object for exposing the Mail API",
+      "properties": {
+        "MailMessage": {
+          "additionalProperties": false,
+          "description": "Usage: typeof transporter.MailMessage",
+          "properties": {
+            "data": {
+              "$ref": "#/definitions/Mail.Options"
+            },
+            "mailer": {
+              "$ref": "#/definitions/class-637931294-10050-14090-637931294-0-14107%3Cdef-interface-645803888-1460-1888-645803888-459-1890-645803888-426-1890-645803888-0-3925%3E1448600842"
+            },
+            "message": {
+              "additionalProperties": false,
+              "description": "Creates a new mime tree node. Assumes 'multipart/*' as the content type if it is a branch, anything else counts as leaf. If rootNode is missing from the options, assumes this is the root.",
+              "properties": {
+                "baseBoundary": {
+                  "description": "shared part of the unique multipart boundary",
+                  "type": "string"
+                },
+                "boundary": {
+                  "description": "a multipart boundary value",
+                  "enum": [
+                    false
+                  ],
+                  "type": "boolean"
+                },
+                "boundaryPrefix": {
+                  "description": "Undocumented",
+                  "type": "string"
+                },
+                "childNodes": {
+                  "items": {
+                    "$ref": "#/definitions/class-1301605675-1861-7188-1301605675-0-72091760475569"
+                  },
+                  "type": "array"
+                },
+                "content": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "$ref": "#/definitions/global.Buffer"
+                    },
+                    {
+                      "$ref": "#/definitions/internal.Readable"
+                    }
+                  ],
+                  "description": "body content for current node"
+                },
+                "contentType": {
+                  "description": "Undocumented",
+                  "type": "string"
+                },
+                "date": {
+                  "description": "If date headers is missing and current node is the root, this value is used instead",
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "disableFileAccess": {
+                  "description": "Undocumented",
+                  "type": "boolean"
+                },
+                "disableUrlAccess": {
+                  "description": "Undocumented",
+                  "type": "boolean"
+                },
+                "filename": {
+                  "description": "filename for an attachment node",
+                  "type": "string"
+                },
+                "hostname": {
+                  "description": "Hostname for default message-id values",
+                  "type": "string"
+                },
+                "keepBcc": {
+                  "description": "If true, do not exclude Bcc from the generated headers",
+                  "type": "boolean"
+                },
+                "multipart": {
+                  "description": "Undocumented",
+                  "type": "boolean"
+                },
+                "newline": {
+                  "description": "If set to 'win' then uses \\r\\n, if 'linux' then \\n. If not set (or `raw` is used) then newlines are kept as is.",
+                  "type": "string"
+                },
+                "nodeCounter": {
+                  "description": "Undocumented",
+                  "type": "number"
+                },
+                "normalizeHeaderKey": {
+                  "$comment": "(key: string) => string",
+                  "description": "method to normalize header keys for custom caseing",
+                  "properties": {
+                    "namedArgs": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "key": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "key"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "type": "object"
+                },
+                "parentNode": {
+                  "$ref": "#/definitions/class-1301605675-1861-7188-1301605675-0-72091760475569"
+                },
+                "rootNode": {
+                  "$ref": "#/definitions/class-1301605675-1861-7188-1301605675-0-72091760475569",
+                  "description": "root node for this tree"
+                },
+                "textEncoding": {
+                  "description": "either 'Q' (the default) or 'B'",
+                  "enum": [
+                    "B",
+                    "Q",
+                    ""
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "baseBoundary",
+                "boundaryPrefix",
+                "childNodes",
+                "date",
+                "disableFileAccess",
+                "disableUrlAccess",
+                "keepBcc",
+                "nodeCounter",
+                "rootNode",
+                "textEncoding"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "mailer",
+            "data",
+            "message"
+          ],
+          "type": "object"
+        },
+        "_defaults": {
+          "$ref": "#/definitions/TransportOptions"
+        },
+        "dkim": {
+          "additionalProperties": false,
+          "properties": {
+            "keys": {
+              "items": {
+                "$ref": "#/definitions/DKIM.SingleKeyOptions"
+              },
+              "type": "array"
+            },
+            "options": {
+              "$ref": "#/definitions/DKIM.Options"
+            }
+          },
+          "required": [
+            "options",
+            "keys"
+          ],
+          "type": "object"
+        },
+        "logger": {
+          "$ref": "#/definitions/Logger"
+        },
+        "meta": {
+          "additionalProperties": false,
+          "properties": {
+            "size": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "size"
+          ],
+          "type": "object"
+        },
+        "options": {
+          "$ref": "#/definitions/Mail.Options"
+        },
+        "transporter": {
+          "$ref": "#/definitions/Transport%3CSMTPTransport.SentMessageInfo%3E"
+        }
+      },
+      "required": [
+        "options",
+        "meta",
+        "dkim",
+        "transporter",
+        "logger",
+        "MailMessage",
+        "_defaults"
+      ],
+      "type": "object"
     },
     "Url": {
       "additionalProperties": false,
@@ -2272,19 +4912,43 @@
       "properties": {
         "domains": {
           "items": {
-            "type": "string"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "format": "regex",
+                "type": "string"
+              }
+            ]
           },
           "type": "array"
         },
         "from": {
           "items": {
-            "type": "string"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "format": "regex",
+                "type": "string"
+              }
+            ]
           },
           "type": "array"
         },
         "ips": {
           "items": {
-            "type": "string"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "format": "regex",
+                "type": "string"
+              }
+            ]
           },
           "type": "array"
         },
@@ -2299,7 +4963,15 @@
         },
         "to": {
           "items": {
-            "type": "string"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "format": "regex",
+                "type": "string"
+              }
+            ]
           },
           "type": "array"
         },
@@ -2323,6 +4995,408 @@
         "TRACE"
       ],
       "type": "string"
+    },
+    "XOAuth2.Options": {
+      "additionalProperties": false,
+      "properties": {
+        "accessToken": {
+          "description": "An existing valid accessToken",
+          "type": "string"
+        },
+        "accessUrl": {
+          "description": "Endpoint for token generation, defaults to 'https://accounts.google.com/o/oauth2/token'",
+          "type": "string"
+        },
+        "clientId": {
+          "description": "Client ID value",
+          "type": "string"
+        },
+        "clientSecret": {
+          "description": "Client secret value",
+          "type": "string"
+        },
+        "expires": {
+          "description": "Optional Access Token expire time in ms",
+          "type": "number"
+        },
+        "privateKey": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "key": {
+                  "type": "string"
+                },
+                "passphrase": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "key",
+                "passphrase"
+              ],
+              "type": "object"
+            }
+          ],
+          "description": "Private key for JSW"
+        },
+        "refreshToken": {
+          "description": "Refresh token for an user",
+          "type": "string"
+        },
+        "serviceClient": {
+          "type": "string"
+        },
+        "timeout": {
+          "description": "Optional TTL for Access Token in seconds",
+          "type": "number"
+        },
+        "user": {
+          "description": "User e-mail address",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "class-1301605675-1861-7188-1301605675-0-72091760475569": {
+      "additionalProperties": false,
+      "description": "Creates a new mime tree node. Assumes 'multipart/*' as the content type if it is a branch, anything else counts as leaf. If rootNode is missing from the options, assumes this is the root.",
+      "properties": {
+        "baseBoundary": {
+          "description": "shared part of the unique multipart boundary",
+          "type": "string"
+        },
+        "boundary": {
+          "description": "a multipart boundary value",
+          "enum": [
+            false
+          ],
+          "type": "boolean"
+        },
+        "boundaryPrefix": {
+          "description": "Undocumented",
+          "type": "string"
+        },
+        "childNodes": {
+          "items": {
+            "$ref": "#/definitions/class-1301605675-1861-7188-1301605675-0-72091760475569"
+          },
+          "type": "array"
+        },
+        "content": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/global.Buffer"
+            },
+            {
+              "$ref": "#/definitions/internal.Readable"
+            }
+          ],
+          "description": "body content for current node"
+        },
+        "contentType": {
+          "description": "Undocumented",
+          "type": "string"
+        },
+        "date": {
+          "description": "If date headers is missing and current node is the root, this value is used instead",
+          "format": "date-time",
+          "type": "string"
+        },
+        "disableFileAccess": {
+          "description": "Undocumented",
+          "type": "boolean"
+        },
+        "disableUrlAccess": {
+          "description": "Undocumented",
+          "type": "boolean"
+        },
+        "filename": {
+          "description": "filename for an attachment node",
+          "type": "string"
+        },
+        "hostname": {
+          "description": "Hostname for default message-id values",
+          "type": "string"
+        },
+        "keepBcc": {
+          "description": "If true, do not exclude Bcc from the generated headers",
+          "type": "boolean"
+        },
+        "multipart": {
+          "description": "Undocumented",
+          "type": "boolean"
+        },
+        "newline": {
+          "description": "If set to 'win' then uses \\r\\n, if 'linux' then \\n. If not set (or `raw` is used) then newlines are kept as is.",
+          "type": "string"
+        },
+        "nodeCounter": {
+          "description": "Undocumented",
+          "type": "number"
+        },
+        "normalizeHeaderKey": {
+          "$comment": "(key: string) => string",
+          "description": "method to normalize header keys for custom caseing",
+          "properties": {
+            "namedArgs": {
+              "additionalProperties": false,
+              "properties": {
+                "key": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "key"
+              ],
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "parentNode": {
+          "$ref": "#/definitions/class-1301605675-1861-7188-1301605675-0-72091760475569"
+        },
+        "rootNode": {
+          "$ref": "#/definitions/class-1301605675-1861-7188-1301605675-0-72091760475569",
+          "description": "root node for this tree"
+        },
+        "textEncoding": {
+          "description": "either 'Q' (the default) or 'B'",
+          "enum": [
+            "B",
+            "Q",
+            ""
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "baseBoundary",
+        "boundaryPrefix",
+        "childNodes",
+        "date",
+        "disableFileAccess",
+        "disableUrlAccess",
+        "keepBcc",
+        "nodeCounter",
+        "rootNode",
+        "textEncoding"
+      ],
+      "type": "object"
+    },
+    "class-637931294-10050-14090-637931294-0-14107<def-interface-645803888-1460-1888-645803888-459-1890-645803888-426-1890-645803888-0-3925>1448600842": {
+      "additionalProperties": false,
+      "description": "Creates an object for exposing the Mail API",
+      "properties": {
+        "MailMessage": {
+          "additionalProperties": false,
+          "description": "Usage: typeof transporter.MailMessage",
+          "properties": {
+            "data": {
+              "$ref": "#/definitions/Mail.Options"
+            },
+            "mailer": {
+              "$ref": "#/definitions/class-637931294-10050-14090-637931294-0-14107%3Cdef-interface-645803888-1460-1888-645803888-459-1890-645803888-426-1890-645803888-0-3925%3E1448600842"
+            },
+            "message": {
+              "additionalProperties": false,
+              "description": "Creates a new mime tree node. Assumes 'multipart/*' as the content type if it is a branch, anything else counts as leaf. If rootNode is missing from the options, assumes this is the root.",
+              "properties": {
+                "baseBoundary": {
+                  "description": "shared part of the unique multipart boundary",
+                  "type": "string"
+                },
+                "boundary": {
+                  "description": "a multipart boundary value",
+                  "enum": [
+                    false
+                  ],
+                  "type": "boolean"
+                },
+                "boundaryPrefix": {
+                  "description": "Undocumented",
+                  "type": "string"
+                },
+                "childNodes": {
+                  "items": {
+                    "$ref": "#/definitions/class-1301605675-1861-7188-1301605675-0-72091760475569"
+                  },
+                  "type": "array"
+                },
+                "content": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "$ref": "#/definitions/global.Buffer"
+                    },
+                    {
+                      "$ref": "#/definitions/internal.Readable"
+                    }
+                  ],
+                  "description": "body content for current node"
+                },
+                "contentType": {
+                  "description": "Undocumented",
+                  "type": "string"
+                },
+                "date": {
+                  "description": "If date headers is missing and current node is the root, this value is used instead",
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "disableFileAccess": {
+                  "description": "Undocumented",
+                  "type": "boolean"
+                },
+                "disableUrlAccess": {
+                  "description": "Undocumented",
+                  "type": "boolean"
+                },
+                "filename": {
+                  "description": "filename for an attachment node",
+                  "type": "string"
+                },
+                "hostname": {
+                  "description": "Hostname for default message-id values",
+                  "type": "string"
+                },
+                "keepBcc": {
+                  "description": "If true, do not exclude Bcc from the generated headers",
+                  "type": "boolean"
+                },
+                "multipart": {
+                  "description": "Undocumented",
+                  "type": "boolean"
+                },
+                "newline": {
+                  "description": "If set to 'win' then uses \\r\\n, if 'linux' then \\n. If not set (or `raw` is used) then newlines are kept as is.",
+                  "type": "string"
+                },
+                "nodeCounter": {
+                  "description": "Undocumented",
+                  "type": "number"
+                },
+                "normalizeHeaderKey": {
+                  "$comment": "(key: string) => string",
+                  "description": "method to normalize header keys for custom caseing",
+                  "properties": {
+                    "namedArgs": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "key": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "key"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "type": "object"
+                },
+                "parentNode": {
+                  "$ref": "#/definitions/class-1301605675-1861-7188-1301605675-0-72091760475569"
+                },
+                "rootNode": {
+                  "$ref": "#/definitions/class-1301605675-1861-7188-1301605675-0-72091760475569",
+                  "description": "root node for this tree"
+                },
+                "textEncoding": {
+                  "description": "either 'Q' (the default) or 'B'",
+                  "enum": [
+                    "B",
+                    "Q",
+                    ""
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "baseBoundary",
+                "boundaryPrefix",
+                "childNodes",
+                "date",
+                "disableFileAccess",
+                "disableUrlAccess",
+                "keepBcc",
+                "nodeCounter",
+                "rootNode",
+                "textEncoding"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "mailer",
+            "data",
+            "message"
+          ],
+          "type": "object"
+        },
+        "_defaults": {
+          "$ref": "#/definitions/TransportOptions"
+        },
+        "dkim": {
+          "additionalProperties": false,
+          "properties": {
+            "keys": {
+              "items": {
+                "$ref": "#/definitions/DKIM.SingleKeyOptions"
+              },
+              "type": "array"
+            },
+            "options": {
+              "$ref": "#/definitions/DKIM.Options"
+            }
+          },
+          "required": [
+            "options",
+            "keys"
+          ],
+          "type": "object"
+        },
+        "logger": {
+          "$ref": "#/definitions/Logger"
+        },
+        "meta": {
+          "additionalProperties": false,
+          "properties": {
+            "size": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "size"
+          ],
+          "type": "object"
+        },
+        "options": {
+          "$ref": "#/definitions/Mail.Options"
+        },
+        "transporter": {
+          "$ref": "#/definitions/Transport%3CSMTPTransport.SentMessageInfo%3E"
+        }
+      },
+      "required": [
+        "options",
+        "meta",
+        "dkim",
+        "transporter",
+        "logger",
+        "MailMessage",
+        "_defaults"
+      ],
+      "type": "object"
     },
     "global.Buffer": {
       "additionalProperties": {
@@ -2379,6 +5453,184 @@
         "hex"
       ],
       "type": "string"
+    },
+    "global.NodeJS.ErrnoException": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "errno": {
+          "type": "number"
+        },
+        "message": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "stack": {
+          "type": "string"
+        },
+        "syscall": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "message",
+        "name"
+      ],
+      "type": "object"
+    },
+    "internal.Duplex": {
+      "additionalProperties": false,
+      "description": "Duplex streams are streams that implement both the `Readable` and `Writable` interfaces.\n\nExamples of `Duplex` streams include:\n\n* `TCP sockets`\n* `zlib streams`\n* `crypto streams`",
+      "properties": {
+        "allowHalfOpen": {
+          "description": "If `false` then the stream will automatically end the writable side when the readable side ends. Set initially by the `allowHalfOpen` constructor option, which defaults to `true`.\n\nThis can be changed manually to change the half-open behavior of an existing `Duplex` stream instance, but must be changed before the `'end'` event is emitted.",
+          "type": "boolean"
+        },
+        "closed": {
+          "description": "Is `true` after `'close'` has been emitted.",
+          "type": "boolean"
+        },
+        "destroyed": {
+          "description": "Is `true` after `readable.destroy()` has been called.",
+          "type": "boolean"
+        },
+        "errored": {
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "message": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "stack": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "message"
+              ],
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Returns error if the stream has been destroyed with an error."
+        },
+        "readable": {
+          "description": "Is `true` if it is safe to call  {@link  read } , which means the stream has not been destroyed or emitted `'error'` or `'end'`.",
+          "type": "boolean"
+        },
+        "readableAborted": {
+          "description": "Returns whether the stream was destroyed or errored before emitting `'end'`.",
+          "type": "boolean"
+        },
+        "readableDidRead": {
+          "description": "Returns whether `'data'` has been emitted.",
+          "type": "boolean"
+        },
+        "readableEncoding": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/global.BufferEncoding"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Getter for the property `encoding` of a given `Readable` stream. The `encoding` property can be set using the  {@link  setEncoding }  method."
+        },
+        "readableEnded": {
+          "description": "Becomes `true` when [`'end'`](https://nodejs.org/docs/latest-v22.x/api/stream.html#event-end) event is emitted.",
+          "type": "boolean"
+        },
+        "readableFlowing": {
+          "description": "This property reflects the current state of a `Readable` stream as described in the [Three states](https://nodejs.org/docs/latest-v22.x/api/stream.html#three-states) section.",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "readableHighWaterMark": {
+          "description": "Returns the value of `highWaterMark` passed when creating this `Readable`.",
+          "type": "number"
+        },
+        "readableLength": {
+          "description": "This property contains the number of bytes (or objects) in the queue ready to be read. The value provides introspection data regarding the status of the `highWaterMark`.",
+          "type": "number"
+        },
+        "readableObjectMode": {
+          "description": "Getter for the property `objectMode` of a given `Readable` stream.",
+          "type": "boolean"
+        },
+        "writable": {
+          "description": "Is `true` if it is safe to call `writable.write()`, which means the stream has not been destroyed, errored, or ended.",
+          "type": "boolean"
+        },
+        "writableCorked": {
+          "description": "Number of times `writable.uncork()` needs to be called in order to fully uncork the stream.",
+          "type": "number"
+        },
+        "writableEnded": {
+          "description": "Is `true` after `writable.end()` has been called. This property does not indicate whether the data has been flushed, for this use `writable.writableFinished` instead.",
+          "type": "boolean"
+        },
+        "writableFinished": {
+          "description": "Is set to `true` immediately before the `'finish'` event is emitted.",
+          "type": "boolean"
+        },
+        "writableHighWaterMark": {
+          "description": "Return the value of `highWaterMark` passed when creating this `Writable`.",
+          "type": "number"
+        },
+        "writableLength": {
+          "description": "This property contains the number of bytes (or objects) in the queue ready to be written. The value provides introspection data regarding the status of the `highWaterMark`.",
+          "type": "number"
+        },
+        "writableNeedDrain": {
+          "description": "Is `true` if the stream's buffer has been full and stream will emit `'drain'`.",
+          "type": "boolean"
+        },
+        "writableObjectMode": {
+          "description": "Getter for the property `objectMode` of a given `Writable` stream.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "allowHalfOpen",
+        "closed",
+        "destroyed",
+        "errored",
+        "readable",
+        "readableAborted",
+        "readableDidRead",
+        "readableEncoding",
+        "readableEnded",
+        "readableFlowing",
+        "readableHighWaterMark",
+        "readableLength",
+        "readableObjectMode",
+        "writable",
+        "writableCorked",
+        "writableEnded",
+        "writableFinished",
+        "writableHighWaterMark",
+        "writableLength",
+        "writableNeedDrain",
+        "writableObjectMode"
+      ],
+      "type": "object"
     },
     "internal.Readable": {
       "additionalProperties": false,
