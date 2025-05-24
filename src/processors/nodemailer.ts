@@ -67,7 +67,6 @@ export class NodeMailerProcessor<
       text: email.text,
       html: email.html === false ? undefined : email.html,
       subject: email.subject,
-      //headers: email.headers.map(h => ({ key: h.key, value: h.line })),
       attachments: email.attachments.map(a => ({
         ...a,
         contentDisposition: a.contentDisposition === "inline" ? "inline" : "attachment",
