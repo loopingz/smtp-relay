@@ -10,6 +10,46 @@ import { NodeMailerProcessor } from "./nodemailer";
 @suite
 class NodeMailerProcessorTest {
   @test
+  async dkim() {
+    const dkimConfig = {
+      "example.com": {
+        keySelector: "testselector",
+        privateKey:
+          "-----BEGIN PRIVATE KEY-----\nMIIBVwIBADANBgkqhkiG9w0BAQEFAASCAT8wggE7AgEAAkEAuQ==\n-----END PRIVATE KEY-----"
+      }
+    };
+    const processor = new NodeMailerProcessor(
+      undefined,
+      {
+        type: "nodemailer",
+        nodemailer: {
+          host: "smtp.example.com",
+          port: 587,
+          secure: false,
+          auth: { user: "username", pass: "password" }
+        },
+        dkims: dkimConfig
+      },
+      new WorkerOutput()
+    );
+    const session: SmtpSession = getFakeSession();
+    session.envelope.mailFrom = { address: "sender@example.com", args: [] };
+    let sendMailArg: any;
+    sinon.stub(processor.transporter, "sendMail").callsFake(arg => {
+      sendMailArg = arg;
+      return Promise.resolve();
+    });
+    await processor.onMail(session);
+    assert.ok(sendMailArg.dkim, "DKIM option should be set");
+    assert.strictEqual(sendMailArg.dkim.domainName, "example.com");
+    assert.strictEqual(sendMailArg.dkim.keySelector, "testselector");
+    assert.strictEqual(sendMailArg.dkim.privateKey, dkimConfig["example.com"].privateKey);
+    session.envelope.mailFrom = { address: "sender@toto.com", args: [] };
+    await processor.onMail(session);
+    assert.ok(!sendMailArg.dkim, "DKIM option should not be set");
+  }
+
+  @test
   async mailer() {
     let nodemailer = new NodeMailerProcessor(
       undefined,

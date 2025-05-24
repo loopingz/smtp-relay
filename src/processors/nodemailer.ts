@@ -5,11 +5,22 @@ import AddressParser from "nodemailer/lib/addressparser/index";
 import { SmtpComponentConfig } from "../component";
 import { SmtpProcessor } from "../processor";
 import { mapAddressObjects, SmtpSession } from "../server";
+import { SingleKeyOptions } from "nodemailer/lib/dkim";
 
 export interface NodeMailerProcessorConfig extends SmtpComponentConfig {
   type: "nodemailer";
   override?: Mail.Options;
+  /**
+   * You can define the nodemailer transport options here
+   * @see https://nodemailer.com/usage/
+   */
   nodemailer?: string | any; //SMTPTransport | Omit<SMTPTransport.Options, "getSocket">;
+  /**
+   * Configuration DKIM per sender domain
+   */
+  dkims?: {
+    [domain: string]: Omit<SingleKeyOptions, "domainName">;
+  };
 }
 
 export class NodeMailerProcessor<
@@ -22,6 +33,7 @@ export class NodeMailerProcessor<
    * @override
    */
   init() {
+    this.config.dkims ??= {};
     this.transporter = nodemailer.createTransport(this.config.nodemailer);
   }
 
@@ -71,11 +83,29 @@ export class NodeMailerProcessor<
   }
 
   /**
+   * Get the DKIM configuration for the specific domain
+   * @param domain
+   * @returns
+   */
+  getDkimForDomain(domain: string): SingleKeyOptions | undefined {
+    for (const d in this.config.dkims) {
+      if (d === domain) {
+        return { ...this.config.dkims[d], domainName: d };
+      }
+    }
+  }
+
+  /**
    * Send with current NodeMailer transporter
    * @param session
    * @returns
    */
   async onMail(session: SmtpSession): Promise<void> {
-    return this.transporter.sendMail({ ...NodeMailerProcessor.transformEmail(session), ...this.config.override });
+    const domain = (<any>session.envelope.mailFrom.valueOf()).address.split("@").pop();
+    return this.transporter.sendMail({
+      ...NodeMailerProcessor.transformEmail(session),
+      ...this.config.override,
+      dkim: this.getDkimForDomain(domain)
+    });
   }
 }
