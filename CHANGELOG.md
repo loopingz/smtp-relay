@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.0.0](https://github.com/loopingz/smtp-relay/compare/v1.8.0...v2.0.0) (2025-05-25)
+
+
+### ⚠ BREAKING CHANGES
+
+* dropping node18 adding node24
+* add DKIM/SPF verification (close #96)
+
+### Features
+
+* add DKIM/SPF verification (close [#96](https://github.com/loopingz/smtp-relay/issues/96)) ([b0df67b](https://github.com/loopingz/smtp-relay/commit/b0df67ba9a01bd09375b3b8bccf30675270feb01))
+* add per domain dkim signature ([5b27727](https://github.com/loopingz/smtp-relay/commit/5b277273570bee820301e96d9db604c21b025bcd))
+* dropping node18 adding node24 ([8f0d08a](https://github.com/loopingz/smtp-relay/commit/8f0d08a80c067465d3ea966e5678c771a34749dc))
+
 ## [1.8.0](https://github.com/loopingz/smtp-relay/compare/v1.7.0...v1.8.0) (2025-02-05)
 
 
