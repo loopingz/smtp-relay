@@ -47,3 +47,5 @@ jobs:
 
       - name: CodeCov
         uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
