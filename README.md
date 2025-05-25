@@ -37,8 +37,8 @@ docker run -p 10025:10025 loopingz/smtp-relay:latest configs/aws-smtp-relay.json
 }
 ```
 
-[!NOTE]
-Replace `main` in the URL with a tag version to get the configuration format of a specific version.
+> [!NOTE]
+> Replace `main` in the URL with a tag version to get the configuration format of a specific version.
 
 **Run with a configuration file:**
 ```jsonc
@@ -173,82 +173,7 @@ Example Configuration:
     *   `maxResolveCount`: (number, optional) DNS lookup limit for SPF. RFC7208 requires this limit to be 10. Defaults to `10`.
     *   `maxVoidCount`: (number, optional) DNS lookup limit for SPF that produce an empty result. RFC7208 requires this limit to be 2. Defaults to `2`.
 *   `enforceDmarc`: (string, optional) Enforce a specific DMARC policy. If set, all `_dmarc` records are replaced with the policy specified here. For example, `"v=DMARC1; p=reject;"`.
-
-## DKIM Key Generation
-
-This utility command helps you generate a new DKIM (DomainKeys Identified Mail) RSA key pair. It will output the public key formatted as a DNS TXT record that you need to add to your domain's DNS settings, and the private key along with example configuration snippets for use with the Nodemailer processor in this SMTP relay.
-
-### Usage
-
-You can run the command using `npx` (even without installing the package globally):
-```bash
-npx smtp-relay dkim-generate <your-domain.com> <selector>
-```
-
--   `<your-domain.com>`: Replace this with the domain for which you are generating the DKIM key (e.g., `example.com`).
--   `<selector>`: Replace this with a DKIM selector. This is a name you choose, often `default` or a date (e.g., `jan2024`). It must be alphanumeric.
-
-For example:
-```bash
-npx smtp-relay dkim-generate example.com default
-```
-
-### Expected Output
-
-After running the command, you will see output similar to the following:
-
-1.  **DNS TXT Record:**
-    The command will print the DNS TXT record that you need to create for your domain. It will look something like this:
-    ```text
-    <selector>._domainkey.<your-domain.com>    v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA...your...public...key...data...AQAB
-    ```
-    -   Replace `<selector>` and `<your-domain.com>` with the actual values you used.
-    -   The long string starting with `p=` is your public key. Ensure you copy the entire value for your DNS record.
-
-2.  **Configuration Snippets for `smtp-relay`:**
-    The command will also provide JSON snippets that you can adapt for your `smtp-relay` configuration, specifically for use with the `nodemailer` processor. This allows `smtp-relay` to sign outgoing emails using the generated private key.
-
-    **Option 1: Single DKIM key configuration**
-    If you are configuring a single DKIM key directly in your `nodemailer` processor options:
-    ```json
-    {
-      "outputs": [
-        {
-          "type": "nodemailer",
-          "dkim": {
-            "domainName": "<your-domain.com>",
-            "keySelector": "<selector>",
-            "privateKey": "-----BEGIN PRIVATE KEY-----\n...your...private...key...data...\n-----END PRIVATE KEY-----\n"
-          }
-          // ... other nodemailer options
-        }
-      ]
-    }
-    ```
-
-    **Option 2: Multiple DKIM keys using the `dkims` object**
-    If you prefer to manage multiple DKIM keys, potentially for different domains:
-    ```json
-    {
-      "outputs": [
-        {
-          "type": "nodemailer",
-          "dkims": {
-            "<your-domain.com>": {
-              "keySelector": "<selector>",
-              "privateKey": "-----BEGIN PRIVATE KEY-----\n...your...private...key...data...\n-----END PRIVATE KEY-----\n"
-            }
-            // ... potentially other domains
-          }
-          // ... other nodemailer options
-        }
-      ]
-    }
-    ```
-    **Important:**
-    - The `privateKey` value will be the actual multi-line PEM formatted private key. Ensure it is correctly formatted in your JSON configuration (e.g., with `\n` for newlines if storing as a single string, or loaded from a file/environment variable in production). The example output from the tool will show the private key directly.
-    - Store your private key securely. Do not commit it directly into your version control if your configuration file is tracked.
-
+   
 ### Processors
 
 These components receive the email sent after it was accepted by the filters.
@@ -309,8 +234,8 @@ The `FILE` type has a size limit defined and will increment a number at the end 
 A `format` can be defined too.
 
 By default, the loggers are defined as a single `CONSOLE` logger.
-[!NOTE]
-You can disable logging completely by adding a `loggers: []` property.
+> [!NOTE]
+> You can disable logging completely by adding a `loggers: []` property.
 
 ## CloudEvent
 
@@ -473,8 +398,8 @@ The password and username are passed either in the configuration with the fields
 The password is prefixed by `${hashAlgorithm}:` where `hashAlgorithm` is one of `plain`, `sha256`, `sha512`, or `md5`. You can get the full list of hash algorithms supported by Node with this command:
 `node -e "console.log(require('crypto').getHashes())"`
 
-[!WARNING]
-`plain` can be used to not hash the password, but it is not recommended for security reasons.
+> [!WARNING]
+> `plain` can be used to not hash the password, but it is not recommended for security reasons.
 
 A `salt` parameter can be added in the configuration with the `salt` field, or via the environment variable `SMTP_PASSWORD_SALT`.
 
@@ -519,8 +444,8 @@ For manual testing, you will need to pass the username and password to the SMTP 
 base64 <<< "password"
 ```
 
-[!IMPORTANT]
-Make sure to use a Base64 encoder that encodes with Destination character set UTF-8 and Destination new line separator LF (Unix). [This online one](https://www.base64encode.org/) does that. The macOS command-line `base64` tool might behave differently.
+> [!IMPORTANT]
+> Make sure to use a Base64 encoder that encodes with Destination character set UTF-8 and Destination new line separator LF (Unix). [This online one](https://www.base64encode.org/) does that. The macOS command-line `base64` tool might behave differently.
 
 **Example Schema for AWS SES with Basic Auth in K8s:**
 ```json
@@ -567,5 +492,82 @@ Make sure to use a Base64 encoder that encodes with Destination character set UT
 }
 ```
 
-[!NOTE]
-Change your logger level to `DEBUG` for help troubleshooting.
+> [!NOTE]
+> Change your logger level to `DEBUG` for help troubleshooting.
+
+
+## DKIM Key Generation
+
+This utility command helps you generate a new DKIM (DomainKeys Identified Mail) RSA key pair. It will output the public key formatted as a DNS TXT record that you need to add to your domain's DNS settings, and the private key along with example configuration snippets for use with the Nodemailer processor in this SMTP relay.
+
+### Usage
+
+You can run the command using `npx` (even without installing the package globally):
+```bash
+npx smtp-relay dkim-generate <your-domain.com> <selector>
+```
+
+-   `<your-domain.com>`: Replace this with the domain for which you are generating the DKIM key (e.g., `example.com`).
+-   `<selector>`: Replace this with a DKIM selector. This is a name you choose, often `default` or a date (e.g., `jan2024`). It must be alphanumeric.
+
+For example:
+```bash
+npx smtp-relay dkim-generate example.com default
+```
+
+### Expected Output
+
+After running the command, you will see output similar to the following:
+
+1.  **DNS TXT Record:**
+    The command will print the DNS TXT record that you need to create for your domain. It will look something like this:
+    ```text
+    <selector>._domainkey.<your-domain.com>    v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA...your...public...key...data...AQAB
+    ```
+    -   Replace `<selector>` and `<your-domain.com>` with the actual values you used.
+    -   The long string starting with `p=` is your public key. Ensure you copy the entire value for your DNS record.
+
+2.  **Configuration Snippets for `smtp-relay`:**
+    The command will also provide JSON snippets that you can adapt for your `smtp-relay` configuration, specifically for use with the `nodemailer` processor. This allows `smtp-relay` to sign outgoing emails using the generated private key.
+
+    **Option 1: Single DKIM key configuration**
+    If you are configuring a single DKIM key directly in your `nodemailer` processor options:
+    ```json
+    {
+      "outputs": [
+        {
+          "type": "nodemailer",
+          "dkim": {
+            "domainName": "<your-domain.com>",
+            "keySelector": "<selector>",
+            "privateKey": "-----BEGIN PRIVATE KEY-----\n...your...private...key...data...\n-----END PRIVATE KEY-----\n"
+          }
+          // ... other nodemailer options
+        }
+      ]
+    }
+    ```
+
+    **Option 2: Multiple DKIM keys using the `dkims` object**
+    If you prefer to manage multiple DKIM keys, potentially for different domains:
+    ```json
+    {
+      "outputs": [
+        {
+          "type": "nodemailer",
+          "dkims": {
+            "<your-domain.com>": {
+              "keySelector": "<selector>",
+              "privateKey": "-----BEGIN PRIVATE KEY-----\n...your...private...key...data...\n-----END PRIVATE KEY-----\n"
+            }
+            // ... potentially other domains
+          }
+          // ... other nodemailer options
+        }
+      ]
+    }
+    ```
+    **Important:**
+    - The `privateKey` value will be the actual multi-line PEM formatted private key. Ensure it is correctly formatted in your JSON configuration (e.g., with `\n` for newlines if storing as a single string, or loaded from a file/environment variable in production). The example output from the tool will show the private key directly.
+    - Store your private key securely. Do not commit it directly into your version control if your configuration file is tracked.
+
