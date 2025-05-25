@@ -21,7 +21,8 @@ The goal is to have a dynamic SMTP server that can either be:
 - Used to relay SMTP protocol to an SES API call (original goal of `aws-smtp-relay`).
 - Used to simulate some Incoming capabilities of AWS SES, like `mail2s3` or `mail2sqs`, and similar `mail2gcpstorage` and `mail2gcppubsub`.
 
-## Quick Start
+<details>
+<summary><h2>Quick Start</h2></summary>
 
 ### Replace `aws-smtp-relay`
 
@@ -121,8 +122,103 @@ docker run -p 10025:10025 -v `pwd`/emails:/smtp-relay/received_emails loopingz/s
 # With auth
 docker run -e SMTP_USERNAME=test -e SMTP_PASSWORD=plain:test -p 10025:10025 -v `pwd`/emails:/smtp-relay/received-emails loopingz/smtp-relay:latest configs/fake-smtp-with-auth.jsonc
 ```
+</details>
 
-## Concepts
+<details>
+<summary><h2>Concepts</h2></summary>
+
+The SMTP server is subdivided into the following components:
+- Filters
+- Core
+- Processors
+- Flows
+
+<details>
+<summary><h3>Filters</h3></summary>
+
+These components decide to accept or refuse an email. At each SMTP command step, they can make a decision to refuse or accept an email, or not make a decision (`boolean|undefined`).
+
+By default, the following filters exist:
+- `whitelist`: allow emails based on regexp or exact values.
+- `http-auth`: proxy the authentication to an HTTP endpoint.
+- `http-filter`: proxy the decision on the email to an HTTP endpoint.
+- `static-auth`: statically defined user/password for authentication.
+- `mail-auth`: validates incoming emails using SPF, DKIM, DMARC, ARC, and BIMI.
+</details>
+
+<details>
+<summary><h4><code>mail-auth</code></h4></summary>
+
+The `mail-auth` filter validates incoming emails using a suite of authentication mechanisms: SPF (Sender Policy Framework), DKIM (DomainKeys Identified Mail), DMARC (Domain-based Message Authentication, Reporting & Conformance), ARC (Authenticated Received Chain), and BIMI (Brand Indicators for Message Identification). It helps in verifying the authenticity and integrity of emails, reducing spam and phishing attempts.
+
+Example Configuration:
+
+```json
+{
+  "type": "mail-auth",
+  "mailauth": {
+    "minBitLength": 1024,
+    "disableArc": false,
+    "disableDmarc": false,
+    "disableBimi": true,
+    "maxResolveCount": 10,
+    "maxVoidCount": 2
+  },
+  "enforceDmarc": "v=DMARC1; p=reject; rua=mailto:dmarc-reports@example.com"
+}
+```
+
+**Configuration Options:**
+
+*   `type`: (string) Must be `"mail-auth"`.
+*   `mailauth`: (object, optional) Configuration options for the underlying `mailauth` library.
+    *   `minBitLength`: (number, optional) The minimum allowed bits for RSA public keys (defaults to 1024). If a DKIM or ARC key has fewer bits, then validation is considered as failed.
+    *   `disableArc`: (boolean, optional) Disable ARC checks. Defaults to `false`.
+    *   `disableDmarc`: (boolean, optional) Disable DMARC checks. Defaults to `false`.
+    *   `disableBimi`: (boolean, optional) Disable BIMI checks. Defaults to `false`.
+    *   `maxResolveCount`: (number, optional) DNS lookup limit for SPF. RFC7208 requires this limit to be 10. Defaults to `10`.
+    *   `maxVoidCount`: (number, optional) DNS lookup limit for SPF that produce an empty result. RFC7208 requires this limit to be 2. Defaults to `2`.
+*   `enforceDmarc`: (string, optional) Enforce a specific DMARC policy. If set, all `_dmarc` records are replaced with the policy specified here. For example, `"v=DMARC1; p=reject;"`.
+</details>
+   
+<details>
+<summary><h3>Processors</h3></summary>
+
+These components receive the email sent after it was accepted by the filters.
+
+There are 4 types:
+- `aws`
+- `gcp`
+- `file`
+- `mailer`
+</details>
+
+<details>
+<summary><h3>Flows</h3></summary>
+
+A flow is defined within the configuration. It defines the filters and the outputs to apply if the message matches the filters. You can have as many flows as you desire within the SMTP server.
+</details>
+
+<details>
+<summary><h3>Core</h3></summary>
+
+The Core manages the coordination of different components and is in charge of capturing the mail stream.
+</details>
+
+### Common variables available for replacements
+
+- `_iso8601_`: date and time in `YYYYmmddHHiiss` format
+- `_timestamp_`: UNIX timestamp
+- `_id_`: Session id
+
+The following variables are not always available but should be within processors:
+- `_from_`: Email of the sender
+- `_messageId_`: Message ID
+- `_subject_`: Subject of the email
+- `_to_`: List of recipients, comma-separated
+</details>
+
+## Logs
 
 The SMTP server is subdivided into the following components:
 - Filters
@@ -212,6 +308,9 @@ We currently support two types:
 - `"CONSOLE"`
 - `"FILE"`
 
+<details>
+<summary>Configuration Example</summary>
+
 ```json
 "loggers": [
   {
@@ -226,6 +325,7 @@ We currently support two types:
   }
 ]
 ```
+</details>
 
 From the library `@webda/workout`, the log level, if not defined, falls back to the `LOG_LEVEL` environment variable and then falls back again to `INFO`.
 
@@ -240,6 +340,9 @@ By default, the loggers are defined as a single `CONSOLE` logger.
 ## CloudEvent
 
 The CloudEvent representation of an email is:
+
+<details>
+<summary>CloudEvent Data Structure</summary>
 
 ```typescript
 /**
@@ -274,6 +377,7 @@ export interface SmtpCloudEvent {
   };
 }
 ```
+</details>
 
 ## HTTP Auth
 
@@ -283,6 +387,9 @@ Use the `http-auth` filter. It supports the following methods for passing creden
 -   **BASIC_AUTH**: Sends an `Authorization` header with Basic Auth (see [MDN Web Docs](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization)).
 -   **FORM_URLENCODED**: Sends a request to the URL with `x-www-form-urlencoded` data containing the username and password.
 -   **JSON**: Sends a JSON body to the URL with the username and password.
+
+<details>
+<summary>Configuration Interface & Sample</summary>
 
 **Configuration Interface:**
 ```typescript
@@ -358,6 +465,7 @@ interface HttpAuthConfiguration {
   "credentialsMethod": "BASIC_AUTH"
 }
 ```
+</details>
 
 ## HTTP Filter
 
@@ -368,6 +476,9 @@ The `http-filter` sends the CloudEvent related to the email to an HTTP endpoint 
 See the `tests/http-filter-with-auth.json` and `test/http-filter.json` configuration examples.
 
 It can also be configured to sign requests with HMAC.
+
+<details>
+<summary>HttpFilterConfig Interface</summary>
 
 ```typescript
 export interface HttpFilterConfig extends HttpConfig {
@@ -388,6 +499,7 @@ export interface HttpFilterConfig extends HttpConfig {
   allowAnyUser?: boolean;
 }
 ```
+</details>
 
 ## Static Basic Auth
 
@@ -403,14 +515,17 @@ The password is prefixed by `${hashAlgorithm}:` where `hashAlgorithm` is one of 
 
 A `salt` parameter can be added in the configuration with the `salt` field, or via the environment variable `SMTP_PASSWORD_SALT`.
 
-### Encrypt your password to use
+<details>
+<summary><h3>Encrypt your password to use</h3></summary>
 
 You can encrypt the password to use with this command:
 ```bash
 HASH="sha256" PASSWORD="TEST" node -e 'console.log(`${process.env.HASH}:${require("crypto").createHash(process.env.HASH).update(process.env.PASSWORD).digest("hex")}`)'
 ```
+</details>
 
-### Raw testing with OpenSSL and pure SMTP protocol
+<details>
+<summary><h3>Raw testing with OpenSSL and pure SMTP protocol</h3></summary>
 
 For manual testing, you will need to pass the username and password to the SMTP relay, Base64 encoded. If you use the SMTP `AUTH LOGIN` method, you will encode and pass the username and password separately.
 
@@ -446,6 +561,7 @@ base64 <<< "password"
 
 > [!IMPORTANT]
 > Make sure to use a Base64 encoder that encodes with Destination character set UTF-8 and Destination new line separator LF (Unix). [This online one](https://www.base64encode.org/) does that. The macOS command-line `base64` tool might behave differently.
+</details>
 
 **Example Schema for AWS SES with Basic Auth in K8s:**
 ```json
@@ -500,7 +616,8 @@ base64 <<< "password"
 
 This utility command helps you generate a new DKIM (DomainKeys Identified Mail) RSA key pair. It will output the public key formatted as a DNS TXT record that you need to add to your domain's DNS settings, and the private key along with example configuration snippets for use with the Nodemailer processor in this SMTP relay.
 
-### Usage
+<details>
+<summary><h3>Usage</h3></summary>
 
 You can run the command using `npx` (even without installing the package globally):
 ```bash
@@ -514,8 +631,10 @@ For example:
 ```bash
 npx smtp-relay dkim-generate example.com default
 ```
+</details>
 
-### Expected Output
+<details>
+<summary><h3>Expected Output</h3></summary>
 
 After running the command, you will see output similar to the following:
 
@@ -570,4 +689,5 @@ After running the command, you will see output similar to the following:
     **Important:**
     - The `privateKey` value will be the actual multi-line PEM formatted private key. Ensure it is correctly formatted in your JSON configuration (e.g., with `\n` for newlines if storing as a single string, or loaded from a file/environment variable in production). The example output from the tool will show the private key directly.
     - Store your private key securely. Do not commit it directly into your version control if your configuration file is tracked.
+</details>
 
