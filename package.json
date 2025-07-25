@@ -18,6 +18,12 @@
     "relay",
     "ses"
   ],
+  "resolutions": {
+    "**/whatwg-url": "14.2.0"
+  },
+  "overrides": {
+    "whatwg-url": "^14.2.0"
+  },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.235.0",
     "@aws-sdk/client-ses": "^3.235.0",
