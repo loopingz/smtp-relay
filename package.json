@@ -1,6 +1,6 @@
 {
   "name": "smtp-relay",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "main": "lib/index.js",
   "bin": "lib/index.js",
   "license": "MIT",
@@ -19,7 +19,8 @@
     "ses"
   ],
   "resolutions": {
-    "**/whatwg-url": "14.2.0"
+    "semver": ">=7.5.2",
+    "fast-xml-parser": ">=4.4.1"
   },
   "overrides": {
     "whatwg-url": "^14.2.0"
@@ -96,10 +97,6 @@
     "ts-json-schema-generator": "^2.4.0",
     "ts-node": "^10.4.0",
     "typescript": "^5.2.2"
-  },
-  "resolutions": {
-    "semver": ">=7.5.2",
-    "fast-xml-parser": ">=4.4.1"
   },
   "auto": {
     "plugins": [

@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.0](https://github.com/loopingz/smtp-relay/compare/v2.0.0...v2.1.0) (2025-07-25)
+
+
+### Features
+
+* move away from yarn and override whatwg-url version ([1dbbf86](https://github.com/loopingz/smtp-relay/commit/1dbbf8652fba05e62424c2b2e47935326be38773))
+
 ## [2.0.0](https://github.com/loopingz/smtp-relay/compare/v1.8.0...v2.0.0) (2025-05-25)
 
 
