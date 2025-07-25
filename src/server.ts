@@ -287,6 +287,7 @@ export class SmtpServer {
       this.logger.log("ERROR", err.message);
     });
     this.server.listen(this.config.port);
+    this.logger.log("INFO", `smtp-relay listening on ${this.config.port}`);
   }
 
   /**
