@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.1](https://github.com/loopingz/smtp-relay/compare/v2.1.0...v2.1.1) (2025-09-20)
+
+
+### Bug Fixes
+
+* **deps:** bump axios from 1.11.0 to 1.12.0 ([#117](https://github.com/loopingz/smtp-relay/issues/117)) ([714f916](https://github.com/loopingz/smtp-relay/commit/714f916539f0e72be9f0c04d3bbe00a3122000fa))
+
 ## [2.1.0](https://github.com/loopingz/smtp-relay/compare/v2.0.0...v2.1.0) (2025-07-25)
 
 
