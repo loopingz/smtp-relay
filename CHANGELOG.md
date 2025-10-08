@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.1](https://github.com/loopingz/smtp-relay/compare/v2.2.0...v2.2.1) (2025-10-08)
+
+
+### Bug Fixes
+
+* logger on cloud processor ([486bd41](https://github.com/loopingz/smtp-relay/commit/486bd4181ecdfb7237a1cb47ad9463d6440a3b3b))
+
 ## [2.2.0](https://github.com/loopingz/smtp-relay/compare/v2.1.2...v2.2.0) (2025-10-08)
 
 
