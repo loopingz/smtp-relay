@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.2.0](https://github.com/loopingz/smtp-relay/compare/v2.1.2...v2.2.0) (2025-10-08)
+
+
+### Features
+
+* allow file:// parameters for TlsOptions and define TlsOptions ([733611b](https://github.com/loopingz/smtp-relay/commit/733611b80d8583c76f9ee7e59540707d251c089c))
+
+
+### Bug Fixes
+
+* update ci ([0c7f20f](https://github.com/loopingz/smtp-relay/commit/0c7f20f4abf19e80c28042fae41b6ba56a8e05d0))
+
 ## [2.1.2](https://github.com/loopingz/smtp-relay/compare/v2.1.1...v2.1.2) (2025-10-08)
 
 
