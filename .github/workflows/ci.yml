@@ -40,10 +40,10 @@ jobs:
           registry-url: "https://registry.npmjs.org"
 
       - name: Install dependencies
-        run: yarn --frozen-lockfile --ignore-engines
+        run: npm install
 
       - name: Test project
-        run: yarn run test
+        run: npm test
 
       - name: CodeCov
         uses: codecov/codecov-action@v5

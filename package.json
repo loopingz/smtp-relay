@@ -20,7 +20,8 @@
   ],
   "resolutions": {
     "semver": ">=7.5.2",
-    "fast-xml-parser": ">=4.4.1"
+    "fast-xml-parser": ">=4.4.1",
+    "nodemailer": ">=7.0.7"
   },
   "overrides": {
     "whatwg-url": "^14.2.0"
