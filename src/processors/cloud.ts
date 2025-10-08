@@ -85,22 +85,23 @@ export abstract class CloudProcessor<T extends CloudProcessorConfig = CloudProce
    * @param session
    */
   async store(session: SmtpSession) {
+    const logger = (this.logger ?? console);
     if (this.config.storage.type === "attachments") {
       if (session.email.attachments.length === 0) {
-        this.logger.log("INFO", `Output[${this.name}] No attachment ignoring ${session.email.messageId}`);
+        logger.log("INFO", `Output[${this.name}] No attachment ignoring ${session.email.messageId}`);
       }
       for (const i in session.email.attachments) {
         const attachment = session.email.attachments[i];
         const destFileName = SmtpServer.replaceVariables(this.config.storage.path, session, {
           attachment: attachment.filename || `attachment_${i}`
         });
-        this.logger.log("INFO", `Output[${this.name}] Storing attachment ${attachment.filename} to ${destFileName}`);
+        logger.log("INFO", `Output[${this.name}] Storing attachment ${attachment.filename} to ${destFileName}`);
         await this.storeData(destFileName, attachment.content);
       }
     } else {
       const destFileName = SmtpServer.replaceVariables(this.config.storage.path, session);
       if (this.config.storage.type === "raw") {
-        this.logger.log("INFO", `Output[${this.name}] Storing ${this.config.type} to ${destFileName}`);
+        logger.log("INFO", `Output[${this.name}] Storing ${this.config.type} to ${destFileName}`);
         let file = session.emailPath;
         if (this.config.storage.addRawHeaders) {
           // We might want to prepend
@@ -129,10 +130,10 @@ export abstract class CloudProcessor<T extends CloudProcessorConfig = CloudProce
           data = session.email.html;
         }
         if (data) {
-          this.logger.log("INFO", `Output[${this.name}] Storing ${this.config.storage.type} to ${destFileName}`);
+          logger.log("INFO", `Output[${this.name}] Storing ${this.config.storage.type} to ${destFileName}`);
           await this.storeData(destFileName, data);
         } else {
-          this.logger.log(
+          logger.log(
             "DEBUG",
             `Output[${this.name}] No data(${this.config.storage.type}) ignoring ${session.email.messageId}`
           );
