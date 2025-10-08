@@ -16,6 +16,7 @@ import stripJsonComments from "strip-json-comments";
 import { parse as YAMLParse } from "yaml";
 import { SmtpFlow, SmtpFlowConfig } from "./flow";
 import { HeadersTransform, HeadersTransformConfig } from "./headers_transformer";
+import { TlsOptions } from "tls";
 
 export type SmtpCallback = (err?, result?) => void;
 export type SmtpNext = () => void;
@@ -33,7 +34,6 @@ export interface FileLoggerOptions extends LoggerOptions {
   filepath: string;
   sizeLimit: number;
 }
-
 export interface SmtpConfig {
   /**
    * @pattern https:\/\/raw\.githubusercontent\.com\/loopingz\/smtp-relay\/(main|v\d+\.\d+\.\d+)\/config\.schema\.json
@@ -101,7 +101,7 @@ export interface SmtpConfig {
     | "disableReverseLookup"
   > & {
     loggers?: (ConsoleLoggerOptions | FileLoggerOptions)[];
-  };
+  } & TlsOptions;
   /**
    * @default 10025
    */
@@ -213,6 +213,12 @@ export class SmtpServer {
       throw new Error(`Configuration format not handled ${configFile}`);
     }
 
+    // Allow file:// for TLS options
+    ["key", "ca", "cert", "pfx"].forEach(attr => {
+      if (this.config.options && typeof this.config.options[attr] === "string" && this.config.options[attr]?.startsWith("file://")) {
+        this.config.options[attr] = fs.readFileSync(this.config.options[attr].replace("file://", "")).toString();
+      }
+    });
     this.config.port ??= 10025;
     this.config.bind ??= "localhost";
     this.config.cachePath ??= ".email_${iso8601}.eml";

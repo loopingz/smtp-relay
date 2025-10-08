@@ -103,6 +103,23 @@
       ],
       "type": "object"
     },
+    "BlockList": {
+      "additionalProperties": false,
+      "description": "The `BlockList` object can be used with some network APIs to specify rules for disabling inbound or outbound access to specific IP addresses, IP ranges, or IP subnets.",
+      "properties": {
+        "rules": {
+          "description": "The list of rules added to the blocklist.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "rules"
+      ],
+      "type": "object"
+    },
     "BrowserRuntimeStreamingBlobPayloadInputTypes": {
       "anyOf": [
         {
@@ -1158,12 +1175,12 @@
           "description": "The record family. Must be `4`, `6`, or `0`. For backward compatibility reasons, `'IPv4'` and `'IPv6'` are interpreted as `4` and `6` respectively. The value 0 indicates that either an IPv4 or IPv6 address is returned. If the value `0` is used with `{ all: true } (see below)`, both IPv4 and IPv6 addresses are returned."
         },
         "hints": {
-          "description": "One or more [supported `getaddrinfo`](https://nodejs.org/docs/latest-v22.x/api/dns.html#supported-getaddrinfo-flags) flags. Multiple flags may be passed by bitwise `OR`ing their values.",
+          "description": "One or more [supported `getaddrinfo`](https://nodejs.org/docs/latest-v24.x/api/dns.html#supported-getaddrinfo-flags) flags. Multiple flags may be passed by bitwise `OR`ing their values.",
           "type": "number"
         },
         "order": {
           "default": "`verbatim` (addresses are not reordered)",
-          "description": "When `verbatim`, the resolved addresses are return unsorted. When `ipv4first`, the resolved addresses are sorted by placing IPv4 addresses before IPv6 addresses. When `ipv6first`, the resolved addresses are sorted by placing IPv6 addresses before IPv4 addresses. Default value is configurable using  {@link  setDefaultResultOrder }  or [`--dns-result-order`](https://nodejs.org/docs/latest-v22.x/api/cli.html#--dns-result-orderorder).",
+          "description": "When `verbatim`, the resolved addresses are return unsorted. When `ipv4first`, the resolved addresses are sorted by placing IPv4 addresses before IPv6 addresses. When `ipv6first`, the resolved addresses are sorted by placing IPv6 addresses before IPv4 addresses. Default value is configurable using  {@link  setDefaultResultOrder }  or [`--dns-result-order`](https://nodejs.org/docs/latest-v24.x/api/cli.html#--dns-result-orderorder).",
           "enum": [
             "ipv4first",
             "ipv6first",
@@ -3068,13 +3085,13 @@
       "properties": {
         "ACL": {
           "$ref": "#/definitions/ObjectCannedACL",
-          "description": "<p>The canned ACL to apply to the object. For more information, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html#CannedACL\">Canned             ACL</a> in the <i>Amazon S3 User Guide</i>.</p>          <p>When adding a new object, you can use headers to grant ACL-based permissions to          individual Amazon Web Services accounts or to predefined groups defined by Amazon S3. These permissions are          then added to the ACL on the object. By default, all objects are private. Only the owner          has full access control. For more information, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html\">Access Control List (ACL) Overview</a>          and <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-using-rest-api.html\">Managing             ACLs Using the REST API</a> in the <i>Amazon S3 User Guide</i>.</p>          <p>If the bucket that you're uploading objects to uses the bucket owner enforced setting          for S3 Object Ownership, ACLs are disabled and no longer affect permissions. Buckets that          use this setting only accept PUT requests that don't specify an ACL or PUT requests that          specify bucket owner full control ACLs, such as the <code>bucket-owner-full-control</code>          canned ACL or an equivalent form of this ACL expressed in the XML format. PUT requests that          contain other ACLs (for example, custom grants to certain Amazon Web Services accounts) fail and return a             <code>400</code> error with the error code <code>AccessControlListNotSupported</code>.          For more information, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/about-object-ownership.html\"> Controlling ownership of             objects and disabling ACLs</a> in the <i>Amazon S3 User Guide</i>.</p>          <note>             <ul>                <li>                   <p>This functionality is not supported for directory buckets.</p>                </li>                <li>                   <p>This functionality is not supported for Amazon S3 on Outposts.</p>                </li>             </ul>          </note>"
+          "description": "<p>The canned ACL to apply to the object. For more information, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html#CannedACL\">Canned ACL</a> in the         <i>Amazon S3 User Guide</i>.</p>          <p>When adding a new object, you can use headers to grant ACL-based permissions to individual       Amazon Web Services accounts or to predefined groups defined by Amazon S3. These permissions are then added to the ACL on       the object. By default, all objects are private. Only the owner has full access control. For more       information, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html\">Access Control         List (ACL) Overview</a> and <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-using-rest-api.html\">Managing ACLs Using the REST API</a> in the         <i>Amazon S3 User Guide</i>.</p>          <p>If the bucket that you're uploading objects to uses the bucket owner enforced setting for S3 Object       Ownership, ACLs are disabled and no longer affect permissions. Buckets that use this setting only accept       PUT requests that don't specify an ACL or PUT requests that specify bucket owner full control ACLs, such       as the <code>bucket-owner-full-control</code> canned ACL or an equivalent form of this ACL expressed in       the XML format. PUT requests that contain other ACLs (for example, custom grants to certain       Amazon Web Services accounts) fail and return a <code>400</code> error with the error code         <code>AccessControlListNotSupported</code>. For more information, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/about-object-ownership.html\"> Controlling ownership of objects and         disabling ACLs</a> in the <i>Amazon S3 User Guide</i>.</p>          <note>             <ul>                <li>                   <p>This functionality is not supported for directory buckets.</p>                </li>                <li>                   <p>This functionality is not supported for Amazon S3 on Outposts.</p>                </li>             </ul>          </note>"
         },
         "Body": {
           "$ref": "#/definitions/StreamingBlobPayloadInputTypes"
         },
         "Bucket": {
-          "description": "<p>The bucket name to which the PUT action was initiated. </p>          <p>             <b>Directory buckets</b> -          When you use this operation with a directory bucket, you must use virtual-hosted-style requests in the format <code>                <i>Bucket-name</i>.s3express-<i>zone-id</i>.<i>region-code</i>.amazonaws.com</code>. Path-style requests are not supported.  Directory bucket names must be unique in the chosen Zone (Availability Zone or Local Zone). Bucket names must follow the format <code>                <i>bucket-base-name</i>--<i>zone-id</i>--x-s3</code> (for example, <code>                <i>amzn-s3-demo-bucket</i>--<i>usw2-az1</i>--x-s3</code>). For information about bucket naming          restrictions, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/directory-bucket-naming-rules.html\">Directory bucket naming             rules</a> in the <i>Amazon S3 User Guide</i>.</p>          <p>             <b>Access points</b> - When you use this action with an access point for general purpose buckets, you must provide the alias of the access point in place of the bucket name or specify the access point ARN. When you use this action with an access point for directory buckets, you must provide the access point name in place of the bucket name. When using the access point ARN, you must direct requests to the access point hostname. The access point hostname takes the form <i>AccessPointName</i>-<i>AccountId</i>.s3-accesspoint.<i>Region</i>.amazonaws.com. When using this action with an access point through the Amazon Web Services SDKs, you provide the access point ARN in place of the bucket name. For more information about access point ARNs, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-access-points.html\">Using access points</a> in the <i>Amazon S3 User Guide</i>.</p>          <note>             <p>Object Lambda access points are not supported by directory buckets.</p>          </note>          <p>             <b>S3 on Outposts</b> - When you use this action with S3 on Outposts, you must direct requests to the S3 on Outposts hostname. The S3 on Outposts hostname takes the                      form <code>                <i>AccessPointName</i>-<i>AccountId</i>.<i>outpostID</i>.s3-outposts.<i>Region</i>.amazonaws.com</code>. When you use this action with S3 on Outposts, the destination bucket must be the Outposts access point ARN or the access point alias. For more information about S3 on Outposts, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/S3onOutposts.html\">What is S3 on Outposts?</a> in the <i>Amazon S3 User Guide</i>.</p> <p>Note: To supply the Multi-region Access Point (MRAP) to Bucket, you need to install the \"@aws-sdk/signature-v4-crt\" package to your project dependencies. For more information, please go to https://github.com/aws/aws-sdk-js-v3#known-issues</p>",
+          "description": "<p>The bucket name to which the PUT action was initiated. </p>          <p>             <b>Directory buckets</b> - When you use this operation with a directory bucket, you must use virtual-hosted-style requests in the format <code>                <i>Bucket-name</i>.s3express-<i>zone-id</i>.<i>region-code</i>.amazonaws.com</code>. Path-style requests are not supported.  Directory bucket names must be unique in the chosen Zone (Availability Zone or Local Zone). Bucket names must follow the format <code>                <i>bucket-base-name</i>--<i>zone-id</i>--x-s3</code> (for example, <code>                <i>amzn-s3-demo-bucket</i>--<i>usw2-az1</i>--x-s3</code>). For information about bucket naming          restrictions, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/directory-bucket-naming-rules.html\">Directory bucket naming             rules</a> in the <i>Amazon S3 User Guide</i>.</p>          <p>             <b>Access points</b> - When you use this action with an access point for general purpose buckets, you must provide the alias of the access point in place of the bucket name or specify the access point ARN. When you use this action with an access point for directory buckets, you must provide the access point name in place of the bucket name. When using the access point ARN, you must direct requests to the access point hostname. The access point hostname takes the form <i>AccessPointName</i>-<i>AccountId</i>.s3-accesspoint.<i>Region</i>.amazonaws.com. When using this action with an access point through the Amazon Web Services SDKs, you provide the access point ARN in place of the bucket name. For more information about access point ARNs, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-access-points.html\">Using access points</a> in the <i>Amazon S3 User Guide</i>.</p>          <note>             <p>Object Lambda access points are not supported by directory buckets.</p>          </note>          <p>             <b>S3 on Outposts</b> - When you use this action with S3 on Outposts, you must direct requests to the S3 on Outposts hostname. The S3 on Outposts hostname takes the                      form <code>                <i>AccessPointName</i>-<i>AccountId</i>.<i>outpostID</i>.s3-outposts.<i>Region</i>.amazonaws.com</code>. When you use this action with S3 on Outposts, the destination bucket must be the Outposts access point ARN or the access point alias. For more information about S3 on Outposts, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/S3onOutposts.html\">What is S3 on Outposts?</a> in the <i>Amazon S3 User Guide</i>.</p> <p>Note: To supply the Multi-region Access Point (MRAP) to Bucket, you need to install the \"@aws-sdk/signature-v4-crt\" package to your project dependencies. For more information, please go to https://github.com/aws/aws-sdk-js-v3#known-issues</p>",
           "type": "string"
         },
         "BucketKeyEnabled": {
@@ -3082,12 +3099,12 @@
           "type": "boolean"
         },
         "CacheControl": {
-          "description": "<p>Can be used to specify caching behavior along the request/reply chain. For more          information, see <a href=\"http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9\">http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9</a>.</p>",
+          "description": "<p>Can be used to specify caching behavior along the request/reply chain. For more information, see         <a href=\"http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9\">http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9</a>.</p>",
           "type": "string"
         },
         "ChecksumAlgorithm": {
           "$ref": "#/definitions/ChecksumAlgorithm",
-          "description": "<p>Indicates the algorithm used to create the checksum for the object when you use the SDK. This header will not provide any     additional functionality if you don't use the SDK. When you send this header, there must be a corresponding <code>x-amz-checksum-<i>algorithm</i>             </code> or     <code>x-amz-trailer</code> header sent. Otherwise, Amazon S3 fails the request with the HTTP status code <code>400 Bad Request</code>.</p>          <p>For the <code>x-amz-checksum-<i>algorithm</i>             </code> header, replace <code>                <i>algorithm</i>             </code> with the supported algorithm from the following list: </p>          <ul>             <li>                <p>                   <code>CRC32</code>                </p>             </li>             <li>                <p>                   <code>CRC32C</code>                </p>             </li>             <li>                <p>                   <code>CRC64NVME</code>                </p>             </li>             <li>                <p>                   <code>SHA1</code>                </p>             </li>             <li>                <p>                   <code>SHA256</code>                </p>             </li>          </ul>          <p>For more     information, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/checking-object-integrity.html\">Checking object integrity</a> in     the <i>Amazon S3 User Guide</i>.</p>          <p>If the individual checksum value you provide through <code>x-amz-checksum-<i>algorithm</i>             </code> doesn't match the checksum algorithm you set through <code>x-amz-sdk-checksum-algorithm</code>, Amazon S3 fails the request with a <code>BadDigest</code> error.</p>          <note>             <p>The <code>Content-MD5</code> or <code>x-amz-sdk-checksum-algorithm</code> header is             required for any request to upload an object with a retention period configured using             Amazon S3 Object Lock. For more information, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock-managing.html#object-lock-put-object\">Uploading objects to an Object Lock enabled bucket </a> in the                <i>Amazon S3 User Guide</i>.</p>          </note>          <p>For directory buckets, when you use Amazon Web Services SDKs, <code>CRC32</code> is the default checksum algorithm that's used for performance.</p>"
+          "description": "<p>Indicates the algorithm used to create the checksum for the object when you use the SDK. This header will not provide any     additional functionality if you don't use the SDK. When you send this header, there must be a corresponding <code>x-amz-checksum-<i>algorithm</i>             </code> or     <code>x-amz-trailer</code> header sent. Otherwise, Amazon S3 fails the request with the HTTP status code <code>400 Bad Request</code>.</p>          <p>For the <code>x-amz-checksum-<i>algorithm</i>             </code> header, replace <code>                <i>algorithm</i>             </code> with the supported algorithm from the following list: </p>          <ul>             <li>                <p>                   <code>CRC32</code>                </p>             </li>             <li>                <p>                   <code>CRC32C</code>                </p>             </li>             <li>                <p>                   <code>CRC64NVME</code>                </p>             </li>             <li>                <p>                   <code>SHA1</code>                </p>             </li>             <li>                <p>                   <code>SHA256</code>                </p>             </li>          </ul>          <p>For more     information, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/checking-object-integrity.html\">Checking object integrity</a> in     the <i>Amazon S3 User Guide</i>.</p>          <p>If the individual checksum value you provide through <code>x-amz-checksum-<i>algorithm</i>             </code> doesn't match the checksum algorithm you set through <code>x-amz-sdk-checksum-algorithm</code>, Amazon S3 fails the request with a <code>BadDigest</code> error.</p>          <note>             <p>The <code>Content-MD5</code> or <code>x-amz-sdk-checksum-algorithm</code> header is required for         any request to upload an object with a retention period configured using Amazon S3 Object Lock. For more         information, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock-managing.html#object-lock-put-object\">Uploading objects           to an Object Lock enabled bucket </a> in the <i>Amazon S3 User Guide</i>.</p>          </note>          <p>For directory buckets, when you use Amazon Web Services SDKs, <code>CRC32</code> is the default checksum algorithm that's used for performance.</p>"
         },
         "ChecksumCRC32": {
           "description": "<p>This header can be used as a data integrity check to verify that the data received is the same data that was originally sent.     This header specifies the Base64 encoded, 32-bit <code>CRC32</code> checksum of the object. For more information, see     <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/checking-object-integrity.html\">Checking object integrity</a> in the     <i>Amazon S3 User Guide</i>.</p>",
@@ -3098,7 +3115,7 @@
           "type": "string"
         },
         "ChecksumCRC64NVME": {
-          "description": "<p>This header can be used as a data integrity check to verify that the data received is          the same data that was originally sent. This header specifies the Base64 encoded, 64-bit             <code>CRC64NVME</code> checksum of the object. The <code>CRC64NVME</code> checksum is          always a full object checksum. For more information, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/checking-object-integrity.html\">Checking object integrity             in the Amazon S3 User Guide</a>.</p>",
+          "description": "<p>This header can be used as a data integrity check to verify that the data received is the same data       that was originally sent. This header specifies the Base64 encoded, 64-bit <code>CRC64NVME</code>       checksum of the object. The <code>CRC64NVME</code> checksum is always a full object checksum. For more       information, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/checking-object-integrity.html\">Checking object integrity in the Amazon S3         User Guide</a>.</p>",
           "type": "string"
         },
         "ChecksumSHA1": {
@@ -3114,7 +3131,7 @@
           "type": "string"
         },
         "ContentEncoding": {
-          "description": "<p>Specifies what content encodings have been applied to the object and thus what decoding          mechanisms must be applied to obtain the media-type referenced by the Content-Type header          field. For more information, see <a href=\"https://www.rfc-editor.org/rfc/rfc9110.html#field.content-encoding\">https://www.rfc-editor.org/rfc/rfc9110.html#field.content-encoding</a>.</p>",
+          "description": "<p>Specifies what content encodings have been applied to the object and thus what decoding mechanisms       must be applied to obtain the media-type referenced by the Content-Type header field. For more       information, see <a href=\"https://www.rfc-editor.org/rfc/rfc9110.html#field.content-encoding\">https://www.rfc-editor.org/rfc/rfc9110.html#field.content-encoding</a>.</p>",
           "type": "string"
         },
         "ContentLanguage": {
@@ -3122,15 +3139,15 @@
           "type": "string"
         },
         "ContentLength": {
-          "description": "<p>Size of the body in bytes. This parameter is useful when the size of the body cannot be          determined automatically. For more information, see <a href=\"https://www.rfc-editor.org/rfc/rfc9110.html#name-content-length\">https://www.rfc-editor.org/rfc/rfc9110.html#name-content-length</a>.</p>",
+          "description": "<p>Size of the body in bytes. This parameter is useful when the size of the body cannot be determined       automatically. For more information, see <a href=\"https://www.rfc-editor.org/rfc/rfc9110.html#name-content-length\">https://www.rfc-editor.org/rfc/rfc9110.html#name-content-length</a>.</p>",
           "type": "number"
         },
         "ContentMD5": {
-          "description": "<p>The Base64 encoded 128-bit <code>MD5</code> digest of the message (without the headers) according to          RFC 1864. This header can be used as a message integrity check to verify that the data is          the same data that was originally sent. Although it is optional, we recommend using the          Content-MD5 mechanism as an end-to-end integrity check. For more information about REST          request authentication, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/RESTAuthentication.html\">REST Authentication</a>.</p>          <note>             <p>The <code>Content-MD5</code> or <code>x-amz-sdk-checksum-algorithm</code> header is             required for any request to upload an object with a retention period configured using             Amazon S3 Object Lock. For more information, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock-managing.html#object-lock-put-object\">Uploading objects to an Object Lock enabled bucket </a> in the                <i>Amazon S3 User Guide</i>.</p>          </note>          <note>             <p>This functionality is not supported for directory buckets.</p>          </note>",
+          "description": "<p>The Base64 encoded 128-bit <code>MD5</code> digest of the message (without the headers) according to       RFC 1864. This header can be used as a message integrity check to verify that the data is the same data       that was originally sent. Although it is optional, we recommend using the Content-MD5 mechanism as an       end-to-end integrity check. For more information about REST request authentication, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/RESTAuthentication.html\">REST       Authentication</a>.</p>          <note>             <p>The <code>Content-MD5</code> or <code>x-amz-sdk-checksum-algorithm</code> header is required for         any request to upload an object with a retention period configured using Amazon S3 Object Lock. For more         information, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock-managing.html#object-lock-put-object\">Uploading objects           to an Object Lock enabled bucket </a> in the <i>Amazon S3 User Guide</i>.</p>          </note>          <note>             <p>This functionality is not supported for directory buckets.</p>          </note>",
           "type": "string"
         },
         "ContentType": {
-          "description": "<p>A standard MIME type describing the format of the contents. For more information, see             <a href=\"https://www.rfc-editor.org/rfc/rfc9110.html#name-content-type\">https://www.rfc-editor.org/rfc/rfc9110.html#name-content-type</a>.</p>",
+          "description": "<p>A standard MIME type describing the format of the contents. For more information, see <a href=\"https://www.rfc-editor.org/rfc/rfc9110.html#name-content-type\">https://www.rfc-editor.org/rfc/rfc9110.html#name-content-type</a>.</p>",
           "type": "string"
         },
         "ExpectedBucketOwner": {
@@ -3138,7 +3155,7 @@
           "type": "string"
         },
         "Expires": {
-          "description": "<p>The date and time at which the object is no longer cacheable. For more information, see             <a href=\"https://www.rfc-editor.org/rfc/rfc7234#section-5.3\">https://www.rfc-editor.org/rfc/rfc7234#section-5.3</a>.</p>",
+          "description": "<p>The date and time at which the object is no longer cacheable. For more information, see <a href=\"https://www.rfc-editor.org/rfc/rfc7234#section-5.3\">https://www.rfc-editor.org/rfc/rfc7234#section-5.3</a>.</p>",
           "format": "date-time",
           "type": "string"
         },
@@ -3159,11 +3176,11 @@
           "type": "string"
         },
         "IfMatch": {
-          "description": "<p>Uploads the object only if the ETag (entity tag) value provided during the WRITE          operation matches the ETag of the object in S3. If the ETag values do not match, the          operation returns a <code>412 Precondition Failed</code> error.</p>          <p>If a conflicting operation occurs during the upload S3 returns a <code>409 ConditionalRequestConflict</code> response. On a 409 failure you should fetch the object's ETag and retry the upload.</p>          <p>Expects the ETag value as a string.</p>          <p>For more information about conditional requests, see <a href=\"https://tools.ietf.org/html/rfc7232\">RFC 7232</a>, or <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/conditional-requests.html\">Conditional requests</a> in the <i>Amazon S3 User Guide</i>.</p>",
+          "description": "<p>Uploads the object only if the ETag (entity tag) value provided during the WRITE operation matches       the ETag of the object in S3. If the ETag values do not match, the operation returns a <code>412         Precondition Failed</code> error.</p>          <p>If a conflicting operation occurs during the upload S3 returns a <code>409         ConditionalRequestConflict</code> response. On a 409 failure you should fetch the object's ETag and       retry the upload.</p>          <p>Expects the ETag value as a string.</p>          <p>For more information about conditional requests, see <a href=\"https://tools.ietf.org/html/rfc7232\">RFC 7232</a>, or <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/conditional-requests.html\">Conditional requests</a> in the         <i>Amazon S3 User Guide</i>.</p>",
           "type": "string"
         },
         "IfNoneMatch": {
-          "description": "<p>Uploads the object only if the object key name does not already exist in the bucket          specified. Otherwise, Amazon S3 returns a <code>412 Precondition Failed</code> error.</p>          <p>If a conflicting operation occurs during the upload S3 returns a <code>409             ConditionalRequestConflict</code> response. On a 409 failure you should retry the          upload.</p>          <p>Expects the '*' (asterisk) character.</p>          <p>For more information about conditional requests, see <a href=\"https://tools.ietf.org/html/rfc7232\">RFC 7232</a>, or <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/conditional-requests.html\">Conditional requests</a> in the <i>Amazon S3 User Guide</i>.</p>",
+          "description": "<p>Uploads the object only if the object key name does not already exist in the bucket specified.       Otherwise, Amazon S3 returns a <code>412 Precondition Failed</code> error.</p>          <p>If a conflicting operation occurs during the upload S3 returns a <code>409         ConditionalRequestConflict</code> response. On a 409 failure you should retry the upload.</p>          <p>Expects the '*' (asterisk) character.</p>          <p>For more information about conditional requests, see <a href=\"https://tools.ietf.org/html/rfc7232\">RFC 7232</a>, or <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/conditional-requests.html\">Conditional requests</a> in the         <i>Amazon S3 User Guide</i>.</p>",
           "type": "string"
         },
         "Key": {
@@ -3179,31 +3196,31 @@
         },
         "ObjectLockLegalHoldStatus": {
           "$ref": "#/definitions/ObjectLockLegalHoldStatus",
-          "description": "<p>Specifies whether a legal hold will be applied to this object. For more information          about S3 Object Lock, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/object-lock.html\">Object Lock</a> in the             <i>Amazon S3 User Guide</i>.</p>          <note>             <p>This functionality is not supported for directory buckets.</p>          </note>"
+          "description": "<p>Specifies whether a legal hold will be applied to this object. For more information about S3 Object       Lock, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/object-lock.html\">Object Lock</a> in       the <i>Amazon S3 User Guide</i>.</p>          <note>             <p>This functionality is not supported for directory buckets.</p>          </note>"
         },
         "ObjectLockMode": {
           "$ref": "#/definitions/ObjectLockMode",
           "description": "<p>The Object Lock mode that you want to apply to this object.</p>          <note>             <p>This functionality is not supported for directory buckets.</p>          </note>"
         },
         "ObjectLockRetainUntilDate": {
-          "description": "<p>The date and time when you want this object's Object Lock to expire. Must be formatted          as a timestamp parameter.</p>          <note>             <p>This functionality is not supported for directory buckets.</p>          </note>",
+          "description": "<p>The date and time when you want this object's Object Lock to expire. Must be formatted as a       timestamp parameter.</p>          <note>             <p>This functionality is not supported for directory buckets.</p>          </note>",
           "format": "date-time",
           "type": "string"
         },
         "RequestPayer": {
           "$ref": "#/definitions/RequestPayer",
-          "description": "<p>Confirms that the requester knows that they will be charged for the request. Bucket          owners need not specify this parameter in their requests. If either the source or          destination S3 bucket has Requester Pays enabled, the requester will pay for corresponding          charges to copy the object. For information about downloading objects from Requester Pays          buckets, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/ObjectsinRequesterPaysBuckets.html\">Downloading Objects in             Requester Pays Buckets</a> in the <i>Amazon S3 User Guide</i>.</p>          <note>             <p>This functionality is not supported for directory buckets.</p>          </note>"
+          "description": "<p>Confirms that the requester knows that they will be charged for the request. Bucket owners need not       specify this parameter in their requests. If either the source or destination S3 bucket has Requester       Pays enabled, the requester will pay for corresponding charges to copy the object. For information about       downloading objects from Requester Pays buckets, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/ObjectsinRequesterPaysBuckets.html\">Downloading Objects in Requester Pays         Buckets</a> in the <i>Amazon S3 User Guide</i>.</p>          <note>             <p>This functionality is not supported for directory buckets.</p>          </note>"
         },
         "SSECustomerAlgorithm": {
-          "description": "<p>Specifies the algorithm to use when encrypting the object (for example,             <code>AES256</code>).</p>          <note>             <p>This functionality is not supported for directory buckets.</p>          </note>",
+          "description": "<p>Specifies the algorithm to use when encrypting the object (for example, <code>AES256</code>).</p>          <note>             <p>This functionality is not supported for directory buckets.</p>          </note>",
           "type": "string"
         },
         "SSECustomerKey": {
-          "description": "<p>Specifies the customer-provided encryption key for Amazon S3 to use in encrypting data. This          value is used to store the object and then it is discarded; Amazon S3 does not store the          encryption key. The key must be appropriate for use with the algorithm specified in the             <code>x-amz-server-side-encryption-customer-algorithm</code> header.</p>          <note>             <p>This functionality is not supported for directory buckets.</p>          </note>",
+          "description": "<p>Specifies the customer-provided encryption key for Amazon S3 to use in encrypting data. This value is       used to store the object and then it is discarded; Amazon S3 does not store the encryption key. The key must       be appropriate for use with the algorithm specified in the         <code>x-amz-server-side-encryption-customer-algorithm</code> header.</p>          <note>             <p>This functionality is not supported for directory buckets.</p>          </note>",
           "type": "string"
         },
         "SSECustomerKeyMD5": {
-          "description": "<p>Specifies the 128-bit MD5 digest of the encryption key according to RFC 1321. Amazon S3 uses          this header for a message integrity check to ensure that the encryption key was transmitted          without error.</p>          <note>             <p>This functionality is not supported for directory buckets.</p>          </note>",
+          "description": "<p>Specifies the 128-bit MD5 digest of the encryption key according to RFC 1321. Amazon S3 uses this header       for a message integrity check to ensure that the encryption key was transmitted without error.</p>          <note>             <p>This functionality is not supported for directory buckets.</p>          </note>",
           "type": "string"
         },
         "SSEKMSEncryptionContext": {
@@ -3216,22 +3233,22 @@
         },
         "ServerSideEncryption": {
           "$ref": "#/definitions/ServerSideEncryption",
-          "description": "<p>The server-side encryption algorithm that was used when you store this object in Amazon S3          (for example, <code>AES256</code>, <code>aws:kms</code>, <code>aws:kms:dsse</code>).</p>          <ul>             <li>                <p>                   <b>General purpose buckets </b> - You have four mutually                exclusive options to protect data using server-side encryption in Amazon S3, depending on                how you choose to manage the encryption keys. Specifically, the encryption key                options are Amazon S3 managed keys (SSE-S3), Amazon Web Services KMS keys (SSE-KMS or DSSE-KMS), and                customer-provided keys (SSE-C). Amazon S3 encrypts data with server-side encryption by                using Amazon S3 managed keys (SSE-S3) by default. You can optionally tell Amazon S3 to encrypt                data at rest by using server-side encryption with other key options. For more                information, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingServerSideEncryption.html\">Using Server-Side                   Encryption</a> in the <i>Amazon S3 User Guide</i>.</p>             </li>             <li>                <p>                   <b>Directory buckets </b> -                For directory buckets, there are only two supported options for server-side encryption: server-side encryption with Amazon S3 managed keys (SSE-S3) (<code>AES256</code>) and server-side encryption with KMS keys (SSE-KMS) (<code>aws:kms</code>). We recommend that the bucket's default encryption uses the desired encryption configuration and you don't override the bucket default encryption in your             <code>CreateSession</code> requests or <code>PUT</code> object requests. Then, new objects  are automatically encrypted with the desired encryption settings. For more          information, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-express-serv-side-encryption.html\">Protecting data with server-side encryption</a> in the <i>Amazon S3 User Guide</i>. For more information about the encryption overriding behaviors in directory buckets, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-express-specifying-kms-encryption.html\">Specifying server-side encryption with KMS for new object uploads</a>. </p>                <p>In the Zonal endpoint API calls (except <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/API/API_CopyObject.html\">CopyObject</a> and <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/API/API_UploadPartCopy.html\">UploadPartCopy</a>) using the REST API, the encryption request headers must match the encryption settings that are specified in the <code>CreateSession</code> request.                             You can't override the values of the encryption settings (<code>x-amz-server-side-encryption</code>, <code>x-amz-server-side-encryption-aws-kms-key-id</code>, <code>x-amz-server-side-encryption-context</code>, and <code>x-amz-server-side-encryption-bucket-key-enabled</code>) that are specified in the <code>CreateSession</code> request.                             You don't need to explicitly specify these encryption settings values in Zonal endpoint API calls, and                             Amazon S3 will use the encryption settings values from the <code>CreateSession</code> request to protect new objects in the directory bucket.                            </p>                <note>                   <p>When you use the CLI or the Amazon Web Services SDKs, for <code>CreateSession</code>, the session token refreshes automatically to avoid service interruptions when a session expires. The CLI or the Amazon Web Services SDKs use the bucket's default encryption configuration for the                             <code>CreateSession</code> request. It's not supported to override the encryption settings values in the <code>CreateSession</code> request.                             So in the Zonal endpoint API calls (except <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/API/API_CopyObject.html\">CopyObject</a> and <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/API/API_UploadPartCopy.html\">UploadPartCopy</a>),           the encryption request headers must match the default encryption configuration of the directory bucket.\n\n</p>                </note>             </li>          </ul>"
+          "description": "<p>The server-side encryption algorithm that was used when you store this object in Amazon S3 or       Amazon FSx.</p>          <ul>             <li>                <p>                   <b>General purpose buckets </b> - You have four mutually exclusive           options to protect data using server-side encryption in Amazon S3, depending on how you choose to manage           the encryption keys. Specifically, the encryption key options are Amazon S3 managed keys (SSE-S3),           Amazon Web Services KMS keys (SSE-KMS or DSSE-KMS), and customer-provided keys (SSE-C). Amazon S3 encrypts data with           server-side encryption by using Amazon S3 managed keys (SSE-S3) by default. You can optionally tell Amazon S3           to encrypt data at rest by using server-side encryption with other key options. For more           information, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingServerSideEncryption.html\">Using Server-Side Encryption</a> in           the <i>Amazon S3 User Guide</i>.</p>             </li>             <li>                <p>                   <b>Directory buckets </b> -           For directory buckets, there are only two supported options for server-side encryption: server-side encryption with Amazon S3 managed keys (SSE-S3) (<code>AES256</code>) and server-side encryption with KMS keys (SSE-KMS) (<code>aws:kms</code>). We recommend that the bucket's default encryption uses the desired encryption configuration and you don't override the bucket default encryption in your             <code>CreateSession</code> requests or <code>PUT</code> object requests. Then, new objects  are automatically encrypted with the desired encryption settings. For more          information, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-express-serv-side-encryption.html\">Protecting data with server-side encryption</a> in the <i>Amazon S3 User Guide</i>. For more information about the encryption overriding behaviors in directory buckets, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-express-specifying-kms-encryption.html\">Specifying server-side encryption with KMS for new object uploads</a>. </p>                <p>In the Zonal endpoint API calls (except <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/API/API_CopyObject.html\">CopyObject</a> and <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/API/API_UploadPartCopy.html\">UploadPartCopy</a>) using the REST API, the encryption request headers must match the encryption settings that are specified in the <code>CreateSession</code> request.                             You can't override the values of the encryption settings (<code>x-amz-server-side-encryption</code>, <code>x-amz-server-side-encryption-aws-kms-key-id</code>, <code>x-amz-server-side-encryption-context</code>, and <code>x-amz-server-side-encryption-bucket-key-enabled</code>) that are specified in the <code>CreateSession</code> request.                             You don't need to explicitly specify these encryption settings values in Zonal endpoint API calls, and                             Amazon S3 will use the encryption settings values from the <code>CreateSession</code> request to protect new objects in the directory bucket.                            </p>                <note>                   <p>When you use the CLI or the Amazon Web Services SDKs, for <code>CreateSession</code>, the session token refreshes automatically to avoid service interruptions when a session expires. The CLI or the Amazon Web Services SDKs use the bucket's default encryption configuration for the                             <code>CreateSession</code> request. It's not supported to override the encryption settings values in the <code>CreateSession</code> request.                             So in the Zonal endpoint API calls (except <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/API/API_CopyObject.html\">CopyObject</a> and <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/API/API_UploadPartCopy.html\">UploadPartCopy</a>),           the encryption request headers must match the default encryption configuration of the directory bucket.\n\n</p>                </note>             </li>             <li>                <p>                   <b>S3 access points for Amazon FSx </b> - When accessing data stored in           Amazon FSx file systems using S3 access points, the only valid server side encryption option is             <code>aws:fsx</code>. All Amazon FSx file systems have encryption configured by default and are           encrypted at rest. Data is automatically encrypted before being written to the file system, and           automatically decrypted as it is read. These processes are handled transparently by Amazon FSx.</p>             </li>          </ul>"
         },
         "StorageClass": {
           "$ref": "#/definitions/StorageClass",
-          "description": "<p>By default, Amazon S3 uses the STANDARD Storage Class to store newly created objects. The          STANDARD storage class provides high durability and high availability. Depending on          performance needs, you can specify a different Storage Class. For more information, see             <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/storage-class-intro.html\">Storage             Classes</a> in the <i>Amazon S3 User Guide</i>.</p>          <note>             <ul>                <li>                   <p>Directory buckets only support <code>EXPRESS_ONEZONE</code> (the S3 Express One Zone storage class) in Availability Zones and <code>ONEZONE_IA</code> (the S3 One Zone-Infrequent Access storage class) in Dedicated Local Zones.</p>                </li>                <li>                   <p>Amazon S3 on Outposts only uses the OUTPOSTS Storage Class.</p>                </li>             </ul>          </note>"
+          "description": "<p>By default, Amazon S3 uses the STANDARD Storage Class to store newly created objects. The STANDARD       storage class provides high durability and high availability. Depending on performance needs, you can       specify a different Storage Class. For more information, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/storage-class-intro.html\">Storage Classes</a> in the         <i>Amazon S3 User Guide</i>.</p>          <note>             <ul>                <li>                   <p>Directory buckets only support <code>EXPRESS_ONEZONE</code> (the S3 Express One Zone storage class) in             Availability Zones and <code>ONEZONE_IA</code> (the S3 One Zone-Infrequent Access storage class) in             Dedicated Local Zones.</p>                </li>                <li>                   <p>Amazon S3 on Outposts only uses the OUTPOSTS Storage Class.</p>                </li>             </ul>          </note>"
         },
         "Tagging": {
-          "description": "<p>The tag-set for the object. The tag-set must be encoded as URL Query parameters. (For          example, \"Key1=Value1\")</p>          <note>             <p>This functionality is not supported for directory buckets.</p>          </note>",
+          "description": "<p>The tag-set for the object. The tag-set must be encoded as URL Query parameters. (For example,       \"Key1=Value1\")</p>          <note>             <p>This functionality is not supported for directory buckets.</p>          </note>",
           "type": "string"
         },
         "WebsiteRedirectLocation": {
-          "description": "<p>If the bucket is configured as a website, redirects requests for this object to another          object in the same bucket or to an external URL. Amazon S3 stores the value of this header in          the object metadata. For information about object metadata, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html\">Object Key and Metadata</a> in the             <i>Amazon S3 User Guide</i>.</p>          <p>In the following example, the request header sets the redirect to an object          (anotherPage.html) in the same bucket:</p>          <p>             <code>x-amz-website-redirect-location: /anotherPage.html</code>          </p>          <p>In the following example, the request header sets the object redirect to another          website:</p>          <p>             <code>x-amz-website-redirect-location: http://www.example.com/</code>          </p>          <p>For more information about website hosting in Amazon S3, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/WebsiteHosting.html\">Hosting Websites on Amazon S3</a> and             <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/how-to-page-redirect.html\">How to             Configure Website Page Redirects</a> in the <i>Amazon S3 User Guide</i>. </p>          <note>             <p>This functionality is not supported for directory buckets.</p>          </note>",
+          "description": "<p>If the bucket is configured as a website, redirects requests for this object to another object in       the same bucket or to an external URL. Amazon S3 stores the value of this header in the object metadata. For       information about object metadata, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html\">Object Key and Metadata</a> in the <i>Amazon S3         User Guide</i>.</p>          <p>In the following example, the request header sets the redirect to an object (anotherPage.html) in       the same bucket:</p>          <p>             <code>x-amz-website-redirect-location: /anotherPage.html</code>          </p>          <p>In the following example, the request header sets the object redirect to another website:</p>          <p>             <code>x-amz-website-redirect-location: http://www.example.com/</code>          </p>          <p>For more information about website hosting in Amazon S3, see <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/WebsiteHosting.html\">Hosting Websites on Amazon S3</a> and <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/how-to-page-redirect.html\">How to Configure Website Page         Redirects</a> in the <i>Amazon S3 User Guide</i>. </p>          <note>             <p>This functionality is not supported for directory buckets.</p>          </note>",
           "type": "string"
         },
         "WriteOffsetBytes": {
-          "description": "<p>          Specifies the offset for appending data to existing objects in bytes.          The offset must be equal to the size of the existing object being appended to.          If no object exists, setting this header to 0 will create a new object.       </p>          <note>             <p>This functionality is only supported for objects in the Amazon S3 Express One Zone storage class in directory buckets.</p>          </note>",
+          "description": "<p> Specifies the offset for appending data to existing objects in bytes. The offset must be equal to       the size of the existing object being appended to. If no object exists, setting this header to 0 will       create a new object. </p>          <note>             <p>This functionality is only supported for objects in the Amazon S3 Express One Zone storage class in         directory buckets.</p>          </note>",
           "type": "number"
         }
       },
@@ -4247,6 +4264,7 @@
     "ServerSideEncryption": {
       "enum": [
         "AES256",
+        "aws:fsx",
         "aws:kms",
         "aws:kms:dsse"
       ],
@@ -4289,8 +4307,208 @@
           "additionalProperties": false,
           "description": "options defines the behavior of the server    options.secure if true, the connection will use TLS. The default is false. If the server doesn’t start in TLS mode, it is still possible to upgrade clear text socket to TLS socket with the STARTTLS command (unless you disable support for it). If secure is true, additional tls options for tls.createServer can be added directly onto this options object.    options.name optional hostname of the server, used for identifying to the client (defaults to os.hostname())    options.banner optional greeting message. This message is appended to the default ESMTP response.    options.size optional maximum allowed message size in bytes, see details here    options.hideSize if set to true then does not expose the max allowed size to the client but keeps size related values like stream.sizeExceeded    options.authMethods optional array of allowed authentication methods, defaults to [‘PLAIN’, ‘LOGIN’]. Only the methods listed in this array are allowed, so if you set it to [‘XOAUTH2’] then PLAIN and LOGIN are not available. Use [‘PLAIN’, ‘LOGIN’, ‘XOAUTH2’] to allow all three. Authentication is only allowed in secure mode (either the server is started with secure:true option or STARTTLS command is used)    options.authOptional allow authentication, but do not require it    options.disabledCommands optional array of disabled commands (see all supported commands here). For example if you want to disable authentication, use [‘AUTH’] as this value. If you want to allow authentication in clear text, set it to [‘STARTTLS’].    options.hideSTARTTLS optional boolean, if set to true then allow using STARTTLS but do not advertise or require it. It only makes sense when creating integration test servers for testing the scenario where you want to try STARTTLS even when it is not advertised    options.hidePIPELINING optional boolean, if set to true then does not show PIPELINING in feature list    options.hide8BITMIME optional boolean, if set to true then does not show 8BITMIME in features list    options.hideSMTPUTF8 optional boolean, if set to true then does not show SMTPUTF8 in features list    options.allowInsecureAuth optional boolean, if set to true allows authentication even if connection is not secured first    options.disableReverseLookup optional boolean, if set to true then does not try to reverse resolve client hostname    options.sniOptions optional Map or an object of TLS options for SNI where servername is the key. Overrided by SNICallback.    options.logger optional bunyan compatible logger instance. If set to true then logs to console. If value is not set or is false then nothing is logged    options.maxClients sets the maximum number of concurrently connected clients, defaults to Infinity    options.useProxy boolean, if set to true expects to be behind a proxy that emits a PROXY header (version 1 only)    options.useXClient boolean, if set to true, enables usage of XCLIENT extension to override connection properties. See session.xClient (Map object) for the details provided by the client    options.useXForward boolean, if set to true, enables usage of XFORWARD extension. See session.xForward (Map object) for the details provided by the client    options.lmtp boolean, if set to true use LMTP protocol instead of SMTP    options.socketTimeout how many milliseconds of inactivity to allow before disconnecting the client (defaults to 1 minute)    options.closeTimeout how many milliseconds to wait before disconnecting pending connections once server.close() has been called (defaults to 30 seconds)",
           "properties": {
+            "ALPNCallback": {
+              "$comment": "(arg: { servername: string; protocols: string[] }) => string | undefined",
+              "description": "If set, this will be called when a client opens a connection using the ALPN extension. One argument will be passed to the callback: an object containing `servername` and `protocols` fields, respectively containing the server name from the SNI extension (if any) and an array of ALPN protocol name strings. The callback must return either one of the strings listed in `protocols`, which will be returned to the client as the selected ALPN protocol, or `undefined`, to reject the connection with a fatal alert. If a string is returned that does not match one of the client's ALPN protocols, an error will be thrown. This option cannot be used with the `ALPNProtocols` option, and setting both options will throw an error.",
+              "properties": {
+                "namedArgs": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "arg": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "protocols": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "servername": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "servername",
+                        "protocols"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "arg"
+                  ],
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            },
+            "ALPNProtocols": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "items": {
+                    "additionalProperties": {
+                      "type": "number"
+                    },
+                    "properties": {
+                      "BYTES_PER_ELEMENT": {
+                        "type": "number"
+                      },
+                      "buffer": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "byteLength": {
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "byteLength"
+                        ],
+                        "type": "object"
+                      },
+                      "byteLength": {
+                        "type": "number"
+                      },
+                      "byteOffset": {
+                        "type": "number"
+                      },
+                      "length": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "BYTES_PER_ELEMENT",
+                      "buffer",
+                      "byteLength",
+                      "byteOffset",
+                      "length"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                {
+                  "additionalProperties": {
+                    "type": "number"
+                  },
+                  "properties": {
+                    "BYTES_PER_ELEMENT": {
+                      "type": "number"
+                    },
+                    "buffer": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "byteLength": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "byteLength"
+                      ],
+                      "type": "object"
+                    },
+                    "byteLength": {
+                      "type": "number"
+                    },
+                    "byteOffset": {
+                      "type": "number"
+                    },
+                    "length": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "BYTES_PER_ELEMENT",
+                    "buffer",
+                    "byteLength",
+                    "byteOffset",
+                    "length"
+                  ],
+                  "type": "object"
+                }
+              ],
+              "description": "An array of strings or a Buffer naming possible ALPN protocols. (Protocols should be ordered by their priority.)"
+            },
+            "SNICallback": {
+              "$comment": "(servername: string, cb: (err: Error | null, ctx?: SecureContext) => void) => void",
+              "description": "SNICallback(servername, cb) <Function> A function that will be called if the client supports SNI TLS extension. Two arguments will be passed when called: servername and cb. SNICallback should invoke cb(null, ctx), where ctx is a SecureContext instance. (tls.createSecureContext(...) can be used to get a proper SecureContext.) If SNICallback wasn't provided the default callback with high-level API will be used (see below).",
+              "properties": {
+                "namedArgs": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "cb": {
+                      "$comment": "(err: Error | null, ctx?: SecureContext) => void",
+                      "properties": {
+                        "namedArgs": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "ctx": {
+                              "$ref": "#/definitions/SecureContext"
+                            },
+                            "err": {
+                              "anyOf": [
+                                {
+                                  "additionalProperties": false,
+                                  "properties": {
+                                    "message": {
+                                      "type": "string"
+                                    },
+                                    "name": {
+                                      "type": "string"
+                                    },
+                                    "stack": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "name",
+                                    "message"
+                                  ],
+                                  "type": "object"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            }
+                          },
+                          "required": [
+                            "err"
+                          ],
+                          "type": "object"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "servername": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "servername",
+                    "cb"
+                  ],
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            },
+            "allowHalfOpen": {
+              "default": false,
+              "description": "Indicates whether half-opened TCP connections are allowed.",
+              "type": "boolean"
+            },
             "allowInsecureAuth": {
               "description": "optional boolean, if set to true allows authentication even if connection is not secured first",
+              "type": "boolean"
+            },
+            "allowPartialTrustChain": {
+              "description": "Treat intermediate (non-self-signed) certificates in the trust CA certificate list as trusted.",
               "type": "boolean"
             },
             "authMethods": {
@@ -4308,9 +4526,105 @@
               "description": "optional greeting message. This message is appended to the default ESMTP response.",
               "type": "string"
             },
+            "blockList": {
+              "$ref": "#/definitions/BlockList",
+              "description": "`blockList` can be used for disabling inbound access to specific IP addresses, IP ranges, or IP subnets. This does not work if the server is behind a reverse proxy, NAT, etc. because the address checked against the block list is the address of the proxy, or the one specified by the NAT."
+            },
+            "ca": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "$ref": "#/definitions/global.Buffer"
+                },
+                {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "$ref": "#/definitions/global.Buffer"
+                      }
+                    ]
+                  },
+                  "type": "array"
+                }
+              ],
+              "description": "Optionally override the trusted CA certificates. Default is to trust the well-known CAs curated by Mozilla. Mozilla's CAs are completely replaced when CAs are explicitly specified using this option."
+            },
+            "cert": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "$ref": "#/definitions/global.Buffer"
+                },
+                {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "$ref": "#/definitions/global.Buffer"
+                      }
+                    ]
+                  },
+                  "type": "array"
+                }
+              ],
+              "description": "Cert chains in PEM format. One cert chain should be provided per private key. Each cert chain should consist of the PEM formatted certificate for a provided private key, followed by the PEM formatted intermediate certificates (if any), in order, and not including the root CA (the root CA must be pre-known to the peer, see ca). When providing multiple cert chains, they do not have to be in the same order as their private keys in key. If the intermediate certificates are not provided, the peer will not be able to validate the certificate, and the handshake will fail."
+            },
+            "ciphers": {
+              "description": "Cipher suite specification, replacing the default. For more information, see modifying the default cipher suite. Permitted ciphers can be obtained via tls.getCiphers(). Cipher names must be uppercased in order for OpenSSL to accept them.",
+              "type": "string"
+            },
+            "clientCertEngine": {
+              "deprecated": true,
+              "description": "Name of an OpenSSL engine which can provide the client certificate.",
+              "type": "string"
+            },
             "closeTimeout": {
               "$ref": "#/definitions/ms",
               "description": "How many millisceonds to wait before disconnecting pending connections once `server.close()` has been called (defaults to 30 seconds)"
+            },
+            "crl": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "$ref": "#/definitions/global.Buffer"
+                },
+                {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "$ref": "#/definitions/global.Buffer"
+                      }
+                    ]
+                  },
+                  "type": "array"
+                }
+              ],
+              "description": "PEM formatted CRLs (Certificate Revocation Lists)."
+            },
+            "dhparam": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "$ref": "#/definitions/global.Buffer"
+                }
+              ],
+              "description": "`'auto'` or custom Diffie-Hellman parameters, required for non-ECDHE perfect forward secrecy. If omitted or invalid, the parameters are silently discarded and DHE ciphers will not be available. ECDHE-based perfect forward secrecy will still be available."
             },
             "disableReverseLookup": {
               "description": "optional boolean, if set to true then does not try to reverse resolve client hostname",
@@ -4322,6 +4636,19 @@
                 "type": "string"
               },
               "type": "array"
+            },
+            "ecdhCurve": {
+              "description": "A string describing a named curve or a colon separated list of curve NIDs or names, for example P-521:P-384:P-256, to use for ECDH key agreement. Set to auto to select the curve automatically. Use crypto.getCurves() to obtain a list of available curve names. On recent releases, openssl ecparam -list_curves will also display the name and description of each available elliptic curve. Default: tls.DEFAULT_ECDH_CURVE.",
+              "type": "string"
+            },
+            "enableTrace": {
+              "default": false,
+              "description": "When enabled, TLS packet trace information is written to `stderr`. This can be used to debug TLS connection problems.",
+              "type": "boolean"
+            },
+            "handshakeTimeout": {
+              "description": "Abort the connection if the SSL/TLS handshake does not finish in the specified number of milliseconds. A 'tlsClientError' is emitted on the tls.Server object whenever a handshake times out. Default: 120000 (120 seconds).",
+              "type": "number"
             },
             "hide8BITMIME": {
               "description": "optional boolean, if set to true then does not show 8BITMIME in features list",
@@ -4338,6 +4665,52 @@
             "hideSTARTTLS": {
               "description": "optional boolean, if set to true then allow using STARTTLS but do not advertise or require it. It only makes sense when creating integration test servers for testing the scenario where you want to try STARTTLS even when it is not advertised",
               "type": "boolean"
+            },
+            "highWaterMark": {
+              "default": "See [stream.getDefaultHighWaterMark()](https://nodejs.org/docs/latest-v24.x/api/stream.html#streamgetdefaulthighwatermarkobjectmode).",
+              "description": "Optionally overrides all `net.Socket`s' `readableHighWaterMark` and `writableHighWaterMark`.",
+              "type": "number"
+            },
+            "honorCipherOrder": {
+              "description": "Attempt to use the server's cipher suite preferences instead of the client's. When true, causes SSL_OP_CIPHER_SERVER_PREFERENCE to be set in secureOptions",
+              "type": "boolean"
+            },
+            "keepAlive": {
+              "default": false,
+              "description": "If set to `true`, it enables keep-alive functionality on the socket immediately after a new incoming connection is received, similarly on what is done in `socket.setKeepAlive([enable][, initialDelay])`.",
+              "type": "boolean"
+            },
+            "keepAliveInitialDelay": {
+              "default": 0,
+              "description": "If set to a positive number, it sets the initial delay before the first keepalive probe is sent on an idle socket.",
+              "type": "number"
+            },
+            "key": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "$ref": "#/definitions/global.Buffer"
+                },
+                {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "$ref": "#/definitions/global.Buffer"
+                      },
+                      {
+                        "$ref": "#/definitions/KeyObject"
+                      }
+                    ]
+                  },
+                  "type": "array"
+                }
+              ],
+              "description": "Private keys in PEM format. PEM allows the option of private keys being encrypted. Encrypted keys will be decrypted with options.passphrase. Multiple keys using different algorithms can be provided either as an array of unencrypted key strings or buffers, or an array of objects in the form {pem: <string|buffer>[, passphrase: <string>]}. The object form can only occur in an array. object.passphrase is optional. Encrypted keys will be decrypted with object.passphrase if provided, or options.passphrase if it is not."
             },
             "lmtp": {
               "description": "boolean, if set to true use LMTP protocol instead of SMTP",
@@ -4364,13 +4737,105 @@
               "$ref": "#/definitions/SecureVersion",
               "description": "Optionally set the maximum TLS version to allow. One of `'TLSv1.3'`, `'TLSv1.2'`, `'TLSv1.1'`, or `'TLSv1'`. Cannot be specified along with the `secureProtocol` option, use one or the other.\n**Default:** `'TLSv1.3'`, unless changed using CLI options. Using `--tls-max-v1.2` sets the default to `'TLSv1.2'`. Using `--tls-max-v1.3` sets the default to `'TLSv1.3'`. If multiple of the options are provided, the highest maximum is used."
             },
+            "minVersion": {
+              "$ref": "#/definitions/SecureVersion",
+              "description": "Optionally set the minimum TLS version to allow. One of `'TLSv1.3'`, `'TLSv1.2'`, `'TLSv1.1'`, or `'TLSv1'`. Cannot be specified along with the `secureProtocol` option, use one or the other.  It is not recommended to use less than TLSv1.2, but it may be required for interoperability.\n**Default:** `'TLSv1.2'`, unless changed using CLI options. Using `--tls-v1.0` sets the default to `'TLSv1'`. Using `--tls-v1.1` sets the default to `'TLSv1.1'`. Using `--tls-min-v1.3` sets the default to 'TLSv1.3'. If multiple of the options are provided, the lowest minimum is used."
+            },
             "name": {
               "description": "optional hostname of the server, used for identifying to the client (defaults to os.hostname())",
               "type": "string"
             },
+            "noDelay": {
+              "default": false,
+              "description": "If set to `true`, it disables the use of Nagle's algorithm immediately after a new incoming connection is received.",
+              "type": "boolean"
+            },
+            "passphrase": {
+              "description": "Shared passphrase used for a single private key and/or a PFX.",
+              "type": "string"
+            },
+            "pauseOnConnect": {
+              "default": false,
+              "description": "Indicates whether the socket should be paused on incoming connections.",
+              "type": "boolean"
+            },
+            "pfx": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "$ref": "#/definitions/global.Buffer"
+                },
+                {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "$ref": "#/definitions/global.Buffer"
+                      },
+                      {
+                        "$ref": "#/definitions/PxfObject"
+                      }
+                    ]
+                  },
+                  "type": "array"
+                }
+              ],
+              "description": "PFX or PKCS12 encoded private key and certificate chain. pfx is an alternative to providing key and cert individually. PFX is usually encrypted, if it is, passphrase will be used to decrypt it. Multiple PFX can be provided either as an array of unencrypted PFX buffers, or an array of objects in the form {buf: <string|buffer>[, passphrase: <string>]}. The object form can only occur in an array. object.passphrase is optional. Encrypted PFX will be decrypted with object.passphrase if provided, or options.passphrase if it is not."
+            },
+            "privateKeyEngine": {
+              "deprecated": true,
+              "description": "Name of an OpenSSL engine to get private key from. Should be used together with privateKeyIdentifier.",
+              "type": "string"
+            },
+            "privateKeyIdentifier": {
+              "deprecated": true,
+              "description": "Identifier of a private key managed by an OpenSSL engine. Should be used together with privateKeyEngine. Should not be set together with key, because both options define a private key in different ways.",
+              "type": "string"
+            },
+            "pskIdentityHint": {
+              "description": "hint to send to a client to help with selecting the identity during TLS-PSK negotiation. Will be ignored in TLS 1.3. Upon failing to set pskIdentityHint `tlsClientError` will be emitted with `ERR_TLS_PSK_SET_IDENTIY_HINT_FAILED` code.",
+              "type": "string"
+            },
+            "rejectUnauthorized": {
+              "default": true,
+              "description": "If true the server will reject any connection which is not authorized with the list of supplied CAs. This option only has an effect if requestCert is true.",
+              "type": "boolean"
+            },
+            "requestCert": {
+              "description": "If true the server will request a certificate from clients that connect and attempt to verify that certificate. Defaults to false.",
+              "type": "boolean"
+            },
             "secure": {
               "description": "if true, the connection will use TLS. The default is false. If the server doesn't start in TLS mode, it is still possible to upgrade clear text socket to TLS socket with the STARTTLS command (unless you disable support for it). If secure is true, additional tls options for tls. createServer can be added directly onto this options object.",
               "type": "boolean"
+            },
+            "secureContext": {
+              "$ref": "#/definitions/SecureContext",
+              "description": "An optional TLS context object from tls.createSecureContext()"
+            },
+            "secureOptions": {
+              "description": "Optionally affect the OpenSSL protocol behavior, which is not usually necessary. This should be used carefully if at all! Value is a numeric bitmask of the SSL_OP_* options from OpenSSL Options",
+              "type": "number"
+            },
+            "secureProtocol": {
+              "description": "Legacy mechanism to select the TLS protocol version to use, it does not support independent control of the minimum and maximum version, and does not support limiting the protocol to TLSv1.3. Use minVersion and maxVersion instead. The possible values are listed as SSL_METHODS, use the function names as strings. For example, use 'TLSv1_1_method' to force TLS version 1.1, or 'TLS_method' to allow any TLS protocol version up to TLSv1.3. It is not recommended to use TLS versions less than 1.2, but it may be required for interoperability. Default: none, see minVersion.",
+              "type": "string"
+            },
+            "sessionIdContext": {
+              "description": "Opaque identifier used by servers to ensure session state is not shared between applications. Unused by clients.",
+              "type": "string"
+            },
+            "sessionTimeout": {
+              "description": "The number of seconds after which a TLS session created by the server will no longer be resumable. See Session Resumption for more information. Default: 300.",
+              "type": "number"
+            },
+            "sigalgs": {
+              "description": "Colon-separated list of supported signature algorithms. The list can contain digest algorithms (SHA256, MD5 etc.), public key algorithms (RSA-PSS, ECDSA etc.), combination of both (e.g 'RSA+SHA384') or TLS v1.3 scheme names (e.g. rsa_pss_pss_sha512).",
+              "type": "string"
             },
             "size": {
               "description": "optional maximum allowed message size in bytes ([see details](https://github.com/andris9/smtp-server#using-size-extension))",
@@ -4379,6 +4844,10 @@
             "socketTimeout": {
               "$ref": "#/definitions/ms",
               "description": "How many milliseconds of inactivity to allow before disconnecting the client (defaults to 1 minute)"
+            },
+            "ticketKeys": {
+              "$ref": "#/definitions/global.Buffer",
+              "description": "48-bytes of cryptographically strong pseudo-random data."
             },
             "useProxy": {
               "description": "boolean, if set to true expects to be behind a proxy that emits a [PROXY](http://www.haproxy.org/download/1.5/doc/proxy-protocol.txt) header (version 1 only)",
@@ -4640,6 +5109,7 @@
       "enum": [
         "DEEP_ARCHIVE",
         "EXPRESS_ONEZONE",
+        "FSX_OPENZFS",
         "GLACIER",
         "GLACIER_IR",
         "INTELLIGENT_TIERING",
@@ -4736,11 +5206,11 @@
           "description": "Getter for the property `encoding` of a given `Readable` stream. The `encoding` property can be set using the  {@link  setEncoding }  method."
         },
         "readableEnded": {
-          "description": "Becomes `true` when [`'end'`](https://nodejs.org/docs/latest-v22.x/api/stream.html#event-end) event is emitted.",
+          "description": "Becomes `true` when [`'end'`](https://nodejs.org/docs/latest-v24.x/api/stream.html#event-end) event is emitted.",
           "type": "boolean"
         },
         "readableFlowing": {
-          "description": "This property reflects the current state of a `Readable` stream as described in the [Three states](https://nodejs.org/docs/latest-v22.x/api/stream.html#three-states) section.",
+          "description": "This property reflects the current state of a `Readable` stream as described in the [Three states](https://nodejs.org/docs/latest-v24.x/api/stream.html#three-states) section.",
           "type": [
             "boolean",
             "null"
