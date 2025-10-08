@@ -94,6 +94,7 @@
     "mocha": "^11.5.0",
     "prettier": "^3.0.3",
     "prettier-plugin-organize-imports": "^4.1.0",
+    "selfsigned": "^3.0.1",
     "sinon": "^20.0.0",
     "ts-json-schema-generator": "^2.4.0",
     "ts-node": "^10.4.0",

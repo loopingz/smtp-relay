@@ -1,0 +1,27 @@
+{
+    "$schema": "../config.schema.json",
+    "flows": {
+        "default": {
+            "filters": [
+                {
+                    "type": "whitelist",
+                    "from": [".*@test.io"]
+                }
+            ],
+      "outputs": [
+        {
+          "type": "file",
+          "path": "./emails/"
+        }
+      ]
+        }
+    },
+    "options": {
+        "key": "file://./certs/tls.key",
+        "cert": "file://./certs/tls.crt",
+        "disableReverseLookup": true,
+        "authOptional": true,
+        "name": "test-server"
+    },
+    "port": 10026
+}

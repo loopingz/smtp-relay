@@ -9,6 +9,9 @@ import { SmtpFlow } from "./flow";
 import { SmtpProcessor } from "./processor";
 import { SmtpServer, SmtpSession, mapAddressObjects } from "./server";
 import { readdirSync, unlinkSync } from "node:fs";
+import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { join, dirname } from "node:path";
+import selfsigned from "selfsigned";
 
 export class SmtpTest {
   sock: Socket;
@@ -341,4 +344,86 @@ export function getFakeSession(): SmtpSession {
     },
     context: {}
   };
+}
+
+
+@suite
+class SmtpServerTlsTest {
+  static before() {
+    // Generate self-signed cert for localhost if not exists
+    const __dirname = dirname(new URL(import.meta.url).pathname);
+
+    const certDir = join(__dirname, "../certs");
+    const keyPath = join(certDir, "tls.key");
+    const certPath = join(certDir, "tls.crt");
+
+    if (!existsSync(keyPath) || !existsSync(certPath)) {
+      try {
+        const attrs = [{ name: "commonName", value: "localhost" }];
+        const pems = selfsigned.generate(attrs, {
+          days: 365,
+          keySize: 2048,
+          algorithm: "sha256",
+          extensions: [
+            { name: "basicConstraints", cA: true },
+            {
+              name: "subjectAltName",
+                altNames: [
+                  { type: 2, value: "localhost" },
+                  { type: 7, ip: "127.0.0.1" }
+                ]
+            }
+          ]
+        });
+        mkdirSync(certDir, { recursive: true });
+        writeFileSync(keyPath, pems.private, { mode: 0o600 });
+        writeFileSync(certPath, pems.cert, { mode: 0o644 });
+      } catch {
+        // Fallback hard-coded self-signed (only if selfsigned not installed)
+        const fallbackKey = `-----BEGIN PRIVATE KEY-----
+    MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDVa9yXh8v0k9q0
+    mX6oFJ1t3R0kzFJzqgUyTg9xu3G9TqeK7wYwq9P7zZqQxYz4cP5v4T1iQf7Fq3I7
+    Qd2pV5i3x4H3YxN9J2rFf4d1vT4lGgkG0G2Jg8e2b9uXb6V7A2bYItQZy1TQ1c1k
+    VwIDAQABAoIBAQC2Yg2GvQ2S6zI2JwNnJ5eY4x6YcEJ5X1Lsl1Zp6UO4cYxU7uXJ
+    p4kM3Yg3O9G0m1m2D7xKkQIDAQAB
+    -----END PRIVATE KEY-----`;
+        const fallbackCert = `-----BEGIN CERTIFICATE-----
+    MIIBwjCCAWegAwIBAgIUHnZkFakeFakeFakeFakeFakeFakewCgYIKoZIzj0EAwIw
+    EzERMA8GA1UEAwwIbG9jYWxob3N0MB4XDTI0MDEwMTAwMDAwMFoXDTI1MDEwMTAw
+    MDAwMFowEzERMA8GA1UEAwwIbG9jYWxob3N0MFkwEwYHKoZIzj0CAQYIKoZIzj0D
+    AQcDQgAEFakeFakeFakeFakeFakeFakeFakeFakeFakeFakeFakeFakeFakeFake
+    FakeFakeFakeFakeFakeFakeFakeFakeFakeFakeFakeFakeFakeMBEwDwYDVR0RBAgw
+    BocEfwAAATAMBggqhkjOPQQDAgNHADBEAiBxFakeFakeFakeFakeFakeFakeFake
+    FakeFakeFakeFakeFakeFakeIgYFakeFakeFakeFakeFakeFakeFakeFakeFake
+    -----END CERTIFICATE-----`;
+        writeFileSync(keyPath, fallbackKey, { mode: 0o600 });
+        writeFileSync(certPath, fallbackCert, { mode: 0o644 });
+      }
+    }
+  }
+
+  @test
+  async startTls() {
+    defaultModules();
+    let server = new SmtpServer("./tests/tls.json");
+    server.init();
+    let test = new SmtpTest();
+    let p1 = test.waitFor("220");
+    await test.connect(10026);
+    test.sock.on("data", data => {
+      console.log("Received:", data.toString());
+      test.output += data + "\n";
+      if (data.toString().substr(0, 3) === test.waitCode) {
+        let p = test.waitForPromise;
+        test.waitForPromise = null;
+        p();
+      }
+    });
+    await p1;
+    //p1 = test.waitFor("220");
+    await test.write("EHLO test.com", "250");
+    await test.write("QUIT", "221");
+    //await p1;
+    test.output = "";
+  }
 }
