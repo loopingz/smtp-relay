@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.2](https://github.com/loopingz/smtp-relay/compare/v2.1.1...v2.1.2) (2025-10-08)
+
+
+### Bug Fixes
+
+* type registration for mail-auth ([7f0030a](https://github.com/loopingz/smtp-relay/commit/7f0030a3a46146aa03d70d45927e764a3859477e))
+
 ## [2.1.1](https://github.com/loopingz/smtp-relay/compare/v2.1.0...v2.1.1) (2025-09-20)
 
 
