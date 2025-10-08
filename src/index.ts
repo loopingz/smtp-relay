@@ -22,7 +22,7 @@ export function defaultModules() {
   /**
    * Ensure SPF, DKIM, DMARC, ARC, BIMI and Received headers are valid
    */
-  SmtpFilter.register("mailauth", MailAuthFilter);
+  SmtpFilter.register("mail-auth", MailAuthFilter);
   /**
    * Whitelist based on "to", "from", "ips" or "domains" fields
    */
