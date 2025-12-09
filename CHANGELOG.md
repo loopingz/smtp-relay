@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.2.3](https://github.com/loopingz/smtp-relay/compare/v2.2.2...v2.2.3) (2025-12-09)
+
+
+### Bug Fixes
+
+* add session id for cachePath ([c403af0](https://github.com/loopingz/smtp-relay/commit/c403af039246e3f29683932ca77b5416aaac5542))
+* **deps:** bump jws from 4.0.0 to 4.0.1 ([#131](https://github.com/loopingz/smtp-relay/issues/131)) ([d65f095](https://github.com/loopingz/smtp-relay/commit/d65f095cd7fbdefa625491db5fadc871b43bbd69))
+
 ## [2.2.2](https://github.com/loopingz/smtp-relay/compare/v2.2.1...v2.2.2) (2025-12-02)
 
 
