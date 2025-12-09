@@ -111,7 +111,7 @@ export interface SmtpConfig {
    */
   bind?: string;
   /**
-   * @default `.email_${iso8601}.eml`
+   * @default `.email_${iso8601}_${id}.eml`
    */
   cachePath?: string;
   /**
@@ -221,7 +221,7 @@ export class SmtpServer {
     });
     this.config.port ??= 10025;
     this.config.bind ??= "localhost";
-    this.config.cachePath ??= ".email_${iso8601}.eml";
+    this.config.cachePath ??= ".email_${iso8601}_${id}.eml";
     this.config.options ??= {};
     if (!this.config.mailHeaders) {
       const packageDesc = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, "..", "package.json")).toString());
