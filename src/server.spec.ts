@@ -272,6 +272,85 @@ class SmtpServerTest {
   }
 
   @test
+  async onDataWriteStreamError() {
+    // Configure server with cachePath pointing to a directory so fs.createWriteStream fails (EISDIR)
+    let server = new SmtpServer("./tests/whitelist-and.json");
+    server.config.cachePath = "."; // writing to a directory triggers write stream 'error'
+    const session = getFakeSession();
+    await new Promise<void>(resolve => {
+      server.onData(
+        <any>{
+          // minimal stream to allow pipe chaining
+          pipe() {
+            return this;
+          },
+          on() {
+            return this;
+          }
+        },
+        <any>session,
+        (err?: any) => {
+          assert.ok(err, "Expected write stream error to be propagated");
+          resolve();
+        }
+      );
+    });
+  }
+
+  @test
+  async onDataStreamError() {
+    // Use a real PassThrough stream and emit an error to hit stream.on('error') path
+    let server = new SmtpServer("./tests/whitelist-and.json");
+    const { PassThrough } = await import("node:stream");
+    const pt = new PassThrough();
+    const session = getFakeSession();
+    await new Promise<void>(resolve => {
+      server.onData(<any>pt, <any>session, (err?: any) => {
+        assert.ok(err, "Expected stream error to be propagated");
+        resolve();
+      });
+      // Emit error after onData sets handlers
+      setImmediate(() => {
+        pt.emit("error", new Error("boom"));
+      });
+    });
+  }
+
+  @test
+  async onDataStreamDestroyThrows() {
+    // Monkey-patch WriteStream.prototype.destroy to throw, without redefining exports
+    const fs = await import("node:fs");
+    const WriteStream = (fs as any).WriteStream;
+    const originalDestroy = WriteStream?.prototype?.destroy;
+    try {
+      if (!WriteStream || !originalDestroy) {
+        // Fallback to simple error coverage if WriteStream not available
+        return await this.onDataStreamError();
+      }
+      WriteStream.prototype.destroy = function () {
+        throw new Error("destroy failed");
+      };
+      let server = new SmtpServer("./tests/whitelist-and.json");
+      const { PassThrough } = await import("node:stream");
+      const pt = new PassThrough();
+      const session = getFakeSession();
+      await new Promise<void>(resolve => {
+        server.onData(<any>pt, <any>session, (err?: any) => {
+          assert.ok(err, "Expected error to be propagated even if destroy throws");
+          resolve();
+        });
+        setImmediate(() => {
+          pt.emit("error", new Error("boom"));
+        });
+      });
+    } finally {
+      if (WriteStream && originalDestroy) {
+        WriteStream.prototype.destroy = originalDestroy;
+      }
+    }
+  }
+
+  @test
   async prometheus() {
     let server = new SmtpServer("./tests/whitelist-prometheus.json");
     try {
@@ -346,7 +425,6 @@ export function getFakeSession(): SmtpSession {
   };
 }
 
-
 @suite
 class SmtpServerTlsTest {
   static before() {
@@ -368,10 +446,10 @@ class SmtpServerTlsTest {
             { name: "basicConstraints", cA: true },
             {
               name: "subjectAltName",
-                altNames: [
-                  { type: 2, value: "localhost" },
-                  { type: 7, ip: "127.0.0.1" }
-                ]
+              altNames: [
+                { type: 2, value: "localhost" },
+                { type: 7, ip: "127.0.0.1" }
+              ]
             }
           ]
         });
