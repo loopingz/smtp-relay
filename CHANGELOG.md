@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.2.5](https://github.com/loopingz/smtp-relay/compare/v2.2.4...v2.2.5) (2025-12-10)
+
+
+### Bug Fixes
+
+* transitive deps ([449993e](https://github.com/loopingz/smtp-relay/commit/449993e1e8a762ec568c5b2d4301b4b8eb382ea0))
+* update deps ([#135](https://github.com/loopingz/smtp-relay/issues/135)) ([444d093](https://github.com/loopingz/smtp-relay/commit/444d0932671937274d70a7def3de921073dcdf9b))
+
 ## [2.2.4](https://github.com/loopingz/smtp-relay/compare/v2.2.3...v2.2.4) (2025-12-10)
 
 
