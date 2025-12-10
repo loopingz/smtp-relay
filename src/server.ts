@@ -431,7 +431,7 @@ export class SmtpServer {
       try {
         writestream.destroy(err);
       } catch (e) {
-        /* ignore */
+        this.logger.log("ERROR", `Error destroying write stream for ${session.emailPath}`, e);
       }
       callback(`error converting stream - ${err}`);
     });
