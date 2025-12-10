@@ -215,7 +215,11 @@ export class SmtpServer {
 
     // Allow file:// for TLS options
     ["key", "ca", "cert", "pfx"].forEach(attr => {
-      if (this.config.options && typeof this.config.options[attr] === "string" && this.config.options[attr]?.startsWith("file://")) {
+      if (
+        this.config.options &&
+        typeof this.config.options[attr] === "string" &&
+        this.config.options[attr]?.startsWith("file://")
+      ) {
         this.config.options[attr] = fs.readFileSync(this.config.options[attr].replace("file://", "")).toString();
       }
     });
@@ -389,10 +393,14 @@ export class SmtpServer {
     // Data
     session.emailPath = SmtpServer.replaceVariables(this.config.cachePath, { ...session });
 
-    // @ts-ignore
-    stream.pipe(new HeadersTransform(this.config.mailHeaders)).pipe(fs.createWriteStream(session.emailPath));
-    // @ts-ignore
-    stream.on("end", async () => {
+    const writestream = fs.createWriteStream(session.emailPath);
+    // Handle write errors explicitly
+    writestream.on("error", err => {
+      this.logger.log("ERROR", `Error writing email to ${session.emailPath}`, err);
+      callback(err);
+    });
+    stream.pipe(new HeadersTransform(this.config.mailHeaders)).pipe(writestream);
+    writestream.on("finish", async () => {
       session.email = await simpleParser(fs.createReadStream(session.emailPath));
       await this.filter("Data", session, [session]);
       // If no decision made after RCPT TO we consider refused
@@ -419,7 +427,14 @@ export class SmtpServer {
       });
     });
 
-    stream.on("error", err => callback(`error converting stream - ${err}`));
+    stream.on("error", err => {
+      try {
+        writestream.destroy(err);
+      } catch (e) {
+        this.logger.log("ERROR", `Error destroying write stream for ${session.emailPath}`, e);
+      }
+      callback(`error converting stream - ${err}`);
+    });
   }
 
   /**
