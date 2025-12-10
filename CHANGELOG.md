@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.4](https://github.com/loopingz/smtp-relay/compare/v2.2.3...v2.2.4) (2025-12-10)
+
+
+### Bug Fixes
+
+* use right event for temporary .eml ([#133](https://github.com/loopingz/smtp-relay/issues/133)) ([7d45f3b](https://github.com/loopingz/smtp-relay/commit/7d45f3be5f35e20ac9eb050b66f205bed1fb5337))
+
 ## [2.2.3](https://github.com/loopingz/smtp-relay/compare/v2.2.2...v2.2.3) (2025-12-09)
 
 
