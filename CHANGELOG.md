@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.2.6](https://github.com/loopingz/smtp-relay/compare/v2.2.5...v2.2.6) (2026-01-26)
+
+
+### Bug Fixes
+
+* **deps:** bump @smithy/config-resolver from 4.3.0 to 4.4.5 ([#138](https://github.com/loopingz/smtp-relay/issues/138)) ([a53ea48](https://github.com/loopingz/smtp-relay/commit/a53ea489af9c30475ba4df1c53942024715cd268))
+* **deps:** bump lodash from 4.17.21 to 4.17.23 ([#139](https://github.com/loopingz/smtp-relay/issues/139)) ([a7b2b53](https://github.com/loopingz/smtp-relay/commit/a7b2b53237d6eb9d3a3721403fab1b36ba07dcbc))
+
 ## [2.2.5](https://github.com/loopingz/smtp-relay/compare/v2.2.4...v2.2.5) (2025-12-10)
 
 
