@@ -29,10 +29,10 @@
     "tmp": "^0.2.5"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.235.0",
-    "@aws-sdk/client-ses": "^3.235.0",
-    "@aws-sdk/client-sqs": "^3.235.0",
-    "@aws-sdk/client-sts": "^3.49.0",
+    "@aws-sdk/client-s3": "^3.987.0",
+    "@aws-sdk/client-ses": "^3.987.0",
+    "@aws-sdk/client-sqs": "^3.987.0",
+    "@aws-sdk/client-sts": "^3.987.0",
     "@google-cloud/pubsub": "^5.0.0",
     "@google-cloud/storage": "^7.1.0",
     "@webda/workout": "^3.0.3",
