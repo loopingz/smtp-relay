@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.2.7](https://github.com/loopingz/smtp-relay/compare/v2.2.6...v2.2.7) (2026-02-17)
+
+
+### Bug Fixes
+
+* **deps:** bump fast-xml-parser from 5.3.0 to 5.3.4 ([#141](https://github.com/loopingz/smtp-relay/issues/141)) ([1489c5a](https://github.com/loopingz/smtp-relay/commit/1489c5a896e376af07a132c988531f0272e6b6fc))
+* **deps:** bump undici and mailauth ([#147](https://github.com/loopingz/smtp-relay/issues/147)) ([2c840c4](https://github.com/loopingz/smtp-relay/commit/2c840c47c96571f160beef61c6dfcc0f8f2b5252))
+
 ## [2.2.6](https://github.com/loopingz/smtp-relay/compare/v2.2.5...v2.2.6) (2026-01-26)
 
 
