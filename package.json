@@ -38,7 +38,7 @@
     "@webda/workout": "^3.0.3",
     "axios": "^1.13.5",
     "cloudevents": "^9.0.0",
-    "fast-xml-parser": ">=5.3.4",
+    "fast-xml-parser": ">=5.3.6",
     "is-in-subnet": "^4.0.1",
     "jsonpath": "^1.2.1",
     "mailauth": "^4.13.0",
