@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.2.8](https://github.com/loopingz/smtp-relay/compare/v2.2.7...v2.2.8) (2026-02-20)
+
+
+### Bug Fixes
+
+* **deps:** bump ajv from 8.17.1 to 8.18.0 ([#150](https://github.com/loopingz/smtp-relay/issues/150)) ([7a3170a](https://github.com/loopingz/smtp-relay/commit/7a3170a91c231348f2ca75332be53a6b45b75f08))
+* **deps:** bump fast-xml-parser from 5.3.4 to 5.3.6 ([#148](https://github.com/loopingz/smtp-relay/issues/148)) ([6205dad](https://github.com/loopingz/smtp-relay/commit/6205dadb16b5d108ec1c114049830b8f9422b4b8))
+
 ## [2.2.7](https://github.com/loopingz/smtp-relay/compare/v2.2.6...v2.2.7) (2026-02-17)
 
 
