@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.9](https://github.com/loopingz/smtp-relay/compare/v2.2.8...v2.2.9) (2026-02-27)
+
+
+### Bug Fixes
+
+* update all deps (close [#151](https://github.com/loopingz/smtp-relay/issues/151)) ([#152](https://github.com/loopingz/smtp-relay/issues/152)) ([e01ee37](https://github.com/loopingz/smtp-relay/commit/e01ee374417b1b877a9366a5261136ef5bb44f59))
+
 ## [2.2.8](https://github.com/loopingz/smtp-relay/compare/v2.2.7...v2.2.8) (2026-02-20)
 
 
