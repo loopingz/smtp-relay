@@ -74,7 +74,7 @@ export class MailAuthFilter extends SmtpFilter<MailAuthConfig> {
     );
     session.context[flow] = { dkim, spf, dmarc, arc, bimi, receivedChain, headers };
 
-    if (dmarc.status.result === "fail" && dmarc.policy === "reject") {
+    if (dmarc && dmarc.status.result === "fail" && dmarc.policy === "reject") {
       return false;
     }
 

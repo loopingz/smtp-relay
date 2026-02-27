@@ -133,7 +133,7 @@ class MailAuthTest {
             signingDomain: "test.com"
           }
         ]
-      });
+      } as any);
       fs.writeFileSync(session.emailPath, result.signatures + originalContent, "utf-8");
       filterResult = await mailauth.onData(session, "mailauth");
       assert.strictEqual(session.context.mailauth.dkim.results[0].status.result, "pass", "DKIM should pass");
@@ -151,7 +151,7 @@ class MailAuthTest {
             signingDomain: "test.com"
           }
         ]
-      });
+      } as any);
       fs.writeFileSync(session.emailPath, result.signatures + originalContent, "utf-8");
       filterResult = await mailauth.onData(session, "mailauth");
       content = fs.readFileSync(session.emailPath, "utf-8");
