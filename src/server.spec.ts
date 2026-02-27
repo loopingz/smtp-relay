@@ -427,7 +427,7 @@ export function getFakeSession(): SmtpSession {
 
 @suite
 class SmtpServerTlsTest {
-  static before() {
+  static async before() {
     // Generate self-signed cert for localhost if not exists
     const __dirname = dirname(new URL(import.meta.url).pathname);
 
@@ -438,8 +438,7 @@ class SmtpServerTlsTest {
     if (!existsSync(keyPath) || !existsSync(certPath)) {
       try {
         const attrs = [{ name: "commonName", value: "localhost" }];
-        const pems = selfsigned.generate(attrs, {
-          days: 365,
+        const pems = await selfsigned.generate(attrs, {
           keySize: 2048,
           algorithm: "sha256",
           extensions: [
