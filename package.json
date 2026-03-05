@@ -31,7 +31,7 @@
     "fast-xml-parser": ">=5.4.1",
     "is-in-subnet": "^4.0.1",
     "jsonpath": "^1.2.1",
-    "mailauth": "^4.13.0",
+    "mailauth": "^4.13.1",
     "mailparser": "^3.9.3",
     "nodemailer": "^8.0.1",
     "prom-client": "^15.1.3",
