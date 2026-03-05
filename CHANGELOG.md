@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.10](https://github.com/loopingz/smtp-relay/compare/v2.2.9...v2.2.10) (2026-03-05)
+
+
+### Bug Fixes
+
+* **deps:** bump fast-xml-parser, @aws-sdk/xml-builder and mailauth ([#154](https://github.com/loopingz/smtp-relay/issues/154)) ([15f22e3](https://github.com/loopingz/smtp-relay/commit/15f22e3ce926d2fb88834bc05601b4089223098f))
+
 ## [2.2.9](https://github.com/loopingz/smtp-relay/compare/v2.2.8...v2.2.9) (2026-02-27)
 
 
