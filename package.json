@@ -18,6 +18,9 @@
     "relay",
     "ses"
   ],
+  "overrides": {
+    "fast-xml-parser": ">=5.4.1"
+  },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.999.0",
     "@aws-sdk/client-ses": "^3.999.0",
@@ -30,7 +33,6 @@
     "cloudevents": "^10.0.0",
     "fast-xml-parser": ">=5.4.1",
     "is-in-subnet": "^4.0.1",
-    "jsonpath": "^1.2.1",
     "mailauth": "^4.13.1",
     "mailparser": "^3.9.3",
     "nodemailer": "^8.0.1",

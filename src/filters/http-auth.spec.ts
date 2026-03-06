@@ -3,7 +3,7 @@ import { WorkerOutput } from "@webda/workout";
 import * as assert from "assert";
 import * as http from "http";
 import { SmtpFlow } from "../flow";
-import { HttpAuthFilter } from "./http-auth";
+import { HttpAuthFilter, jsonPathValue } from "./http-auth";
 
 @suite
 class HttpAuthSmtpServerTest {
@@ -134,5 +134,102 @@ class HttpAuthSmtpServerTest {
     } finally {
       await this.server?.close();
     }
+  }
+}
+
+@suite
+class JsonPathValueTest {
+  @test
+  "should read simple property"() {
+    const obj = { name: "John", age: 30 };
+    assert.strictEqual(jsonPathValue(obj, "name"), "John");
+    assert.strictEqual(jsonPathValue(obj, "age"), 30);
+  }
+
+  @test
+  "should read nested property"() {
+    const obj = { user: { name: "John", address: { city: "Paris" } } };
+    assert.strictEqual(jsonPathValue(obj, "user.name"), "John");
+    assert.strictEqual(jsonPathValue(obj, "user.address.city"), "Paris");
+  }
+
+  @test
+  "should handle $. prefix"() {
+    const obj = { user: { name: "John" } };
+    assert.strictEqual(jsonPathValue(obj, "$.user.name"), "John");
+    assert.strictEqual(jsonPathValue(obj, "user.name"), "John");
+  }
+
+  @test
+  "should return undefined for non-existent property"() {
+    const obj = { name: "John" };
+    assert.strictEqual(jsonPathValue(obj, "nonexistent"), undefined);
+    assert.strictEqual(jsonPathValue(obj, "user.name"), undefined);
+  }
+
+  @test
+  "should set simple property"() {
+    const obj = {};
+    jsonPathValue(obj, "name", "John");
+    assert.deepStrictEqual(obj, { name: "John" });
+  }
+
+  @test
+  "should set nested property and create intermediate objects"() {
+    const obj = {};
+    jsonPathValue(obj, "user.name", "John");
+    assert.deepStrictEqual(obj, { user: { name: "John" } });
+  }
+
+  @test
+  "should set deeply nested property"() {
+    const obj = {};
+    jsonPathValue(obj, "user.address.city", "Paris");
+    assert.deepStrictEqual(obj, { user: { address: { city: "Paris" } } });
+  }
+
+  @test
+  "should set property with $. prefix"() {
+    const obj = {};
+    jsonPathValue(obj, "$.user.name", "John");
+    assert.deepStrictEqual(obj, { user: { name: "John" } });
+  }
+
+  @test
+  "should update existing property"() {
+    const obj = { name: "John" };
+    jsonPathValue(obj, "name", "Jane");
+    assert.deepStrictEqual(obj, { name: "Jane" });
+  }
+
+  @test
+  "should set property in existing nested object"() {
+    const obj = { user: { age: 30 } };
+    jsonPathValue(obj, "user.name", "John");
+    assert.deepStrictEqual(obj, { user: { age: 30, name: "John" } });
+  }
+
+  @test
+  "should handle empty object"() {
+    const obj = {};
+    assert.strictEqual(jsonPathValue(obj, "name"), undefined);
+    jsonPathValue(obj, "name", "value");
+    assert.strictEqual(jsonPathValue(obj, "name"), "value");
+  }
+
+  @test
+  "should handle root level property"() {
+    const obj = { root: "value" };
+    assert.strictEqual(jsonPathValue(obj, "root"), "value");
+    jsonPathValue(obj, "root", "newValue");
+    assert.strictEqual(jsonPathValue(obj, "root"), "newValue");
+  }
+
+  @test
+  "should create multiple levels at once"() {
+    const obj = {};
+    jsonPathValue(obj, "a.b.c.d.e", "deep");
+    assert.strictEqual(jsonPathValue(obj, "a.b.c.d.e"), "deep");
+    assert.deepStrictEqual(obj, { a: { b: { c: { d: { e: "deep" } } } } });
   }
 }

@@ -1,9 +1,7 @@
 import { createHmac } from "crypto";
-import * as jsonpath from "jsonpath";
 import { SMTPServerAuthentication } from "smtp-server";
 import { SmtpFilter } from "../filter";
 import { HttpConfig } from "./http-filter";
-const jp = jsonpath.default;
 
 /**
  * Expose the fetch api (node>18) and add hmac signature
@@ -25,6 +23,41 @@ export async function request(options: RequestInit & HttpConfig) {
       .digest("hex");
   }
   return fetch(options.url, options);
+}
+
+export function jsonPathValue(object: any, path: string, value?: string) {
+  if (path.startsWith("$.")) {
+    path = path.substring(2);
+  }
+  const parts = path.split(".");
+  let current = object;
+  const isUnsafeKey = (key: string) =>
+    key === "__proto__" || key === "prototype" || key === "constructor";
+  for (let i = 0; i < parts.length; i++) {
+    const part = parts[i];
+    // Prevent prototype pollution by blocking unsafe keys
+    if (isUnsafeKey(part)) {
+      return undefined;
+    }
+    if (i === parts.length - 1 && value !== undefined) {
+      current[part] = value;
+      return;
+    }
+    if (current[part] === undefined) {
+      if (value !== undefined) {
+        // Only create nested objects when the current value is an object
+        if (current !== null && typeof current === "object") {
+          current[part] = {};
+        } else {
+          return undefined;
+        }
+      } else {
+        return undefined;
+      }
+    }
+    current = current[part];
+  }
+  return current;
 }
 
 export interface HttpAuthConfig extends HttpConfig {
@@ -123,8 +156,8 @@ export class HttpAuthFilter extends SmtpFilter<HttpAuthConfig> {
       return res.ok;
     } else if (this.config.credentialsMethod === "JSON") {
       const data = {};
-      jp.value(data, this.config.userField || "$.username", auth.username);
-      jp.value(data, this.config.passwordField || "$.password", auth.password);
+      jsonPathValue(data, this.config.userField || "$.username", auth.username);
+      jsonPathValue(data, this.config.passwordField || "$.password", auth.password);
       const res = await request({
         ...this.config,
         body: JSON.stringify(data),
@@ -132,7 +165,7 @@ export class HttpAuthFilter extends SmtpFilter<HttpAuthConfig> {
       });
       // If jsonpath is defined then we parse the answer
       if (this.config.json_result && res.ok) {
-        if (jp.value(await res.json(), this.config.json_result.path) === this.config.json_result.value) {
+        if (jsonPathValue(await res.json(), this.config.json_result.path) === this.config.json_result.value) {
           return true;
         }
         return false;
