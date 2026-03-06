@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.11](https://github.com/loopingz/smtp-relay/compare/v2.2.10...v2.2.11) (2026-03-06)
+
+
+### Bug Fixes
+
+* remove jsonpath ([#157](https://github.com/loopingz/smtp-relay/issues/157)) ([daab05f](https://github.com/loopingz/smtp-relay/commit/daab05facc6f58940e203379d98cccb8c0621055))
+
 ## [2.2.10](https://github.com/loopingz/smtp-relay/compare/v2.2.9...v2.2.10) (2026-03-05)
 
 
