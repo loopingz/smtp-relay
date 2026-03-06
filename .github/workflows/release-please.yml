@@ -17,7 +17,7 @@ jobs:
         with:
           release-type: node
           package-name: smtp-relay
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
         if: ${{ steps.release.outputs.release_created }}
