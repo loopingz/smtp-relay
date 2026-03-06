@@ -19,7 +19,7 @@ jobs:
           package-name: smtp-relay
       - uses: actions/checkout@v6
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v4
         if: ${{ steps.release.outputs.release_created }}
 
       - name: Build image
