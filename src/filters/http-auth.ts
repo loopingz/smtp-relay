@@ -31,15 +31,26 @@ export function jsonPathValue(object: any, path: string, value?: string) {
   }
   const parts = path.split(".");
   let current = object;
+  const isUnsafeKey = (key: string) =>
+    key === "__proto__" || key === "prototype" || key === "constructor";
   for (let i = 0; i < parts.length; i++) {
     const part = parts[i];
+    // Prevent prototype pollution by blocking unsafe keys
+    if (isUnsafeKey(part)) {
+      return undefined;
+    }
     if (i === parts.length - 1 && value !== undefined) {
       current[part] = value;
       return;
     }
     if (current[part] === undefined) {
       if (value !== undefined) {
-        current[part] = {};
+        // Only create nested objects when the current value is an object
+        if (current !== null && typeof current === "object") {
+          current[part] = {};
+        } else {
+          return undefined;
+        }
       } else {
         return undefined;
       }
