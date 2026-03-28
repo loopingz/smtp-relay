@@ -552,6 +552,9 @@ export class SmtpServer {
    */
   close() {
     this.server.close();
+    if (this.promServer) {
+      this.promServer.close();
+    }
   }
 }
 
