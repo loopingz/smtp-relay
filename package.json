@@ -71,7 +71,12 @@
     "exclude": [
       "**/*.spec.ts"
     ],
-    "excludeNodeModules": true
+    "excludeNodeModules": true,
+    "check-coverage": true,
+    "lines": 70,
+    "functions": 70,
+    "branches": 60,
+    "statements": 70
   },
   "devDependencies": {
     "@auto-it/all-contributors": "^11.3.6",
