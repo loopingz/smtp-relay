@@ -299,6 +299,26 @@ class SmtpServerTest {
   }
 
   @test
+  async onDataTransformError() {
+    // Trigger transform.on('error') path by using a stream that pipes through the HeadersTransform
+    let server = new SmtpServer("./tests/whitelist-and.json");
+    const { PassThrough } = await import("node:stream");
+    const pt = new PassThrough();
+    const session = getFakeSession();
+    await new Promise<void>(resolve => {
+      server.onData(<any>pt, <any>session, (err?: any) => {
+        assert.ok(err, "Expected transform error to be propagated");
+        resolve();
+      });
+      // The pipe chain is: pt -> HeadersTransform -> writestream
+      // Access the transform via pt's pipe destination
+      const pipes = (pt as any)._readableState.pipes;
+      const transform = Array.isArray(pipes) ? pipes[0] : pipes;
+      setImmediate(() => transform.emit("error", new Error("transform error")));
+    });
+  }
+
+  @test
   async onDataStreamError() {
     // Use a real PassThrough stream and emit an error to hit stream.on('error') path
     let server = new SmtpServer("./tests/whitelist-and.json");
