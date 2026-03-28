@@ -65,7 +65,6 @@ export class HttpFilter extends SmtpFilter<HttpFilterConfig> {
       },
       body: JSON.stringify(getCloudEvent(session))
     });
-    console.log("onData result", res, res.ok);
     return res.ok;
   }
 

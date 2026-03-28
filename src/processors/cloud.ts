@@ -150,7 +150,7 @@ export abstract class CloudProcessor<T extends CloudProcessorConfig = CloudProce
       await this.store(session);
     }
     if (this.config.pubsub) {
-      console.log(`Output[${this.name}] Publishing cloudevent to ${this.config.pubsub.topic}`);
+      (this.logger ?? console).log("INFO", `Output[${this.name}] Publishing cloudevent to ${this.config.pubsub.topic}`);
       await this.publishMessage(JSON.stringify(getCloudEvent(session, this.config.pubsub.truncate)));
     }
   }
