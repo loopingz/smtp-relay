@@ -13,7 +13,7 @@ export class SmtpComponent<T extends SmtpComponentConfig = SmtpComponentConfig> 
   name: string;
 
   constructor(public flow: SmtpFlow, public config: T, public logger: WorkerOutput) {
-    this.name = config.name;
+    this.name = config.name ?? config.type;
     this.init();
   }
 

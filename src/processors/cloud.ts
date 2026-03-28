@@ -94,26 +94,28 @@ export abstract class CloudProcessor<T extends CloudProcessorConfig = CloudProce
    */
   async store(session: SmtpSession) {
     const logger = (this.logger ?? console);
-    if (this.config.storage.type === "attachments") {
-      if (session.email.attachments.length === 0) {
-        logger.log("INFO", `Output[${this.name}] No attachment ignoring ${session.email.messageId}`);
+    const storage = this.config.storage!;
+    const email = session.email!;
+    if (storage.type === "attachments") {
+      if (email.attachments.length === 0) {
+        logger.log("INFO", `Output[${this.name}] No attachment ignoring ${email.messageId}`);
       }
-      for (const i in session.email.attachments) {
-        const attachment = session.email.attachments[i];
-        const destFileName = SmtpServer.replaceVariables(this.config.storage.path, session, {
+      for (const i in email.attachments) {
+        const attachment = email.attachments[i];
+        const destFileName = SmtpServer.replaceVariables(storage.path, session, {
           attachment: attachment.filename || `attachment_${i}`
         });
         logger.log("INFO", `Output[${this.name}] Storing attachment ${attachment.filename} to ${destFileName}`);
         await this.storeData(destFileName, attachment.content);
       }
     } else {
-      const destFileName = SmtpServer.replaceVariables(this.config.storage.path, session);
-      if (this.config.storage.type === "raw") {
+      const destFileName = SmtpServer.replaceVariables(storage.path, session);
+      if (storage.type === "raw") {
         logger.log("INFO", `Output[${this.name}] Storing ${this.config.type} to ${destFileName}`);
-        let file = session.emailPath;
-        if (this.config.storage.addRawHeaders) {
+        let file: string = session.emailPath!;
+        if (storage.addRawHeaders) {
           // We might want to prepend
-          await readFile(session.emailPath).then(data => {
+          await readFile(session.emailPath!).then(data => {
             const prefix = `X-smtp-relay-`;
             // Store the RCPT_TO and MAIL_FROM in the email
             const headers = session.envelope.rcptTo.map(a => `${prefix}RCPT_TO: ${sanitizeHeaderValue(a.address)}`);
@@ -131,19 +133,19 @@ export abstract class CloudProcessor<T extends CloudProcessorConfig = CloudProce
         }
         await this.storeFile(destFileName, file);
       } else {
-        let data: string;
-        if (this.config.storage.type === "text") {
-          data = session.email.text;
-        } else if (this.config.storage.type === "html" && session.email.html !== false) {
-          data = session.email.html;
+        let data: string | undefined;
+        if (storage.type === "text") {
+          data = email.text;
+        } else if (storage.type === "html" && email.html !== false) {
+          data = email.html;
         }
         if (data) {
-          logger.log("INFO", `Output[${this.name}] Storing ${this.config.storage.type} to ${destFileName}`);
+          logger.log("INFO", `Output[${this.name}] Storing ${storage.type} to ${destFileName}`);
           await this.storeData(destFileName, data);
         } else {
           logger.log(
             "DEBUG",
-            `Output[${this.name}] No data(${this.config.storage.type}) ignoring ${session.email.messageId}`
+            `Output[${this.name}] No data(${storage.type}) ignoring ${email.messageId}`
           );
         }
       }

@@ -32,7 +32,7 @@ export class NodeMailerProcessor<
   T extends NodeMailerProcessorConfig = NodeMailerProcessorConfig
 > extends SmtpProcessor<T> {
   type: string = "nodemailer";
-  transporter: nodemailer.Transporter;
+  transporter!: nodemailer.Transporter;
 
   /**
    * @override
@@ -48,13 +48,13 @@ export class NodeMailerProcessor<
    * @returns
    */
   static transformEmail(session: SmtpSession): Mail.Options {
-    const email = session.email;
-    const addressTransformer = a => {
-      return a.value.map(ad => ad.address);
+    const email = session.email!;
+    const addressTransformer = (a: AddressObject): string[] => {
+      return a.value.map(ad => ad.address).filter((addr): addr is string => addr !== undefined);
     };
     // If no headers we do not fill the bcc as we have no to,cc headers
-    if (session.email.headerLines?.length && !session.email.bcc) {
-      const noBcc = [session.email.cc, session.email.to].flat().filter(a => a);
+    if (email.headerLines?.length && !email.bcc) {
+      const noBcc = [email.cc, email.to].flat().filter((a): a is AddressObject => !!a);
       const bcc: AddressObject[] = session.envelope.rcptTo
         .filter(a => {
           // Find address that are not included in the to/cc headers
@@ -62,11 +62,11 @@ export class NodeMailerProcessor<
         })
         .map(a => ({ value: AddressParser(a.address), text: a.address, html: a.address }));
       if (bcc.length) {
-        session.email.bcc = bcc.length === 1 ? bcc.pop() : bcc;
+        email.bcc = bcc.length === 1 ? bcc.pop() : bcc;
       }
     }
     return {
-      from: email.from.text,
+      from: email.from?.text,
       to: mapAddressObjects<string[]>(email.to, addressTransformer)?.flat(),
       cc: mapAddressObjects<string[]>(email.cc, addressTransformer)?.flat(),
       text: email.text,
@@ -74,14 +74,14 @@ export class NodeMailerProcessor<
       subject: email.subject,
       attachments: email.attachments.map(a => ({
         ...a,
-        contentDisposition: a.contentDisposition === "inline" ? "inline" : "attachment",
-        headers: (headers => {
-          let res = {};
+        contentDisposition: a.contentDisposition === "inline" ? "inline" : "attachment" as const,
+        headers: ((headers: Map<string, string>) => {
+          let res: { [key: string]: string } = {};
           [...headers.keys()].forEach(k => {
-            res[k] = headers.get(k);
+            res[k] = headers.get(k)!;
           });
           return res;
-        })(a.headers)
+        })(a.headers as unknown as Map<string, string>)
       }))
     };
   }

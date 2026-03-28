@@ -25,12 +25,12 @@ class GCPProcessorTest {
 
   @test
   async pubsub() {
-    let gcp = new GCPProcessor(undefined, { type: "gcp", pubsub: { topic: "test" } }, new WorkerOutput());
+    let gcp = new GCPProcessor(undefined as any, { type: "gcp", pubsub: { topic: "test" } }, new WorkerOutput());
     let session: SmtpSession = getFakeSession();
     let evt;
-    sinon.stub(gcp.pubsub, "topic").callsFake(() => {
+    (sinon.stub(gcp.pubsub, "topic") as any).callsFake(() => {
       return {
-        publishMessage: ({ data }) => {
+        publishMessage: ({ data }: { data: any }) => {
           evt = data;
         }
       };
@@ -42,7 +42,7 @@ class GCPProcessorTest {
   @test
   async storage() {
     let gcp: GCPProcessor = new GCPProcessor(
-      undefined,
+      undefined as any,
       {
         type: "gcp",
         storage: { bucket: "test", path: "${id}.eml" }
@@ -50,23 +50,23 @@ class GCPProcessorTest {
       new WorkerOutput()
     );
     let session: SmtpSession = getFakeSession();
-    let filename;
-    let destination;
-    let content;
-    let bucket;
+    let filename: any;
+    let destination: any;
+    let content: any;
+    let bucket: any;
     // Test raw
-    sinon.stub(gcp.storage, "bucket").callsFake(bucketname => {
+    (sinon.stub(gcp.storage, "bucket") as any).callsFake((bucketname: any) => {
       bucket = bucketname;
       return {
-        file: argFilename => {
+        file: (argFilename: any) => {
           filename = argFilename;
           return {
-            save: argContent => {
+            save: (argContent: any) => {
               content = argContent;
             }
           };
         },
-        upload: (argFilename, params) => {
+        upload: (argFilename: any, params: any) => {
           filename = argFilename;
           destination = params.destination;
         }
@@ -85,14 +85,14 @@ class GCPProcessorTest {
     assert.strictEqual(destination, "1234.eml");
 
     bucket = filename = destination = undefined;
-    gcp.config.storage.type = "text";
+    gcp.config.storage!.type = "text";
     // No text to save
     await gcp.onMail(session);
     assert.strictEqual(bucket, undefined);
 
-    session.email.html = "Coucou";
+    session.email!.html = "Coucou";
     bucket = filename = destination = undefined;
-    gcp.config.storage.type = "html";
+    gcp.config.storage!.type = "html";
     // HTML export
     await gcp.onMail(session);
     assert.strictEqual(bucket, "test");
@@ -101,11 +101,11 @@ class GCPProcessorTest {
 
     // Attachments exports
     bucket = filename = destination = undefined;
-    gcp.config.storage.type = "attachments";
-    gcp.config.storage.path = "${id}_${attachment}";
+    gcp.config.storage!.type = "attachments";
+    gcp.config.storage!.path = "${id}_${attachment}";
     await gcp.onMail(session);
     assert.strictEqual(bucket, undefined);
-    session.email.attachments.push(<Attachment>(<unknown>{
+    session.email!.attachments.push(<Attachment>(<unknown>{
       filename: "plop",
       content: Buffer.from("Coucou")
     }));
@@ -113,7 +113,7 @@ class GCPProcessorTest {
     assert.strictEqual(bucket, "test");
     assert.strictEqual(filename, "1234_plop");
     assert.deepStrictEqual(content.toString(), "Coucou");
-    session.email.attachments = [<Attachment>(<unknown>{
+    session.email!.attachments = [<Attachment>(<unknown>{
         content: Buffer.from("Coucou")
       })];
     await gcp.onMail(session);

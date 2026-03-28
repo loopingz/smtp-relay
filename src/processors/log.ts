@@ -31,12 +31,12 @@ export class LogProcessor<T extends LogProcessorConfig = LogProcessorConfig> ext
 ${"-".repeat(80)}
 `;
 
-    this.config.fields
-      .filter(f => email[f] !== undefined)
+    this.config.fields!
+      .filter(f => (email as any)[f] !== undefined)
       .forEach(f => {
-        let value = email[f];
+        let value = (email as any)[f];
         if (value instanceof Array) {
-          value = email[f].join(", ");
+          value = (email as any)[f].join(", ");
         }
         content += `${f}: ${value}\n`;
       });

@@ -14,13 +14,13 @@ import { join, dirname } from "node:path";
 import selfsigned from "selfsigned";
 
 export class SmtpTest {
-  sock: Socket;
-  output: string;
-  waitForPromise: () => void;
-  waitCode: string;
-  smtpServer: SmtpServer;
+  sock!: Socket;
+  output!: string;
+  waitForPromise: (() => void) | null = null;
+  waitCode!: string;
+  smtpServer!: SmtpServer;
 
-  async write(data, nextCode = undefined) {
+  async write(data: string, nextCode?: string) {
     return new Promise<void>(resolve => {
       console.log("Sending:", data);
       if (!data.endsWith("\n")) {
@@ -42,7 +42,7 @@ export class SmtpTest {
     this.smtpServer?.close();
   }
 
-  async waitFor(code) {
+  async waitFor(code: string) {
     this.waitCode = code;
     return new Promise<void>(resolve => {
       this.waitForPromise = resolve;
@@ -66,7 +66,7 @@ export class SmtpTest {
         if (data.toString().substr(0, 3) === this.waitCode) {
           let p = this.waitForPromise;
           this.waitForPromise = null;
-          p();
+          p?.();
         }
       });
       this.sock.on("end", () => resolve(this.output));
@@ -99,7 +99,7 @@ export class SmtpTest {
         if (data.toString().substr(0, 3) === this.waitCode) {
           let p = this.waitForPromise;
           this.waitForPromise = null;
-          p();
+          p?.();
         }
       });
       this.sock.on("end", () => resolve(this.output));
@@ -154,7 +154,7 @@ class CountFilter extends SmtpFilter {
     ["Connect", "Data", "RcptTo", "MailFrom", "Auth"].forEach(m => {
       m = `on${m}`;
       this.stats[m] = 0;
-      this[m] = async (...args) => {
+      (this as any)[m] = async (...args: any[]) => {
         this.stats[m]++;
         return undefined;
       };
@@ -165,7 +165,7 @@ class CountFilter extends SmtpFilter {
 class OpenFilter extends SmtpFilter {
   type: string = "allow";
 
-  async onRcptTo(address, session): Promise<true> {
+  async onRcptTo(address: any, session: any): Promise<true> {
     return true;
   }
 }
@@ -247,10 +247,10 @@ class SmtpServerTest {
     // @ts-ignore
     await server.onDataRead(null);
     assert.strictEqual(logger.getLogs().length, 1);
-    await server.onConnect(null, () => {});
-    await server.onEvent("RcptTo", null, null, () => {});
+    await server.onConnect(null as any, () => {});
+    await server.onEvent("RcptTo", null as any, null as any, () => {});
 
-    assert.throws(() => SmtpProcessor.get(null, { type: "unknown-processor" }), /unknown-processor/);
+    assert.throws(() => SmtpProcessor.get(null as any, { type: "unknown-processor" }), /unknown-processor/);
     assert.throws(() => new SmtpServer("./tests/whitelist-and.ini"), /Configuration format not handled/);
     new SmtpServer("./tests/whitelist.yaml");
     // Verify counter analyzing
@@ -357,7 +357,7 @@ class SmtpServerTest {
       await axios.get("http://localhost:8080/metrics");
       await assert.rejects(() => axios.get("http://localhost:8080/plop"), /404/);
     } finally {
-      server.promServer.close();
+      server.promServer!.close();
     }
   }
 
@@ -376,7 +376,7 @@ class SmtpServerTest {
       if (data.toString().substr(0, 3) === test.waitCode) {
         let p = test.waitForPromise;
         test.waitForPromise = null;
-        p();
+        p?.();
       }
     });
     await p1;
@@ -493,7 +493,7 @@ class SmtpServerTlsTest {
       if (data.toString().substr(0, 3) === test.waitCode) {
         let p = test.waitForPromise;
         test.waitForPromise = null;
-        p();
+        p?.();
       }
     });
     await p1;

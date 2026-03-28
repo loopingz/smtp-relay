@@ -24,10 +24,10 @@ class AWSProcessorTest {
 
   @test
   async pubsub() {
-    let aws = new AWSProcessor(undefined, { type: "aws", pubsub: { topic: "test" } }, new WorkerOutput());
+    let aws = new AWSProcessor(undefined as any, { type: "aws", pubsub: { topic: "test" } }, new WorkerOutput());
     let session: SmtpSession = getFakeSession();
     let evt;
-    sinon.stub(aws.sqs, "sendMessage").callsFake(data => {
+    sinon.stub(aws.sqs, "sendMessage").callsFake((data: any) => {
       evt = data;
     });
     await aws.onMail(session);
@@ -37,7 +37,7 @@ class AWSProcessorTest {
   @test
   async storage() {
     let aws: AWSProcessor = new AWSProcessor(
-      undefined,
+      undefined as any,
       {
         type: "aws",
         storage: { bucket: "test", path: "${id}.eml" }
@@ -45,9 +45,9 @@ class AWSProcessorTest {
       new WorkerOutput()
     );
     let session: SmtpSession = getFakeSession();
-    let cmd;
+    let cmd: any;
     // Test raw
-    sinon.stub(aws.s3, "putObject").callsFake(arg => {
+    sinon.stub(aws.s3, "putObject").callsFake((arg: any) => {
       cmd = arg;
     });
     session.emailPath = "./src/index.ts";
@@ -56,8 +56,8 @@ class AWSProcessorTest {
     assert.deepStrictEqual(cmd.Key, "1234.eml");
 
     cmd = undefined;
-    session.email.html = "Coucou";
-    aws.config.storage.type = "html";
+    session.email!.html = "Coucou";
+    aws.config.storage!.type = "html";
     // No text to save
     await aws.onMail(session);
     assert.deepStrictEqual(cmd.Bucket, "test");
@@ -68,7 +68,7 @@ class AWSProcessorTest {
   @test
   async ses() {
     let aws: AWSProcessor = new AWSProcessor(
-      undefined,
+      undefined as any,
       {
         type: "aws",
         ses: true
@@ -76,9 +76,9 @@ class AWSProcessorTest {
       new WorkerOutput()
     );
     let session: SmtpSession = getFakeSession();
-    let cmd;
+    let cmd: any;
     // Test raw
-    sinon.stub(aws.ses, "sendRawEmail").callsFake(arg => {
+    sinon.stub(aws.ses, "sendRawEmail").callsFake((arg: any) => {
       cmd = arg;
     });
     session.emailPath = "./src/index.ts";

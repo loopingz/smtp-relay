@@ -7,7 +7,7 @@ import { HttpAuthFilter, jsonPathValue } from "./http-auth";
 
 @suite
 class HttpAuthSmtpServerTest {
-  server;
+  server: any;
   jsonpath: boolean = false;
 
   before() {

@@ -5,10 +5,10 @@ import { SmtpFlow } from "./flow";
 import { SmtpSession } from "./server";
 
 export class SmtpFilter<T extends SmtpComponentConfig = SmtpComponentConfig> extends SmtpComponent<T> {
-  name: string;
-  flow: SmtpFlow;
-  config: T;
-  logger: WorkerOutput;
+  declare name: string;
+  declare flow: SmtpFlow;
+  declare config: T;
+  declare logger: WorkerOutput;
 
   async onAuth(_auth: SMTPServerAuthentication, _session: SmtpSession, _flow?: string): Promise<boolean | undefined> {
     return undefined;
@@ -16,19 +16,19 @@ export class SmtpFilter<T extends SmtpComponentConfig = SmtpComponentConfig> ext
   async onConnect(_session: SmtpSession, _flow?: string): Promise<boolean | undefined> {
     return undefined;
   }
-  onMailFrom(_address: SMTPServerAddress, _session: SmtpSession, _flow?: string): Promise<boolean | undefined> {
+  async onMailFrom(_address: SMTPServerAddress, _session: SmtpSession, _flow?: string): Promise<boolean | undefined> {
     return undefined;
   }
-  onRcptTo(_address: SMTPServerAddress, _session: SmtpSession, _flow?: string): Promise<boolean | undefined> {
+  async onRcptTo(_address: SMTPServerAddress, _session: SmtpSession, _flow?: string): Promise<boolean | undefined> {
     return undefined;
   }
-  onData(_session: SmtpSession, _flow?: string): Promise<boolean | undefined> {
+  async onData(_session: SmtpSession, _flow?: string): Promise<boolean | undefined> {
     return undefined;
   }
 
-  static registry = {};
+  static registry: { [key: string]: new (...args: any[]) => SmtpFilter } = {};
 
-  static register(type: string, constructor) {
+  static register(type: string, constructor: new (...args: any[]) => SmtpFilter) {
     SmtpFilter.registry[type] = constructor;
   }
 
@@ -39,11 +39,11 @@ export class SmtpFilter<T extends SmtpComponentConfig = SmtpComponentConfig> ext
     return new SmtpFilter.registry[config.type](flow, config, flow.logger);
   }
 
-  getState(session: SmtpSession) {
+  getState(session: SmtpSession & { [key: string]: any }) {
     return session[`${this.flow.name}_${this.name}`];
   }
 
-  setState(session: SmtpSession, state: any) {
+  setState(session: SmtpSession & { [key: string]: any }, state: any) {
     session[`${this.flow.name}_${this.name}`] = state;
   }
 }

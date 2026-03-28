@@ -14,11 +14,12 @@ import {
 } from "smtp-server";
 import stripJsonComments from "strip-json-comments";
 import { parse as YAMLParse } from "yaml";
+import { SmtpFilter } from "./filter";
 import { SmtpFlow, SmtpFlowConfig } from "./flow";
 import { HeadersTransform, HeadersTransformConfig } from "./headers_transformer";
 import { TlsOptions } from "tls";
 
-export type SmtpCallback = (err?, result?) => void;
+export type SmtpCallback = (err?: any, result?: any) => void;
 export type SmtpNext = () => void;
 
 export interface LoggerOptions {
@@ -196,14 +197,14 @@ export interface SmtpSession extends SMTPServerSession {
 }
 
 export class SmtpServer {
-  server: SMTPServer;
+  server!: SMTPServer;
   config: SmtpConfig;
   flows: { [key: string]: SmtpFlow };
   logger: WorkerOutput;
   counter?: Counter;
-  promServer: http.Server<typeof http.IncomingMessage, typeof http.ServerResponse>;
+  promServer?: http.Server<typeof http.IncomingMessage, typeof http.ServerResponse>;
 
-  constructor(configFile: string = undefined) {
+  constructor(configFile?: string) {
     if (!configFile) {
       configFile = "./smtp-relay.json";
     }
@@ -219,13 +220,13 @@ export class SmtpServer {
     }
 
     // Allow file:// for TLS options
-    ["key", "ca", "cert", "pfx"].forEach(attr => {
+    (["key", "ca", "cert", "pfx"] as const).forEach(attr => {
       if (
         this.config.options &&
-        typeof this.config.options[attr] === "string" &&
-        this.config.options[attr]?.startsWith("file://")
+        typeof (this.config.options as any)[attr] === "string" &&
+        (this.config.options as any)[attr]?.startsWith("file://")
       ) {
-        this.config.options[attr] = fs.readFileSync(this.config.options[attr].replace("file://", "")).toString();
+        (this.config.options as any)[attr] = fs.readFileSync((this.config.options as any)[attr].replace("file://", "")).toString();
       }
     });
     this.config.port ??= 10025;
@@ -254,7 +255,7 @@ export class SmtpServer {
       });
       this.promServer = http
         .createServer(async (req, res) => {
-          if (req.method === "GET" && req.url === this.config.prometheus.url) {
+          if (req.method === "GET" && req.url === this.config.prometheus!.url) {
             res.writeHead(200, { "Content-Type": register.contentType });
             res.write(await register.metrics());
             res.end();
@@ -273,11 +274,11 @@ export class SmtpServer {
   }
 
   init() {
-    this.config.options.loggers.forEach(logger => {
+    this.config.options.loggers!.forEach(logger => {
       if (logger.type === "CONSOLE") {
-        new ConsoleLogger(this.logger, logger.level, logger.format);
+        new ConsoleLogger(this.logger, logger.level as WorkerLogLevel, logger.format);
       } else if (logger.type === "FILE") {
-        new FileLogger(this.logger, logger.level, logger.filepath, logger.sizeLimit, logger.format);
+        new FileLogger(this.logger, logger.level as WorkerLogLevel, logger.filepath, logger.sizeLimit, logger.format);
       }
     });
 
@@ -286,7 +287,7 @@ export class SmtpServer {
       banner: "loopingz/smtp-relay",
       ...this.config.options,
       // We move SMTPServer log INFO level to DEBUG as it is very verbose
-      logger: this.config.options.loggers.length > 0 ? { ...logger, info: logger.debug, level: () => {} } : false,
+      logger: this.config.options.loggers!.length > 0 ? { ...logger, info: logger.debug, level: () => {} } : false,
       onAuth: (auth: SMTPServerAuthentication, session: SmtpSession, callback: SmtpCallback) =>
         this.onAuth(auth, session, callback),
       onConnect: (session: SmtpSession, callback: SmtpCallback) => this.onConnect(session, callback),
@@ -319,7 +320,7 @@ export class SmtpServer {
    * @param flow
    */
   removeFlow(flow: SmtpFlow) {
-    this.flows[flow.name] = undefined;
+    delete this.flows[flow.name];
   }
 
   private withTimeout<T>(promise: Promise<T> | T, label: string): Promise<T> {
@@ -342,8 +343,9 @@ export class SmtpServer {
         continue;
       }
       for (let filter of flow.filters) {
+        const method = `on${evt}` as keyof SmtpFilter;
         let res = await this.withTimeout(
-          filter[`on${evt}`](...args, name),
+          (filter[method] as (...a: any[]) => Promise<boolean | undefined>)(...args, name),
           `Filter '${filter.config.type}' on ${evt}`
         );
         // If undefined the filter is not giving an answer so skipping
@@ -413,17 +415,17 @@ export class SmtpServer {
    */
   async onData(stream: SMTPServerDataStream, session: SmtpSession, callback: SmtpCallback) {
     // Data
-    session.emailPath = SmtpServer.replaceVariables(this.config.cachePath, { ...session });
+    session.emailPath = SmtpServer.replaceVariables(this.config.cachePath!, { ...session } as SmtpSession);
 
-    const writestream = fs.createWriteStream(session.emailPath);
+    const writestream = fs.createWriteStream(session.emailPath!);
     // Handle write errors explicitly
     writestream.on("error", err => {
       this.logger.log("ERROR", `Error writing email to ${session.emailPath}`, err);
       callback(err);
     });
-    stream.pipe(new HeadersTransform(this.config.mailHeaders)).pipe(writestream);
+    stream.pipe(new HeadersTransform(this.config.mailHeaders!)).pipe(writestream);
     writestream.on("finish", async () => {
-      session.email = await simpleParser(fs.createReadStream(session.emailPath));
+      session.email = await simpleParser(fs.createReadStream(session.emailPath!));
       await this.filter("Data", session, [session]);
       // If no decision made after RCPT TO we consider refused
       for (let name in session.flows) {
@@ -440,7 +442,7 @@ export class SmtpServer {
         (async () => {
           await this.onDataRead(session);
           if (!this.config.keepCache) {
-            fs.unlink(session.emailPath, err => {
+            fs.unlink(session.emailPath!, err => {
               err && this.logger.log("ERROR", `Unable to delete ${session.emailPath}`, err);
             });
           }

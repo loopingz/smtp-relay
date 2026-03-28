@@ -8,9 +8,9 @@ import { SmtpSession } from "./server";
 export abstract class SmtpProcessor<T extends SmtpComponentConfig = SmtpComponentConfig> extends SmtpComponent<T> {
   abstract onMail(session: SmtpSession): Promise<any>;
 
-  static registry = {};
+  static registry: { [key: string]: new (...args: any[]) => SmtpProcessor } = {};
 
-  static register(type: string, constructor) {
+  static register(type: string, constructor: new (...args: any[]) => SmtpProcessor) {
     SmtpProcessor.registry[type] = constructor;
   }
 

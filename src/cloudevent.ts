@@ -1,6 +1,6 @@
 import { CloudEvent } from "cloudevents";
 import { SmtpSession } from "./server";
-import { AddressObject } from "mailparser";
+import { AddressObject, ParsedMail } from "mailparser";
 import { SMTPServerAddress } from "smtp-server";
 
 /**
@@ -39,7 +39,7 @@ export function getCloudEvent<T extends SmtpCloudEvent = SmtpCloudEvent>(
   session: SmtpSession,
   truncation: number = 8192
 ): CloudEvent<T> {
-  const getAddressObject = (arg: SMTPServerAddress | false) : AddressObject => {
+  const getAddressObject = (arg: SMTPServerAddress | false) : AddressObject | undefined => {
     if (!arg) {
       return undefined;
     }
@@ -54,28 +54,29 @@ export function getCloudEvent<T extends SmtpCloudEvent = SmtpCloudEvent>(
       text: arg.address
     }
   }
-  session.email.from ??= getAddressObject(session.envelope.mailFrom);
-  session.email.to ??= session.envelope.rcptTo?.map(a => getAddressObject(a));
+  const email = session.email!;
+  email.from ??= getAddressObject(session.envelope.mailFrom);
+  email.to ??= session.envelope.rcptTo?.map(a => getAddressObject(a)).filter((a): a is AddressObject => a !== undefined);
   return new CloudEvent<T>({
     type: "com.loopingz.smtp-relay.v2",
     source: session.localAddress,
     time: session.time.toISOString(),
-    subject: session.email?.messageId,
+    subject: email?.messageId,
     data: <T>{
-      email: (email => ({
-        from: email.from,
-        attachments: email.attachments.map(a => ({
+      email: ((e: ParsedMail) => ({
+        from: e.from,
+        attachments: e.attachments.map(a => ({
           filename: a.filename?.substring(0, truncation),
           size: a.size
         })),
-        subject: email.subject?.substring(0, truncation),
-        priority: email.priority,
-        cc: email.cc,
-        to: email.to,
-        bcc: email.bcc,
-        text: email.text?.substring(0, truncation),
-        html: email.html ? email.html.substring(0, truncation) : undefined
-      }))(session.email),
+        subject: e.subject?.substring(0, truncation),
+        priority: e.priority,
+        cc: e.cc,
+        to: e.to,
+        bcc: e.bcc,
+        text: e.text?.substring(0, truncation),
+        html: e.html ? e.html.substring(0, truncation) : undefined
+      }))(email),
       server: {
         clientHostname: session.clientHostname.substring(0, truncation),
         remoteAddress: session.remoteAddress,
