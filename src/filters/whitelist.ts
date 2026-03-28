@@ -58,7 +58,11 @@ export class WhitelistFilter extends SmtpFilter<WhitelistFilterConfiguration> {
     if (!reg.endsWith("$")) {
       reg += "$";
     }
-    return new RegExp(reg);
+    try {
+      return new RegExp(reg);
+    } catch (e) {
+      throw new Error(`Invalid regex pattern in whitelist filter: '${reg}' - ${e instanceof Error ? e.message : e}`);
+    }
   }
 
   /**
@@ -76,7 +80,7 @@ export class WhitelistFilter extends SmtpFilter<WhitelistFilterConfiguration> {
           if (f === value) {
             return true;
           }
-        } else if (f instanceof RegExp && f.exec(value)) {
+        } else if (f instanceof RegExp && f.test(value)) {
           return true;
         }
       }
