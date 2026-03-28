@@ -2,7 +2,7 @@ import { SMTPServerAuthentication } from "smtp-server";
 import { SmtpComponentConfig } from "../component";
 import { SmtpFilter } from "../filter";
 import { SmtpSession } from "../server";
-import { request } from "./http-auth";
+import { request, validateUrl } from "./http-auth";
 import { getCloudEvent } from "../cloudevent";
 
 export interface HttpConfig extends SmtpComponentConfig {
@@ -27,6 +27,11 @@ export interface HttpConfig extends SmtpComponentConfig {
      */
     header?: string;
   };
+  /**
+   * Skip SSRF validation on URLs (for development/testing only)
+   * @default false
+   */
+  allowPrivateUrls?: boolean;
 }
 
 export interface HttpFilterConfig extends HttpConfig {
@@ -52,6 +57,9 @@ export class HttpFilter extends SmtpFilter<HttpFilterConfig> {
   init() {
     if (this.config.url === undefined) {
       throw new Error("http-auth filter requires an url");
+    }
+    if (!this.config.allowPrivateUrls) {
+      validateUrl(this.config.url);
     }
     this.config.allowAnyUser ??= false;
     this.config.method ??= "POST";

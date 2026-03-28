@@ -5,7 +5,8 @@
           {
             "type": "http-filter",
             "url": "http://localhost:16662/smtp/filter",
-            "allowAnyUser": true
+            "allowAnyUser": true,
+            "allowPrivateUrls": true
           }
         ],
         "outputs": [

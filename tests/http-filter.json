@@ -4,7 +4,8 @@
         "filters": [
           {
             "type": "http-filter",
-            "url": "http://localhost:16662/smtp/filter"
+            "url": "http://localhost:16662/smtp/filter",
+            "allowPrivateUrls": true
           }
         ],
         "outputs": [

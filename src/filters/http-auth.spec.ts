@@ -3,7 +3,7 @@ import { WorkerOutput } from "@webda/workout";
 import * as assert from "assert";
 import * as http from "http";
 import { SmtpFlow } from "../flow";
-import { HttpAuthFilter, jsonPathValue } from "./http-auth";
+import { HttpAuthFilter, jsonPathValue, validateUrl } from "./http-auth";
 
 @suite
 class HttpAuthSmtpServerTest {
@@ -86,7 +86,11 @@ class HttpAuthSmtpServerTest {
           ),
         /http-auth filter cannot use GET method with other than BASIC_AUTH/
       );
-      filter = new HttpAuthFilter(flow, <any>{ type: "http-auth", url: "http://localhost:16661" }, logger);
+      filter = new HttpAuthFilter(
+        flow,
+        <any>{ type: "http-auth", url: "http://localhost:16661", allowPrivateUrls: true },
+        logger
+      );
       assert.ok(
         !(await filter.onAuth({ method: "LOGIN", username: "test", password: "plop", validatePassword: () => false }))
       );
@@ -231,5 +235,50 @@ class JsonPathValueTest {
     jsonPathValue(obj, "a.b.c.d.e", "deep");
     assert.strictEqual(jsonPathValue(obj, "a.b.c.d.e"), "deep");
     assert.deepStrictEqual(obj, { a: { b: { c: { d: { e: "deep" } } } } });
+  }
+}
+
+@suite
+class ValidateUrlTest {
+  @test
+  "should allow public HTTP URLs"() {
+    assert.doesNotThrow(() => validateUrl("http://example.com/api"));
+    assert.doesNotThrow(() => validateUrl("https://example.com/api"));
+  }
+
+  @test
+  "should block non-HTTP protocols"() {
+    assert.throws(() => validateUrl("ftp://example.com"), /SSRF protection: protocol/);
+    assert.throws(() => validateUrl("file:///etc/passwd"), /SSRF protection: protocol/);
+    assert.throws(() => validateUrl("gopher://example.com"), /SSRF protection: protocol/);
+  }
+
+  @test
+  "should block localhost"() {
+    assert.throws(() => validateUrl("http://localhost"), /SSRF protection: hostname/);
+    assert.throws(() => validateUrl("http://localhost:8080"), /SSRF protection: hostname/);
+  }
+
+  @test
+  "should block loopback and private IPs"() {
+    assert.throws(() => validateUrl("http://127.0.0.1"), /SSRF protection: private IP/);
+    assert.throws(() => validateUrl("http://10.0.0.1"), /SSRF protection: private IP/);
+    assert.throws(() => validateUrl("http://172.16.0.1"), /SSRF protection: private IP/);
+    assert.throws(() => validateUrl("http://172.31.255.255"), /SSRF protection: private IP/);
+    assert.throws(() => validateUrl("http://192.168.1.1"), /SSRF protection: private IP/);
+    assert.throws(() => validateUrl("http://169.254.169.254"), /SSRF protection: private IP/);
+    assert.throws(() => validateUrl("http://0.0.0.0"), /SSRF protection: hostname/);
+  }
+
+  @test
+  "should block IPv6 loopback"() {
+    assert.throws(() => validateUrl("http://[::1]"), /SSRF protection: hostname/);
+  }
+
+  @test
+  "should allow non-private IPs"() {
+    assert.doesNotThrow(() => validateUrl("http://8.8.8.8"));
+    assert.doesNotThrow(() => validateUrl("http://172.32.0.1"));
+    assert.doesNotThrow(() => validateUrl("http://172.15.0.1"));
   }
 }

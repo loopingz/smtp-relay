@@ -4,6 +4,37 @@ import { SmtpFilter } from "../filter";
 import { HttpConfig } from "./http-filter";
 
 /**
+ * Validate URL to prevent SSRF attacks
+ * Blocks private/internal addresses and non-HTTP protocols
+ */
+export function validateUrl(urlStr: string) {
+  const url = new URL(urlStr);
+  if (!["http:", "https:"].includes(url.protocol)) {
+    throw new Error(`SSRF protection: protocol '${url.protocol}' is not allowed, only http: and https:`);
+  }
+  const hostname = url.hostname.toLowerCase();
+  // Block obvious localhost variants
+  if (hostname === "localhost" || hostname === "[::1]" || hostname === "0.0.0.0") {
+    throw new Error(`SSRF protection: hostname '${hostname}' is not allowed`);
+  }
+  // Block private IPv4 ranges
+  const ipMatch = hostname.match(/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/);
+  if (ipMatch) {
+    const [, a, b] = ipMatch.map(Number);
+    if (
+      a === 127 || // 127.0.0.0/8
+      a === 10 || // 10.0.0.0/8
+      (a === 172 && b >= 16 && b <= 31) || // 172.16.0.0/12
+      (a === 192 && b === 168) || // 192.168.0.0/16
+      (a === 169 && b === 254) || // 169.254.0.0/16 (link-local / cloud metadata)
+      a === 0 // 0.0.0.0/8
+    ) {
+      throw new Error(`SSRF protection: private IP '${hostname}' is not allowed`);
+    }
+  }
+}
+
+/**
  * Expose the fetch api (node>18) and add hmac signature
  * @param options
  * @returns
@@ -132,6 +163,9 @@ export class HttpAuthFilter extends SmtpFilter<HttpAuthConfig> {
     this.config.method ??= this.config.credentialsMethod === "BASIC_AUTH" ? "GET" : "POST";
     if (this.config.credentialsMethod !== "BASIC_AUTH" && this.config.method === "GET") {
       throw new Error("http-auth filter cannot use GET method with other than BASIC_AUTH");
+    }
+    if (!this.config.allowPrivateUrls) {
+      validateUrl(this.config.url);
     }
   }
 
