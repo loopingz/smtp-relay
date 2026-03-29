@@ -420,12 +420,23 @@ export class SmtpServer {
     session.emailPath = SmtpServer.replaceVariables(this.config.cachePath!, { ...session });
 
     const writestream = fs.createWriteStream(session.emailPath!);
+    const transform = new HeadersTransform(this.config.mailHeaders!);
+    let callbackCalled = false;
+    const callbackOnce = (err?: any) => {
+      if (callbackCalled) return;
+      callbackCalled = true;
+      callback(err);
+    };
     // Handle write errors explicitly
     writestream.on("error", err => {
       this.logger.log("ERROR", `Error writing email to ${session.emailPath}`, err);
-      callback(err);
+      callbackOnce(err);
     });
-    stream.pipe(new HeadersTransform(this.config.mailHeaders!)).pipe(writestream);
+    transform.on("error", err => {
+      this.logger.log("ERROR", `Error transforming headers for ${session.emailPath}`, err);
+      callbackOnce(err);
+    });
+    stream.pipe(transform).pipe(writestream);
     writestream.on("finish", async () => {
       session.email = await simpleParser(fs.createReadStream(session.emailPath!));
       await this.filter("Data", session, [session]);
@@ -447,11 +458,12 @@ export class SmtpServer {
 
     stream.on("error", err => {
       try {
-        writestream.destroy(err);
+        transform.destroy();
+        writestream.destroy();
       } catch (e) {
-        this.logger.log("ERROR", `Error destroying write stream for ${session.emailPath}`, e);
+        this.logger.log("ERROR", `Error destroying streams for ${session.emailPath}`, e);
       }
-      callback(`error converting stream - ${err}`);
+      callbackOnce(`error converting stream - ${err}`);
     });
   }
 
