@@ -244,9 +244,9 @@ class SmtpServerTest {
   async cov() {
     let server = new SmtpServer("./tests/whitelist-and.json");
     let logger = new MemoryLogger(server.logger, "ERROR");
-    // Should log but not crash
+    // onDataRead now throws on invalid session; processAndCleanup catches and logs
     // @ts-ignore
-    await server.onDataRead(null);
+    await server["processAndCleanup"](null);
     assert.strictEqual(logger.getLogs().length, 1);
     await server.onConnect(null as any, () => {});
     await server.onEvent("RcptTo", null as any, null as any, () => {});

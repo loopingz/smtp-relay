@@ -493,11 +493,16 @@ export class SmtpServer {
   }
 
   private async processAndCleanup(session: SmtpSession) {
-    await this.onDataRead(session);
-    if (!this.config.keepCache) {
-      fs.unlink(session.emailPath!, err => {
-        err && this.logger.log("ERROR", `Unable to delete ${session.emailPath}`, err);
-      });
+    try {
+      await this.onDataRead(session);
+    } catch (readErr) {
+      this.logger.log("ERROR", "Error processing email data", readErr);
+    } finally {
+      if (!this.config.keepCache && session?.emailPath) {
+        fs.unlink(session.emailPath, err => {
+          err && this.logger.log("ERROR", `Unable to delete ${session.emailPath}`, err);
+        });
+      }
     }
   }
 
@@ -506,29 +511,25 @@ export class SmtpServer {
    * @param session
    */
   async onDataRead(session: SmtpSession) {
-    try {
-      // We filter here as we can have several RCPT TO
-      for (let name in session.flows) {
-        let flow = this.flows[name];
-        this.counter?.inc({ status: "accepted", flow: name });
-        this.logger.log(
-          "INFO",
-          `Accepting mail from ${
-            session.envelope.mailFrom ? session.envelope.mailFrom.address : "unknown"
-          } to ${session.envelope.rcptTo.map(a => a.address).join(",")} (${session.clientHostname})`
-        );
-        for (let output of flow.outputs) {
-          this.logger.log("DEBUG", `Output[${output.name}] triggered`);
-          try {
-            await output.onMail(session);
-          } catch (err) {
-            this.logger.log("ERROR", `Flow(${name}) Output(${output.name})`, err);
-            this.counter?.inc({ status: "error", flow: name, output: output.name });
-          }
+    // We filter here as we can have several RCPT TO
+    for (let name in session.flows) {
+      let flow = this.flows[name];
+      this.counter?.inc({ status: "accepted", flow: name });
+      this.logger.log(
+        "INFO",
+        `Accepting mail from ${
+          session.envelope.mailFrom ? session.envelope.mailFrom.address : "unknown"
+        } to ${session.envelope.rcptTo.map(a => a.address).join(",")} (${session.clientHostname})`
+      );
+      for (let output of flow.outputs) {
+        this.logger.log("DEBUG", `Output[${output.name}] triggered`);
+        try {
+          await output.onMail(session);
+        } catch (err) {
+          this.logger.log("ERROR", `Flow(${name}) Output(${output.name})`, err);
+          this.counter?.inc({ status: "error", flow: name, output: output.name });
         }
       }
-    } catch (err) {
-      this.logger.log("ERROR", err);
     }
   }
 
