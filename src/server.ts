@@ -119,6 +119,11 @@ export interface SmtpConfig {
    */
   keepCache?: boolean;
   /**
+   * Timeout in milliseconds for filter execution
+   * @default 30000
+   */
+  filterTimeout?: number;
+  /**
    * Configure prometheus metrics
    */
   prometheus?: {
@@ -226,6 +231,7 @@ export class SmtpServer {
     this.config.port ??= 10025;
     this.config.bind ??= "localhost";
     this.config.cachePath ??= ".email_${iso8601}_${id}.eml";
+    this.config.filterTimeout ??= 30000;
     this.config.options ??= {};
     if (!this.config.mailHeaders) {
       const packageDesc = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, "..", "package.json")).toString());
@@ -316,6 +322,19 @@ export class SmtpServer {
     this.flows[flow.name] = undefined;
   }
 
+  private withTimeout<T>(promise: Promise<T> | T, label: string): Promise<T> {
+    let timer: ReturnType<typeof setTimeout>;
+    return Promise.race([
+      Promise.resolve(promise).finally(() => clearTimeout(timer)),
+      new Promise<T>((_, reject) => {
+        timer = setTimeout(
+          () => reject(new Error(`${label} timed out after ${this.config.filterTimeout}ms`)),
+          this.config.filterTimeout
+        );
+      })
+    ]);
+  }
+
   async filter(evt: "Auth" | "MailFrom" | "RcptTo" | "Data" | "Connect" | "Close", session: SmtpSession, args: any[]) {
     for (let name in this.flows) {
       let flow = this.flows[name];
@@ -323,7 +342,10 @@ export class SmtpServer {
         continue;
       }
       for (let filter of flow.filters) {
-        let res = await filter[`on${evt}`](...args, name);
+        let res = await this.withTimeout(
+          filter[`on${evt}`](...args, name),
+          `Filter '${filter.config.type}' on ${evt}`
+        );
         // If undefined the filter is not giving an answer so skipping
         if (res === undefined) {
           continue;
