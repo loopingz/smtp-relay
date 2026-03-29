@@ -276,9 +276,11 @@ export class SmtpServer {
   init() {
     this.config.options.loggers!.forEach(logger => {
       if (logger.type === "CONSOLE") {
-        new ConsoleLogger(this.logger, logger.level as WorkerLogLevel, logger.format);
+        // Constructor registers itself on the WorkerOutput as a side effect
+        void new ConsoleLogger(this.logger, logger.level as WorkerLogLevel, logger.format);
       } else if (logger.type === "FILE") {
-        new FileLogger(this.logger, logger.level as WorkerLogLevel, logger.filepath, logger.sizeLimit, logger.format);
+        // Constructor registers itself on the WorkerOutput as a side effect
+        void new FileLogger(this.logger, logger.level as WorkerLogLevel, logger.filepath, logger.sizeLimit, logger.format);
       }
     });
 
@@ -415,7 +417,7 @@ export class SmtpServer {
    */
   async onData(stream: SMTPServerDataStream, session: SmtpSession, callback: SmtpCallback) {
     // Data
-    session.emailPath = SmtpServer.replaceVariables(this.config.cachePath!, { ...session } as SmtpSession);
+    session.emailPath = SmtpServer.replaceVariables(this.config.cachePath!, { ...session });
 
     const writestream = fs.createWriteStream(session.emailPath!);
     // Handle write errors explicitly
@@ -439,15 +441,7 @@ export class SmtpServer {
           callback(err);
           return;
         }
-        (async () => {
-          await this.onDataRead(session);
-          if (!this.config.keepCache) {
-            fs.unlink(session.emailPath!, err => {
-              err && this.logger.log("ERROR", `Unable to delete ${session.emailPath}`, err);
-            });
-          }
-          callback();
-        })();
+        this.processAndCleanup(session).then(() => callback(), callback);
       });
     });
 
@@ -495,6 +489,15 @@ export class SmtpServer {
       this.manageCallback(session, callback);
     } catch (err) {
       callback(err);
+    }
+  }
+
+  private async processAndCleanup(session: SmtpSession) {
+    await this.onDataRead(session);
+    if (!this.config.keepCache) {
+      fs.unlink(session.emailPath!, err => {
+        err && this.logger.log("ERROR", `Unable to delete ${session.emailPath}`, err);
+      });
     }
   }
 

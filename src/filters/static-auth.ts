@@ -44,7 +44,7 @@ export class StaticAuthFilter extends SmtpFilter<StaticAuthConfiguration> {
     if (this.config.username === undefined || this.config.password === undefined) {
       throw new Error("static-auth filter requires to have authentication defined");
     }
-    const info = this.config.password!.split(":");
+    const info = this.config.password.split(":");
     if (info[0] !== "plain" && !crypto.getHashes().includes(info[0])) {
       throw new Error(
         `static-auth do not recognize hash\nValid options: ${["plain", ...crypto.getHashes()].join(",")}`
