@@ -75,7 +75,7 @@ export class HeadersTransform extends Transform {
    * @param callback
    * @returns
    */
-  _transform(chunk, encoding, callback) {
+  _transform(chunk: any, encoding: BufferEncoding, callback: () => void) {
     // Do not filter headers if headers are already done
     if (this.headersDone) {
       this.push(chunk);
@@ -106,7 +106,7 @@ export class HeadersTransform extends Transform {
     if (currentChunk.endsWith("\n")) {
       this.previousChunk = "";
     } else {
-      this.previousChunk = lines.pop();
+      this.previousChunk = lines.pop() ?? "";
     }
     const filteredLines = lines.filter(line => this.includeHeader(line));
     this.push(filteredLines.join("\n"));

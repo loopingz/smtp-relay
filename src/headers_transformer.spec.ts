@@ -8,12 +8,12 @@ import { HeadersTransform } from "./headers_transformer";
 class BufferWritable extends Writable {
   buffer: Buffer;
 
-  constructor(options?) {
+  constructor(options?: any) {
     super(options);
     this.buffer = Buffer.alloc(0); // Initialize an empty buffer
   }
 
-  _write(chunk, encoding, callback) {
+  _write(chunk: any, encoding: BufferEncoding, callback: () => void) {
     // Concatenate the incoming chunk to the buffer
     this.buffer = Buffer.concat([this.buffer, chunk]);
     callback();

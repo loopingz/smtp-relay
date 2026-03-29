@@ -75,7 +75,7 @@ export class StaticAuthFilter extends SmtpFilter<StaticAuthConfiguration> {
    * @returns
    */
   validatePassword(password: string): boolean {
-    const info = this.config.password.split(":");
+    const info = this.config.password!.split(":");
     if (info[0] === "plain") {
       return this.safeEqual(info[1], password);
     } else if (this.config.salt) {

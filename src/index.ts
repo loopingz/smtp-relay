@@ -79,8 +79,8 @@ if (import.meta.url === url.pathToFileURL(process.argv[1]).href) {
       console.log("Example: smtp-relay dkim-generate example.com default");
       process.exit(1);
     }
-    const selector = process.argv.pop();
-    const domain = process.argv.pop();
+    const selector = process.argv.pop()!;
+    const domain = process.argv.pop()!;
     if (/[a-z0-9]+/.test(selector) === false) {
       console.log("Selector must be alphanumeric");
       process.exit(1);

@@ -11,9 +11,9 @@ import { SmtpCloudEvent } from "../cloudevent";
 
 @suite
 class HttpSmtpServerTest extends SmtpTest {
-  server;
+  server: any;
   jsonpath: boolean = false;
-  smtpServer: SmtpServer;
+  declare smtpServer: SmtpServer;
 
   before() {
     this.server = http
@@ -27,13 +27,13 @@ class HttpSmtpServerTest extends SmtpTest {
           if (req.headers["content-type"] === "application/json") {
             let info: SmtpCloudEvent = JSON.parse(body).data;
             if (
-              info.email.from.value[0].address === "test@smtp-relay.com" &&
-              info.email.to.find(a => a.value[0].address === "recipient@domain1.com")
+              info.email.from?.value[0].address === "test@smtp-relay.com" &&
+              info.email.to?.find(a => a.value[0].address === "recipient@domain1.com")
             ) {
               res.write("OK");
             } else if (
-              info.email.from.value[0].address === "test@smtp-relay.com" &&
-              info.email.to.find(a => a.value[0].address === "recipient@domain1.com") &&
+              info.email.from?.value[0].address === "test@smtp-relay.com" &&
+              info.email.to?.find(a => a.value[0].address === "recipient@domain1.com") &&
               info.server.username === "authenticated"
             ) {
               res.write("OK");
@@ -86,7 +86,7 @@ class HttpSmtpServerTest extends SmtpTest {
       if (data.toString().substr(0, 3) === test.waitCode) {
         let p = test.waitForPromise;
         test.waitForPromise = null;
-        p();
+        p?.();
       }
     });
     await p1;
@@ -117,7 +117,7 @@ class HttpSmtpServerTest extends SmtpTest {
       if (data.toString().substr(0, 3) === test.waitCode) {
         let p = test.waitForPromise;
         test.waitForPromise = null;
-        p();
+        p?.();
       }
     });
     await p1;

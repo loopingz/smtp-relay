@@ -17,9 +17,9 @@ export interface AWSProcessorConfig extends CloudProcessorConfig {
 }
 
 export class AWSProcessor<T extends AWSProcessorConfig = AWSProcessorConfig> extends CloudProcessor<T> {
-  s3: S3;
-  sqs: SQS;
-  ses: SES;
+  s3!: S3;
+  sqs!: SQS;
+  ses!: SES;
 
   /**
    * @override
@@ -27,7 +27,7 @@ export class AWSProcessor<T extends AWSProcessorConfig = AWSProcessorConfig> ext
   async storeData(destination: string, content: string | Buffer): Promise<void> {
     await this.s3.putObject({
       ...this.config.putOptions,
-      Bucket: this.config.storage.bucket,
+      Bucket: this.config.storage!.bucket,
       Key: destination,
       Body: content
     });
@@ -38,7 +38,7 @@ export class AWSProcessor<T extends AWSProcessorConfig = AWSProcessorConfig> ext
    */
   async storeFile(destination: string, sourceFile: string): Promise<void> {
     await this.s3.putObject({
-      Bucket: this.config.storage.bucket,
+      Bucket: this.config.storage!.bucket,
       Key: destination,
       Body: fs.createReadStream(sourceFile)
     });
@@ -51,7 +51,7 @@ export class AWSProcessor<T extends AWSProcessorConfig = AWSProcessorConfig> ext
     await this.sqs.sendMessage({
       ...this.config.sendMessageOptions,
       MessageBody: message,
-      QueueUrl: this.config.pubsub.topic
+      QueueUrl: this.config.pubsub!.topic
     });
   }
 
@@ -76,7 +76,7 @@ export class AWSProcessor<T extends AWSProcessorConfig = AWSProcessorConfig> ext
     if (this.config.ses) {
       const Destinations = session.envelope.rcptTo.map(a => a.address);
       await this.ses.sendRawEmail({
-        RawMessage: { Data: fs.readFileSync(session.emailPath) },
+        RawMessage: { Data: fs.readFileSync(session.emailPath!) },
         Destinations,
         ...this.config.sendRawEmailOptions
       });

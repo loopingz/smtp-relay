@@ -19,7 +19,7 @@ class NodeMailerProcessorTest {
       }
     };
     const processor = new NodeMailerProcessor(
-      undefined,
+      undefined as any,
       {
         type: "nodemailer",
         nodemailer: {
@@ -35,7 +35,7 @@ class NodeMailerProcessorTest {
     const session: SmtpSession = getFakeSession();
     session.envelope.mailFrom = { address: "sender@example.com", args: [] };
     let sendMailArg: any;
-    sinon.stub(processor.transporter, "sendMail").callsFake(arg => {
+    sinon.stub(processor.transporter, "sendMail").callsFake((arg: any) => {
       sendMailArg = arg;
       return Promise.resolve();
     });
@@ -52,7 +52,7 @@ class NodeMailerProcessorTest {
   @test
   async mailer() {
     let nodemailer = new NodeMailerProcessor(
-      undefined,
+      undefined as any,
       {
         type: "nodemailer",
         nodemailer: {
@@ -70,11 +70,11 @@ class NodeMailerProcessorTest {
 
     let session: SmtpSession = getFakeSession();
     let msg;
-    sinon.stub(nodemailer.transporter, "sendMail").callsFake(arg => {
+    (sinon.stub(nodemailer.transporter, "sendMail") as any).callsFake((arg: any) => {
       msg = arg;
     });
 
-    session.email.to = [
+    session.email!.to = [
       {
         html: "",
         text: "",
@@ -84,7 +84,7 @@ class NodeMailerProcessorTest {
     const headers = new Map<string, HeaderValue>();
     headers.set("plop", "test");
     // @ts-ignore
-    session.email.attachments.push({
+    session.email!.attachments.push({
       contentDisposition: "plop",
       headers
     });
@@ -96,7 +96,7 @@ class NodeMailerProcessorTest {
   async bccResolution() {
     const session = getFakeSession();
     let nodemailer = new NodeMailerProcessor(
-      undefined,
+      undefined as any,
       {
         type: "nodemailer",
         nodemailer: {
@@ -116,23 +116,23 @@ class NodeMailerProcessorTest {
       { address: "to@test.com", args: [] },
       { address: "cc@test.com", args: [] }
     ];
-    session.email.cc = [
+    session.email!.cc = [
       {
         html: "",
         text: "",
         value: [{ name: "", address: "cc@test.com" }]
       }
     ];
-    session.email.to = [
+    session.email!.to = [
       {
         html: "",
         text: "",
         value: [{ name: "", address: "to@test.com" }]
       }
     ];
-    session.email.headerLines = [{ key: "plop", line: "test" }];
+    session.email!.headerLines = [{ key: "plop", line: "test" }];
     NodeMailerProcessor.transformEmail(session);
-    assert.deepStrictEqual(session.email.bcc, {
+    assert.deepStrictEqual(session.email!.bcc, {
       html: "bcc@test.com",
       text: "bcc@test.com",
       value: [

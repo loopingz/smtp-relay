@@ -22,10 +22,10 @@ export class WhitelistFilter extends SmtpFilter<WhitelistFilterConfiguration> {
 
   init() {
     // Ensure regexps do not allow any partial match
-    ["from", "to", "ips", "domains"]
+    (["from", "to", "ips", "domains"] as const)
       .filter(a => this.config[a])
       .forEach(attr => {
-        this.config[attr] = this.config[attr].map(r => this.getRegExp(r));
+        this.config[attr] = this.config[attr]!.map(r => this.getRegExp(r));
       });
     if (this.config.subnets) {
       this.subnetChecker = createChecker(this.config.subnets);
@@ -44,7 +44,10 @@ export class WhitelistFilter extends SmtpFilter<WhitelistFilterConfiguration> {
    * Avoid regexp to have partial match
    * @param reg
    */
-  getRegExp(reg: string): RegExp | string {
+  getRegExp(reg: string | RegExp): RegExp | string {
+    if (reg instanceof RegExp) {
+      return reg;
+    }
     if (!reg.startsWith("regexp:")) {
       return reg;
     }

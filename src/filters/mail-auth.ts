@@ -39,6 +39,10 @@ export interface MailAuthConfig extends SmtpComponentConfig {
      * DNS lookup limit for SPF that produce an empty result. RFC7208 requires this limit to be 2.
      */
     maxVoidCount?: number;
+    /**
+     * Custom resolver function
+     */
+    resolver?: (domain: string, type: string) => Promise<any>;
   };
   /**
    * Enforce DMARC policy. If set all _dmarc records are replaced with the policy set here.s
@@ -53,10 +57,11 @@ export class MailAuthFilter extends SmtpFilter<MailAuthConfig> {
   type: string = "mail-auth";
 
   async onData(session: SmtpSession, flow: string): Promise<boolean> {
+    const mailauthConfig = this.config.mailauth ?? {};
     const { dkim, spf, arc, dmarc, bimi, receivedChain, headers } = await authenticate(
-      createReadStream(session.emailPath),
+      createReadStream(session.emailPath!),
       {
-        ...this.config.mailauth,
+        ...mailauthConfig,
         sender: session.envelope.mailFrom !== false ? session.envelope.mailFrom.address : undefined,
         helo: session.hostNameAppearsAs,
         ip: session.remoteAddress,
@@ -65,11 +70,11 @@ export class MailAuthFilter extends SmtpFilter<MailAuthConfig> {
               if (domain.startsWith("_dmarc.")) {
                 return [[this.config.enforceDmarc]];
               }
-              return this.config.mailauth["resolver"]
-                ? this.config.mailauth["resolver"](domain, type)
+              return mailauthConfig.resolver
+                ? mailauthConfig.resolver(domain, type)
                 : dns.resolve(domain, type);
             }
-          : this.config.mailauth["resolver"]
+          : mailauthConfig.resolver
       }
     );
     session.context[flow] = { dkim, spf, dmarc, arc, bimi, receivedChain, headers };
@@ -79,8 +84,8 @@ export class MailAuthFilter extends SmtpFilter<MailAuthConfig> {
     }
 
     // Append headers to the email
-    const originalContent = await readFile(session.emailPath, "utf8");
-    await writeFile(session.emailPath, headers + originalContent, "utf8");
+    const originalContent = await readFile(session.emailPath!, "utf8");
+    await writeFile(session.emailPath!, headers + originalContent, "utf8");
 
     return true;
   }

@@ -10,8 +10,8 @@ class CloudEventTest {
   default() {
     let session = getFakeSession();
 
-    session.email.cc = [];
-    session.email.bcc = [
+    session.email!.cc = [];
+    session.email!.bcc = [
       {
         html: "",
         text: "",
@@ -23,7 +23,7 @@ class CloudEventTest {
         ]
       }
     ];
-    session.email.to = {
+    session.email!.to = {
       html: "",
       text: "",
       value: [
@@ -33,15 +33,15 @@ class CloudEventTest {
         }
       ]
     };
-    session.email.attachments.push(<Attachment>(<unknown>{
+    session.email!.attachments.push(<Attachment>(<unknown>{
       content: Buffer.from("Coucou")
     }));
-    session.email.subject = "1234".repeat(4096);
-    session.email.text = "My text";
-    session.email.html = "My html";
+    session.email!.subject = "1234".repeat(4096);
+    session.email!.text = "My text";
+    session.email!.html = "My html";
     let evt = getCloudEvent(session);
     // Should have been truncated
-    assert.strictEqual(evt.data.email.subject, "1234".repeat(2048));
+    assert.strictEqual(evt.data!.email.subject, "1234".repeat(2048));
   }
 
   @test
@@ -57,9 +57,9 @@ class CloudEventTest {
     ]
     // @ts-ignore
     session.email = {};
-    session.email.attachments = [];
+    session.email!.attachments = [];
     let evt = getCloudEvent(session);
     // Should have been truncated
-    assert.strictEqual(evt.data.email.to[0].value[0].address, "test@test.com");
+    assert.strictEqual(evt.data!.email.to![0].value[0].address, "test@test.com");
   }
 }

@@ -33,11 +33,25 @@ class WhitelistSmtpServerTest {
   }
 
   @test
+  async getRegExpPassthroughRegExp() {
+    let output = new WorkerOutput();
+    const filter = new WhitelistFilter(
+      undefined as any,
+      {
+        type: "whitelist"
+      },
+      output
+    );
+    const reg = /^test$/;
+    assert.strictEqual(filter.getRegExp(reg), reg);
+  }
+
+  @test
   async whitelistSubnet() {
     let output = new WorkerOutput();
     let logger = new MemoryLogger(output);
     const filter = new WhitelistFilter(
-      undefined,
+      undefined as any,
       {
         type: "whitelist",
         subnets: ["10.0.0.0/8", "127.0.0.1/32"]

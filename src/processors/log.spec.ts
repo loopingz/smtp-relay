@@ -12,7 +12,7 @@ class LogProcessorTest {
   @test
   async mailer() {
     let log = new LogProcessor(
-      undefined,
+      undefined as any,
       {
         type: "log"
       },
@@ -22,17 +22,17 @@ class LogProcessorTest {
     let session: SmtpSession = getFakeSession();
     let msg;
 
-    session.email.to = [
+    session.email!.to = [
       {
         html: "Html content",
         text: "Text content",
         value: [{ name: "Test", address: "test@plop.com" }]
       }
     ];
-    session.email.html = "Html content";
-    session.email.text = "Text content";
-    session.email.subject = "Subject";
-    session.email.from = {
+    session.email!.html = "Html content";
+    session.email!.text = "Text content";
+    session.email!.subject = "Subject";
+    session.email!.from = {
       html: "Html content",
       text: "Text content",
       value: [{ name: "Test", address: "" }]
@@ -41,12 +41,12 @@ class LogProcessorTest {
     const headers = new Map<string, HeaderValue>();
     headers.set("plop", "test");
     // @ts-ignore
-    session.email.attachments.push({
+    session.email!.attachments.push({
       contentDisposition: "plop",
       headers
     });
-    let calls = [];
-    let stub = sinon.stub(log.logger, "log").callsFake((...args) => {
+    let calls: any[][] = [];
+    let stub = sinon.stub(log.logger, "log").callsFake((...args: any[]) => {
       calls.push(args);
     });
     await log.onMail(session);

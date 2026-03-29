@@ -14,17 +14,18 @@ class MailAuthTest {
   async dnsMocked() {
     // SPF test
     const session = getFakeSession();
-    const originalContent = fs.readFileSync(session.emailPath, "utf-8");
+    const emailPath = session.emailPath!;
+    const originalContent = fs.readFileSync(emailPath, "utf-8");
     try {
       // Save original dns.resolveTxt
       const logger = new WorkerOutput();
       const flow = new SmtpFlow("test", { outputs: [] }, logger);
-      const zone = {};
+      const zone: { [key: string]: { [key: string]: string[] } } = {};
       const mailauth = new MailAuthFilter(
         flow,
         {
           mailauth: {
-            resolver: async (domain, type) => {
+            resolver: async (domain: string, type: string) => {
               console.log(`Resolving ${domain} ${type} ${zone[domain] ? zone[domain][type] : "not found"}`);
               if (zone[domain] && zone[domain][type]) {
                 return zone[domain][type].map((record: string) => [record]);
@@ -80,7 +81,7 @@ class MailAuthTest {
       zone["test.com"].TXT = ["v=spf1 ip4:127.0.0.1 -all"];
       filterResult = await mailauth.onData(session, "mailauth");
       assert.ok(filterResult, "SPF should pass");
-      let content = fs.readFileSync(session.emailPath, "utf-8");
+      let content = fs.readFileSync(emailPath, "utf-8");
       assert.ok(content.includes("Received-SPF:"), "Should have Received-SPF header");
       zone["test.com"].TXT = ["v=spf1 ip4:1.2.3.4 ~all"];
       //assert.ok(await mailauth.onData(session, "mailauth"), "SPF should pass with softfail");
@@ -124,8 +125,8 @@ class MailAuthTest {
       };
 
       // DKIM signing
-      fs.writeFileSync(session.emailPath, originalContent);
-      let result = await dkimSign(fs.createReadStream(session.emailPath), {
+      fs.writeFileSync(emailPath, originalContent);
+      let result = await dkimSign(fs.createReadStream(emailPath), {
         signatureData: [
           {
             selector: "key",
@@ -134,16 +135,16 @@ class MailAuthTest {
           }
         ]
       } as any);
-      fs.writeFileSync(session.emailPath, result.signatures + originalContent, "utf-8");
+      fs.writeFileSync(emailPath, result.signatures + originalContent, "utf-8");
       filterResult = await mailauth.onData(session, "mailauth");
       assert.strictEqual(session.context.mailauth.dkim.results[0].status.result, "pass", "DKIM should pass");
       session.context = {};
-      content = fs.readFileSync(session.emailPath, "utf-8");
+      content = fs.readFileSync(emailPath, "utf-8");
       assert.ok(content.includes("dkim=pass"), "Should have contains dkim=pass");
 
       // Invalid DKIM signature
       // Wrong key
-      result = await dkimSign(fs.createReadStream(session.emailPath), {
+      result = await dkimSign(fs.createReadStream(emailPath), {
         signatureData: [
           {
             selector: "key",
@@ -152,9 +153,9 @@ class MailAuthTest {
           }
         ]
       } as any);
-      fs.writeFileSync(session.emailPath, result.signatures + originalContent, "utf-8");
+      fs.writeFileSync(emailPath, result.signatures + originalContent, "utf-8");
       filterResult = await mailauth.onData(session, "mailauth");
-      content = fs.readFileSync(session.emailPath, "utf-8");
+      content = fs.readFileSync(emailPath, "utf-8");
       assert.strictEqual(session.context.mailauth.dkim.results[0].status.result, "fail", "DKIM should fail");
 
       zone["key._domainkey.test.com"] = {
@@ -166,16 +167,16 @@ class MailAuthTest {
         ]
       };
       filterResult = await mailauth.onData(session, "mailauth");
-      content = fs.readFileSync(session.emailPath, "utf-8");
+      content = fs.readFileSync(emailPath, "utf-8");
       assert.strictEqual(session.context.mailauth.dkim.results[0].status.result, "pass", "DKIM should pass");
-      mailauth.config.mailauth.minBitLength = 2048;
-      fs.writeFileSync(session.emailPath, result.signatures + originalContent, "utf-8");
+      mailauth.config.mailauth!.minBitLength = 2048;
+      fs.writeFileSync(emailPath, result.signatures + originalContent, "utf-8");
       filterResult = await mailauth.onData(session, "mailauth");
       // Waiting on https://github.com/postalsys/mailauth/pull/84 to be merged
       //assert.strictEqual(session.context.mailauth.dkim.results[0].status.result, "fail", "DKIM should fail");
     } finally {
       // Restore original content
-      await fs.promises.writeFile(session.emailPath, originalContent, "utf-8");
+      await fs.promises.writeFile(emailPath, originalContent, "utf-8");
     }
   }
 }

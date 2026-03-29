@@ -9,19 +9,20 @@ import { HttpConfig } from "./http-filter";
  * @returns
  */
 export async function request(options: RequestInit & HttpConfig) {
-  options.headers ??= {};
+  const headers: Record<string, string | number> = (options.headers ?? {}) as Record<string, string | number>;
   if (options.hmac) {
     options.hmac.algo ??= "sha256";
     options.hmac.header ??= "X-SMTP-RELAY";
-    options.headers["X-SMTP-RELAY-TIME"] = Date.now();
-    const data = [options.url, options.method, options.headers["X-SMTP-RELAY-TIME"]];
+    headers["X-SMTP-RELAY-TIME"] = Date.now();
+    const data: (string | number)[] = [options.url, options.method ?? "GET", headers["X-SMTP-RELAY-TIME"]];
     if (options.body) {
-      data.push(options.body);
+      data.push(options.body as string);
     }
-    options.headers[options.hmac.header] = createHmac(options.hmac.algo, options.hmac.secret)
+    headers[options.hmac.header] = createHmac(options.hmac.algo, options.hmac.secret)
       .update(data.join("\n"))
       .digest("hex");
   }
+  options.headers = headers as any;
   return fetch(options.url, options);
 }
 
@@ -148,16 +149,16 @@ export class HttpAuthFilter extends SmtpFilter<HttpAuthConfig> {
       // application/x-www-form-urlencoded
       const res = await request({
         ...this.config,
-        body: `${this.config.userField}=${encodeURIComponent(auth.username)}&${
-          this.config.passwordField
-        }=${encodeURIComponent(auth.password)}`,
+        body: `${this.config.userField!}=${encodeURIComponent(auth.username ?? "")}&${
+          this.config.passwordField!
+        }=${encodeURIComponent(auth.password ?? "")}`,
         headers: { "Content-Type": "application/x-www-form-urlencoded" }
       });
       return res.ok;
     } else if (this.config.credentialsMethod === "JSON") {
       const data = {};
       jsonPathValue(data, this.config.userField || "$.username", auth.username);
-      jsonPathValue(data, this.config.passwordField || "$.password", auth.password);
+      jsonPathValue(data, this.config.passwordField || "$.password", auth.password ?? "");
       const res = await request({
         ...this.config,
         body: JSON.stringify(data),
