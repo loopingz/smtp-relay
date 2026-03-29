@@ -7,6 +7,7 @@ import { defaultModules } from ".";
 import { SmtpFilter } from "./filter";
 import { SmtpFlow } from "./flow";
 import { SmtpProcessor } from "./processor";
+import { register } from "prom-client";
 import { SmtpServer, SmtpSession, mapAddressObjects } from "./server";
 import { readdirSync, unlinkSync } from "node:fs";
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
@@ -359,6 +360,20 @@ class SmtpServerTest {
     } finally {
       server.promServer!.close();
     }
+  }
+
+  @test
+  async gracefulShutdownWithPrometheus() {
+    register.clear();
+    defaultModules();
+    let server = new SmtpServer("./tests/whitelist-prometheus.json");
+    server.init();
+    // Verify prometheus is running
+    await axios.get("http://localhost:8080/metrics");
+    // close() should shut down both SMTP and prometheus servers
+    server.close();
+    // Verify prometheus is no longer reachable
+    await assert.rejects(() => axios.get("http://localhost:8080/metrics"));
   }
 
   @test
