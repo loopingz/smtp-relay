@@ -77,11 +77,22 @@ export class StaticAuthFilter extends SmtpFilter<StaticAuthConfiguration> {
   validatePassword(password: string): boolean {
     const info = this.config.password.split(":");
     if (info[0] === "plain") {
-      return info[1] === password;
+      return this.safeEqual(info[1], password);
     } else if (this.config.salt) {
-      return crypto.createHmac(info[0], this.config.salt).update(password).digest("hex") === info[1];
+      const computed = crypto.createHmac(info[0], this.config.salt).update(password).digest("hex");
+      return this.safeEqual(computed, info[1]);
     } else {
-      return crypto.createHash(info[0]).update(password).digest("hex") === info[1];
+      const computed = crypto.createHash(info[0]).update(password).digest("hex");
+      return this.safeEqual(computed, info[1]);
     }
+  }
+
+  private safeEqual(a: string, b: string): boolean {
+    const bufA = Buffer.from(a ?? "");
+    const bufB = Buffer.from(b ?? "");
+    if (bufA.length !== bufB.length) {
+      return false;
+    }
+    return crypto.timingSafeEqual(bufA, bufB);
   }
 }
