@@ -52,6 +52,7 @@
     "build:binaries": "esbuild ./src/index.ts --bundle --platform=node --outfile=bin/smtp-relay.cjs && node --experimental-sea-config sea-config.json",
     "build:schema": "ts-json-schema-generator -f ./tsconfig.json --type 'SmtpConfig' -o config.schema.json",
     "pretest": "npm run build",
+    "typecheck": "tsc --noEmit",
     "lint": "prettier --check src/**/*",
     "lint:fix": "prettier --write src/**/*",
     "test": "c8 mocha --recursive --exit --timeout=6000 src/**/*.spec.ts src/*.spec.ts",
