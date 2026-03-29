@@ -277,10 +277,10 @@ export class SmtpServer {
     this.config.options.loggers!.forEach(logger => {
       if (logger.type === "CONSOLE") {
         // Constructor registers itself on the WorkerOutput as a side effect
-        void new ConsoleLogger(this.logger, logger.level as WorkerLogLevel, logger.format);
+        new ConsoleLogger(this.logger, logger.level as WorkerLogLevel, logger.format);
       } else if (logger.type === "FILE") {
         // Constructor registers itself on the WorkerOutput as a side effect
-        void new FileLogger(this.logger, logger.level as WorkerLogLevel, logger.filepath, logger.sizeLimit, logger.format);
+        new FileLogger(this.logger, logger.level as WorkerLogLevel, logger.filepath, logger.sizeLimit, logger.format);
       }
     });
 
