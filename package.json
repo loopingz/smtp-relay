@@ -99,7 +99,7 @@
     "sinon": "^21.0.1",
     "ts-json-schema-generator": "^2.5.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.3"
+    "typescript": "^6.0.2"
   },
   "auto": {
     "plugins": [

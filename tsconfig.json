@@ -5,14 +5,15 @@
       "es2019",
       "DOM"
     ],
-    "module": "es2020",
+    "module": "esnext",
+    "rootDir": "./src",
     "outDir": "./lib",
     "strict": true,
     "declaration": true,
     "sourceMap": true,
     "experimentalDecorators": true,
     "esModuleInterop": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "skipLibCheck": true
   },
   "include": [
