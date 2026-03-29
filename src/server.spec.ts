@@ -243,7 +243,7 @@ class SmtpServerTest {
   async cov() {
     let server = new SmtpServer("./tests/whitelist-and.json");
     let logger = new MemoryLogger(server.logger, "ERROR");
-    // Should log but not crash
+    // Should throw since errors now propagate to the caller
     // @ts-ignore
     await server.onDataRead(null);
     assert.strictEqual(logger.getLogs().length, 1);
