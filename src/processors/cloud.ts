@@ -5,6 +5,14 @@ import { SmtpServer, SmtpSession } from "../server";
 import { readFile, writeFile } from "node:fs/promises";
 
 /**
+ * Sanitize a value for safe inclusion in email headers.
+ * Strips CR and LF characters to prevent header injection.
+ */
+function sanitizeHeaderValue(value: string): string {
+  return value.replace(/[\r\n]/g, "");
+}
+
+/**
  * Configuration for GCPProcessor
  */
 export interface CloudProcessorConfig extends SmtpComponentConfig {
@@ -108,15 +116,15 @@ export abstract class CloudProcessor<T extends CloudProcessorConfig = CloudProce
           await readFile(session.emailPath).then(data => {
             const prefix = `X-smtp-relay-`;
             // Store the RCPT_TO and MAIL_FROM in the email
-            const headers = session.envelope.rcptTo.map(a => `${prefix}RCPT_TO: ${a.address}`);
+            const headers = session.envelope.rcptTo.map(a => `${prefix}RCPT_TO: ${sanitizeHeaderValue(a.address)}`);
             if (session.envelope.mailFrom) {
-              headers.push(`${prefix}MAIL_FROM:${session.envelope.mailFrom.address}`);
+              headers.push(`${prefix}MAIL_FROM:${sanitizeHeaderValue(session.envelope.mailFrom.address)}`);
             }
             if (session.user) {
-              headers.push(`${prefix}USER:${session.user}`);
+              headers.push(`${prefix}USER:${sanitizeHeaderValue(session.user)}`);
             }
-            headers.push(`${prefix}CLIENT_HOSTNAME:${session.clientHostname}`);
-            headers.push(`${prefix}HELO:${session.hostNameAppearsAs}`);
+            headers.push(`${prefix}CLIENT_HOSTNAME:${sanitizeHeaderValue(session.clientHostname)}`);
+            headers.push(`${prefix}HELO:${sanitizeHeaderValue(session.hostNameAppearsAs)}`);
             file = session.emailPath + ".raw";
             return writeFile(file, `${headers.join("\n")}\n${data}`);
           });
