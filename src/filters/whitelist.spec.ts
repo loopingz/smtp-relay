@@ -83,4 +83,20 @@ class WhitelistSmtpServerTest {
       false
     );
   }
+
+  @test
+  async getRegExpInvalidRegex() {
+    let output = new WorkerOutput();
+    const filter = new WhitelistFilter(
+      undefined as any,
+      {
+        type: "whitelist"
+      },
+      output
+    );
+    assert.throws(
+      () => filter.getRegExp("regexp:[invalid"),
+      /Invalid regex pattern in whitelist filter/
+    );
+  }
 }
