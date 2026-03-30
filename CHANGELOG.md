@@ -1,5 +1,24 @@
 # Changelog
 
+## [2.3.0](https://github.com/loopingz/smtp-relay/compare/v2.2.11...v2.3.0) (2026-03-29)
+
+
+### Features
+
+* **server:** add configurable timeout for filter execution ([#201](https://github.com/loopingz/smtp-relay/issues/201)) ([607fe08](https://github.com/loopingz/smtp-relay/commit/607fe08551a6577d7f7a51a3a675743718dc99c1))
+
+
+### Bug Fixes
+
+* remove console.log that bypasses log filtering ([#195](https://github.com/loopingz/smtp-relay/issues/195)) ([91f3562](https://github.com/loopingz/smtp-relay/commit/91f35624247389fcb1e74c4fb7be4a52230ea2c9))
+* sanitize header values to prevent injection ([#196](https://github.com/loopingz/smtp-relay/issues/196)) ([198c252](https://github.com/loopingz/smtp-relay/commit/198c252003f0d0e958110cf5f0c9feac90731c82))
+* **server:** close Prometheus server on shutdown ([#197](https://github.com/loopingz/smtp-relay/issues/197)) ([95adbf9](https://github.com/loopingz/smtp-relay/commit/95adbf9f424a01ab505e060725dc8ffdfa1ce1bc))
+* **server:** handle async errors in onData and onDataRead ([#194](https://github.com/loopingz/smtp-relay/issues/194)) ([b560559](https://github.com/loopingz/smtp-relay/commit/b56055954f07d511df6277f4d80e8f5aa2a9ad71))
+* **server:** properly cleanup all streams on error in onData ([#199](https://github.com/loopingz/smtp-relay/issues/199)) ([158ba34](https://github.com/loopingz/smtp-relay/commit/158ba3402c7cc1bfe40c5813d8d00537a5541af1))
+* **types:** enable TypeScript strict mode ([#205](https://github.com/loopingz/smtp-relay/issues/205)) ([9144bb5](https://github.com/loopingz/smtp-relay/commit/9144bb53218afd9f9981a303349ea391eb04ac15))
+* use constant-time comparison for password validation ([#193](https://github.com/loopingz/smtp-relay/issues/193)) ([b10dcaf](https://github.com/loopingz/smtp-relay/commit/b10dcaf60a1d798fc8c2dc566f2f67c9d426280f))
+* validate regex patterns in whitelist filter ([#202](https://github.com/loopingz/smtp-relay/issues/202)) ([53bad3c](https://github.com/loopingz/smtp-relay/commit/53bad3cee8a19d8de3a8352065147349bb74e058))
+
 ## [2.2.11](https://github.com/loopingz/smtp-relay/compare/v2.2.10...v2.2.11) (2026-03-06)
 
 
