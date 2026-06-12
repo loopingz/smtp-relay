@@ -32,7 +32,7 @@
     "cloudevents": "^10.0.0",
     "fast-xml-parser": ">=5.4.1",
     "is-in-subnet": "^4.0.1",
-    "mailauth": "^4.13.1",
+    "mailauth": "^4.13.3",
     "mailparser": "^3.9.3",
     "nodemailer": "^8.0.1",
     "prom-client": "^15.1.3",
