@@ -1,5 +1,5 @@
 # Build from node
-FROM node:22 AS builder
+FROM node:26 AS builder
 
 RUN mkdir /app
 ADD src /app/src/
