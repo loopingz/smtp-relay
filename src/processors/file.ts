@@ -1,8 +1,8 @@
 import * as fs from "fs";
 import * as path from "path";
-import { SmtpComponentConfig } from "../component";
-import { SmtpProcessor } from "../processor";
-import { SmtpServer, SmtpSession } from "../server";
+import { SmtpComponentConfig } from "../component.js";
+import { SmtpProcessor } from "../processor.js";
+import { SmtpServer, SmtpSession } from "../server.js";
 
 export interface FileProcessorConfig extends SmtpComponentConfig {
   /**

@@ -3,9 +3,9 @@ import { WorkerOutput } from "@webda/workout";
 import * as assert from "assert";
 import * as fs from "fs";
 import * as sinon from "sinon";
-import { SmtpSession } from "../server";
-import { getFakeSession } from "../server.spec";
-import { AWSProcessor } from "./aws";
+import { SmtpSession } from "../server.js";
+import { getFakeSession } from "../server.spec.js";
+import { AWSProcessor } from "./aws.js";
 
 @suite
 class AWSProcessorTest {

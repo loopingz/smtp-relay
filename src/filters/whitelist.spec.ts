@@ -1,8 +1,8 @@
 import { suite, test } from "@testdeck/mocha";
-import { defaultModules } from "..";
-import { SmtpServer } from "../server";
-import { SmtpTest } from "../server.spec";
-import { WhitelistFilter } from "./whitelist";
+import { defaultModules } from "../index.js";
+import { SmtpServer } from "../server.js";
+import { SmtpTest } from "../server.spec.js";
+import { WhitelistFilter } from "./whitelist.js";
 import { MemoryLogger, WorkerOutput } from "@webda/workout";
 import * as assert from "assert";
 

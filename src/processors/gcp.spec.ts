@@ -3,9 +3,9 @@ import { WorkerOutput } from "@webda/workout";
 import * as assert from "assert";
 import { Attachment } from "mailparser";
 import * as sinon from "sinon";
-import { SmtpSession } from "../server";
-import { getFakeSession } from "../server.spec";
-import { GCPProcessor } from "./gcp";
+import { SmtpSession } from "../server.js";
+import { getFakeSession } from "../server.spec.js";
+import { GCPProcessor } from "./gcp.js";
 import { readFileSync } from "node:fs";
 
 @suite

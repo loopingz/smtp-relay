@@ -1,8 +1,8 @@
 import { suite, test } from "@testdeck/mocha";
 import { WorkerOutput } from "@webda/workout";
 import * as assert from "assert";
-import { SmtpFlow } from "../flow";
-import { StaticAuthFilter } from "./static-auth";
+import { SmtpFlow } from "../flow.js";
+import { StaticAuthFilter } from "./static-auth.js";
 
 @suite
 class StaticSmtpServerTest {

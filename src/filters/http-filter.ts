@@ -1,9 +1,9 @@
 import { SMTPServerAuthentication } from "smtp-server";
-import { SmtpComponentConfig } from "../component";
-import { SmtpFilter } from "../filter";
-import { SmtpSession } from "../server";
-import { request } from "./http-auth";
-import { getCloudEvent } from "../cloudevent";
+import { SmtpComponentConfig } from "../component.js";
+import { SmtpFilter } from "../filter.js";
+import { SmtpSession } from "../server.js";
+import { request } from "./http-auth.js";
+import { getCloudEvent } from "../cloudevent.js";
 
 export interface HttpConfig extends SmtpComponentConfig {
   /**

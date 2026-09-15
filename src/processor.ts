@@ -1,6 +1,6 @@
-import { SmtpComponent, SmtpComponentConfig } from "./component";
-import { SmtpFlow } from "./flow";
-import { SmtpSession } from "./server";
+import { SmtpComponent, SmtpComponentConfig } from "./component.js";
+import { SmtpFlow } from "./flow.js";
+import { SmtpSession } from "./server.js";
 
 /**
  * Middleware to add behavior to the smtp

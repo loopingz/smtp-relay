@@ -1,7 +1,7 @@
 import { SMTPServerAddress } from "smtp-server";
-import { SmtpComponentConfig } from "../component";
-import { SmtpFilter } from "../filter";
-import { SmtpSession } from "../server";
+import { SmtpComponentConfig } from "../component.js";
+import { SmtpFilter } from "../filter.js";
+import { SmtpSession } from "../server.js";
 import { createChecker } from "is-in-subnet";
 
 export interface WhitelistFilterConfiguration extends SmtpComponentConfig {

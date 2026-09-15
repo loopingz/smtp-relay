@@ -1,15 +1,15 @@
 import { WorkerOutput } from "@webda/workout";
-import { SmtpFilter } from "./filter";
-import { StaticAuthConfiguration } from "./filters/static-auth";
-import { WhitelistFilterConfiguration } from "./filters/whitelist";
-import { SmtpProcessor } from "./processor";
-import { AWSProcessorConfig } from "./processors/aws";
-import { FileProcessorConfig } from "./processors/file";
-import { GCPProcessorConfig } from "./processors/gcp";
-import { NodeMailerProcessorConfig } from "./processors/nodemailer";
-import { MailAuthConfig } from "./filters/mail-auth";
-import { HttpAuthConfig } from "./filters/http-auth";
-import { HttpFilterConfig } from "./filters/http-filter";
+import { SmtpFilter } from "./filter.js";
+import { StaticAuthConfiguration } from "./filters/static-auth.js";
+import { WhitelistFilterConfiguration } from "./filters/whitelist.js";
+import { SmtpProcessor } from "./processor.js";
+import { AWSProcessorConfig } from "./processors/aws.js";
+import { FileProcessorConfig } from "./processors/file.js";
+import { GCPProcessorConfig } from "./processors/gcp.js";
+import { NodeMailerProcessorConfig } from "./processors/nodemailer.js";
+import { MailAuthConfig } from "./filters/mail-auth.js";
+import { HttpAuthConfig } from "./filters/http-auth.js";
+import { HttpFilterConfig } from "./filters/http-filter.js";
 
 /**
  * This define one flow within the SMTP Server

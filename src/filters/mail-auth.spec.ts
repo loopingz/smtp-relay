@@ -1,10 +1,10 @@
 import { suite, test } from "@testdeck/mocha";
 import { WorkerOutput } from "@webda/workout";
 import * as assert from "assert";
-import { SmtpFlow } from "../flow";
+import { SmtpFlow } from "../flow.js";
 import * as fs from "node:fs";
-import { MailAuthFilter } from "./mail-auth";
-import { getFakeSession } from "../server.spec";
+import { MailAuthFilter } from "./mail-auth.js";
+import { getFakeSession } from "../server.spec.js";
 import { generateKeyPairSync } from "node:crypto";
 import { dkimSign } from "mailauth/lib/dkim/sign";
 

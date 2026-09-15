@@ -1,7 +1,7 @@
 import { createHmac } from "crypto";
 import { SMTPServerAuthentication } from "smtp-server";
-import { SmtpFilter } from "../filter";
-import { HttpConfig } from "./http-filter";
+import { SmtpFilter } from "../filter.js";
+import { HttpConfig } from "./http-filter.js";
 
 /**
  * Expose the fetch api (node>18) and add hmac signature

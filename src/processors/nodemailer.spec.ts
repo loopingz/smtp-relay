@@ -3,9 +3,9 @@ import { WorkerOutput } from "@webda/workout";
 import * as assert from "assert";
 import { HeaderValue } from "mailparser";
 import * as sinon from "sinon";
-import { SmtpSession } from "../server";
-import { getFakeSession } from "../server.spec";
-import { NodeMailerProcessor } from "./nodemailer";
+import { SmtpSession } from "../server.js";
+import { getFakeSession } from "../server.spec.js";
+import { NodeMailerProcessor } from "./nodemailer.js";
 
 @suite
 class NodeMailerProcessorTest {

@@ -1,8 +1,8 @@
 import { suite, test } from "@testdeck/mocha";
 import * as assert from "assert";
 import { Attachment } from "mailparser";
-import { getCloudEvent } from "./cloudevent";
-import { getFakeSession } from "./server.spec";
+import { getCloudEvent } from "./cloudevent.js";
+import { getFakeSession } from "./server.spec.js";
 
 @suite
 class CloudEventTest {

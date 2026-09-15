@@ -2,12 +2,12 @@ import { suite, test } from "@testdeck/mocha";
 import { WorkerOutput } from "@webda/workout";
 import * as assert from "assert";
 import * as http from "http";
-import { defaultModules } from "..";
-import { SmtpFlow } from "../flow";
-import { SmtpServer } from "../server";
-import { SmtpTest } from "../server.spec";
-import { HttpFilter } from "./http-filter";
-import { SmtpCloudEvent } from "../cloudevent";
+import { defaultModules } from "../index.js";
+import { SmtpFlow } from "../flow.js";
+import { SmtpServer } from "../server.js";
+import { SmtpTest } from "../server.spec.js";
+import { HttpFilter } from "./http-filter.js";
+import { SmtpCloudEvent } from "../cloudevent.js";
 
 @suite
 class HttpSmtpServerTest extends SmtpTest {

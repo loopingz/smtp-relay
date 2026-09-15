@@ -14,9 +14,9 @@ import {
 } from "smtp-server";
 import stripJsonComments from "strip-json-comments";
 import { parse as YAMLParse } from "yaml";
-import { SmtpFilter } from "./filter";
-import { SmtpFlow, SmtpFlowConfig } from "./flow";
-import { HeadersTransform, HeadersTransformConfig } from "./headers_transformer";
+import { SmtpFilter } from "./filter.js";
+import { SmtpFlow, SmtpFlowConfig } from "./flow.js";
+import { HeadersTransform, HeadersTransformConfig } from "./headers_transformer.js";
 import { TlsOptions } from "tls";
 
 export type SmtpCallback = (err?: any, result?: any) => void;

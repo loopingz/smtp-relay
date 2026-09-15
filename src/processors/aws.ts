@@ -2,8 +2,8 @@ import { PutObjectCommandInput, S3 } from "@aws-sdk/client-s3";
 import { SendRawEmailCommandInput, SES } from "@aws-sdk/client-ses";
 import { SendMessageCommandInput, SQS } from "@aws-sdk/client-sqs";
 import * as fs from "fs";
-import { SmtpSession } from "../server";
-import { CloudProcessor, CloudProcessorConfig } from "./cloud";
+import { SmtpSession } from "../server.js";
+import { CloudProcessor, CloudProcessorConfig } from "./cloud.js";
 
 export interface AWSProcessorConfig extends CloudProcessorConfig {
   type: "aws";

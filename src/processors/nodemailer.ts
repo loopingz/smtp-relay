@@ -1,12 +1,12 @@
 import { AddressObject } from "mailparser";
 import * as nodemailer from "nodemailer";
-import Mail from "nodemailer/lib/mailer";
-import AddressParser from "nodemailer/lib/addressparser/index";
-import { SmtpComponentConfig } from "../component";
-import { SmtpProcessor } from "../processor";
-import { mapAddressObjects, SmtpSession } from "../server";
-import type { SingleKeyOptions } from "nodemailer/lib/dkim";
-import type SMTPTransport from "nodemailer/lib/smtp-transport";
+import type Mail from "nodemailer/lib/mailer/index.js";
+import AddressParser from "nodemailer/lib/addressparser/index.js";
+import { SmtpComponentConfig } from "../component.js";
+import { SmtpProcessor } from "../processor.js";
+import { mapAddressObjects, SmtpSession } from "../server.js";
+import type { SingleKeyOptions } from "nodemailer/lib/dkim/index.js";
+import type SMTPTransport from "nodemailer/lib/smtp-transport/index.js";
 
 type Pojo<T> = {
   [K in keyof T]: T[K] extends Function ? never : T[K];

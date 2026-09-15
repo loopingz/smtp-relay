@@ -2,8 +2,8 @@ import { suite, test } from "@testdeck/mocha";
 import { WorkerOutput } from "@webda/workout";
 import * as assert from "assert";
 import * as http from "http";
-import { SmtpFlow } from "../flow";
-import { HttpAuthFilter, jsonPathValue } from "./http-auth";
+import { SmtpFlow } from "../flow.js";
+import { HttpAuthFilter, jsonPathValue } from "./http-auth.js";
 
 @suite
 class HttpAuthSmtpServerTest {
