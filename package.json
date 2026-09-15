@@ -19,30 +19,30 @@
     "ses"
   ],
   "overrides": {
-    "fast-xml-parser": ">=5.4.1"
+    "fast-xml-parser": ">=5.11.1"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.999.0",
-    "@aws-sdk/client-ses": "^3.999.0",
-    "@aws-sdk/client-sqs": "^3.999.0",
-    "@aws-sdk/client-sts": "^3.999.0",
-    "@google-cloud/pubsub": "^5.3.0",
-    "@google-cloud/storage": "^7.19.0",
+    "@aws-sdk/client-s3": "^3.1132.0",
+    "@aws-sdk/client-ses": "^3.1132.0",
+    "@aws-sdk/client-sqs": "^3.1132.0",
+    "@aws-sdk/client-sts": "^3.1132.0",
+    "@google-cloud/pubsub": "^6.0.1",
+    "@google-cloud/storage": "^8.1.0",
     "@webda/workout": "^3.2.1",
     "cloudevents": "^10.0.0",
-    "fast-xml-parser": ">=5.4.1",
+    "fast-xml-parser": ">=5.11.1",
     "is-in-subnet": "^4.0.1",
-    "mailauth": "^5.0.2",
-    "mailparser": "^3.9.12",
-    "nodemailer": "^9.0.0",
+    "mailauth": "^5.0.3",
+    "mailparser": "^3.9.26",
+    "nodemailer": "^10.0.10",
     "prom-client": "^15.1.3",
-    "semver": ">=7.7.4",
-    "smtp-server": "^3.18.1",
+    "semver": ">=7.8.5",
+    "smtp-server": "^3.19.12",
     "strip-json-comments": "^5.0.3",
-    "yaml": "^2.8.2"
+    "yaml": "^2.9.1"
   },
   "engines": {
-    "node": ">= 20"
+    "node": ">=22.19.0"
   },
   "files": [
     "lib"
@@ -86,17 +86,16 @@
     "@testdeck/mocha": "^0.3.3",
     "@types/mailparser": "^3.4.6",
     "@types/mocha": "^10.0.10",
-    "@types/nodemailer": "^7.0.11",
-    "@types/sinon": "^21.0.0",
-    "@types/smtp-server": "^3.5.12",
+    "@types/sinon": "^22.0.0",
+    "@types/smtp-server": "^3.5.13",
     "auto": "^11.3.6",
-    "axios": "^1.13.5",
+    "axios": "^1.20.0",
     "c8": "^12.0.0",
-    "esbuild": "^0.28.0",
-    "mocha": "^11.7.5",
-    "prettier": "^3.8.1",
+    "esbuild": "^0.28.2",
+    "mocha": "^12.0.1",
+    "prettier": "^3.9.6",
     "selfsigned": "^5.5.0",
-    "sinon": "^21.0.1",
+    "sinon": "^22.1.0",
     "ts-json-schema-generator": "^2.5.0",
     "tsx": "^4.23.13",
     "typescript": "^7.0.2"

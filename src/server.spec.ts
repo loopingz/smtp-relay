@@ -501,8 +501,6 @@ class SmtpServerEdgeCasesTest {
       assert.notStrictEqual(logger, false, "a configured logger is forwarded to smtp-server");
       // smtp-server is very verbose on INFO, so INFO is remapped onto DEBUG
       assert.strictEqual(logger.info, logger.debug);
-      // `level` is a no-op: the level is owned by the smtp-relay configuration
-      assert.strictEqual(logger.level(), undefined);
     } finally {
       server.close();
     }

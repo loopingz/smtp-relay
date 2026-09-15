@@ -289,7 +289,7 @@ export class SmtpServer {
       banner: "loopingz/smtp-relay",
       ...this.config.options,
       // We move SMTPServer log INFO level to DEBUG as it is very verbose
-      logger: this.config.options.loggers!.length > 0 ? { ...logger, info: logger.debug, level: () => {} } : false,
+      logger: this.config.options.loggers!.length > 0 ? { ...logger, info: logger.debug } : false,
       onAuth: (auth: SMTPServerAuthentication, session: SmtpSession, callback: SmtpCallback) =>
         this.onAuth(auth, session, callback),
       onConnect: (session: SmtpSession, callback: SmtpCallback) => this.onConnect(session, callback),

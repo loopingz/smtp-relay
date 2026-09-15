@@ -5,26 +5,58 @@ import AddressParser from "nodemailer/lib/addressparser/index.js";
 import { SmtpComponentConfig } from "../component.js";
 import { SmtpProcessor } from "../processor.js";
 import { mapAddressObjects, SmtpSession } from "../server.js";
-import type { SingleKeyOptions } from "nodemailer/lib/dkim/index.js";
+import type DKIM from "nodemailer/lib/dkim/index.js";
 import type SMTPTransport from "nodemailer/lib/smtp-transport/index.js";
 
 type Pojo<T> = {
   [K in keyof T]: T[K] extends Function ? never : T[K];
 };
 
+/**
+ * nodemailer types a private key as `crypto.KeyLike`, which also covers Buffer and
+ * crypto.KeyObject. This configuration is deserialized from a JSON/YAML file, so a
+ * PEM string is the only representable form.
+ */
+type PemPrivateKey<T> = Omit<T, "privateKey"> & { privateKey?: string };
+
 export interface NodeMailerProcessorConfig extends SmtpComponentConfig {
   type: "nodemailer";
-  override?: Mail.Options;
+  /**
+   * Message fields to force on every email
+   *
+   * `dkim` is not part of it, use the `dkims` attribute instead, and per message
+   * `auth` is not either as credentials belong to the `nodemailer` transport
+   */
+  override?: Omit<Mail.Options, "dkim" | "auth">;
   /**
    * You can define the nodemailer transport options here
    * @see https://nodemailer.com/usage/
    */
-  nodemailer?: string | Pojo<SMTPTransport> | Pojo<SMTPTransport.Options>;
+  nodemailer?:
+    | string
+    | (Omit<Pojo<SMTPTransport.Options>, "auth" | "dkim" | "oauth2" | "customAuth" | "getSocket"> & {
+        /**
+         * Authentication settings, no authentication when not set
+         *
+         * The attributes expecting a callback (`customAuth`, `getSocket`) or a live
+         * instance (`oauth2`) are not part of it as they cannot be expressed in a
+         * configuration file, and `dkim` is configured with `dkims` instead
+         */
+        auth?: PemPrivateKey<NonNullable<SMTPTransport.Options["auth"]>>;
+      });
   /**
    * Configuration DKIM per sender domain
    */
   dkims?: {
-    [domain: string]: Omit<SingleKeyOptions, "domainName">;
+    [domain: string]: Omit<DKIM.SingleKeyOptions, "domainName" | "privateKey"> & {
+      /**
+       * PEM encoded private key used to sign the messages of this domain
+       *
+       * nodemailer also accepts a Buffer or a crypto.KeyObject here, but this
+       * is read from a JSON/YAML file so only a string is representable
+       */
+      privateKey: string;
+    };
   };
 }
 
@@ -91,7 +123,7 @@ export class NodeMailerProcessor<
    * @param domain
    * @returns
    */
-  getDkimForDomain(domain: string): SingleKeyOptions | undefined {
+  getDkimForDomain(domain: string): DKIM.SingleKeyOptions | undefined {
     for (const d in this.config.dkims) {
       if (d === domain) {
         return { ...this.config.dkims[d], domainName: d };
@@ -106,7 +138,7 @@ export class NodeMailerProcessor<
    */
   async onMail(session: SmtpSession): Promise<void> {
     const domain = (<any>session.envelope.mailFrom.valueOf()).address.split("@").pop();
-    return this.transporter.sendMail({
+    await this.transporter.sendMail({
       ...NodeMailerProcessor.transformEmail(session),
       ...this.config.override,
       dkim: this.getDkimForDomain(domain)
