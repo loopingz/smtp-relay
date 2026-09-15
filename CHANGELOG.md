@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.0.0](https://github.com/loopingz/smtp-relay/compare/v2.3.0...v3.0.0) (2026-09-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* drop node 20 to node 26
+
+### Features
+
+* drop node 20 to node 26 ([dbb4923](https://github.com/loopingz/smtp-relay/commit/dbb492307f28157eb53d94d4df40b9615e2fdb4e))
+
 ## [2.3.0](https://github.com/loopingz/smtp-relay/compare/v2.2.11...v2.3.0) (2026-03-29)
 
 
