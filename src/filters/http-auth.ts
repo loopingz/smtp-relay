@@ -40,21 +40,20 @@ export function jsonPathValue(object: any, path: string, value?: string) {
     if (isUnsafeKey(part)) {
       return undefined;
     }
+    // Only objects can carry properties: refuse to read through or write onto
+    // anything else (null included) rather than throwing a TypeError
+    if (current === null || typeof current !== "object") {
+      return undefined;
+    }
     if (i === parts.length - 1 && value !== undefined) {
       current[part] = value;
       return;
     }
     if (current[part] === undefined) {
-      if (value !== undefined) {
-        // Only create nested objects when the current value is an object
-        if (current !== null && typeof current === "object") {
-          current[part] = {};
-        } else {
-          return undefined;
-        }
-      } else {
+      if (value === undefined) {
         return undefined;
       }
+      current[part] = {};
     }
     current = current[part];
   }

@@ -67,4 +67,24 @@ text: Text content
 `
     );
   }
+
+  @test
+  async fallsBackToConsoleWithoutLogger() {
+    // No WorkerOutput provided: the processor must fall back to the global console
+    const log = new LogProcessor(undefined as any, { type: "log" }, undefined as any);
+    const session: SmtpSession = getFakeSession();
+    session.email!.subject = "Subject";
+    const calls: any[][] = [];
+    const stub = sinon.stub(console, "log").callsFake((...args: any[]) => {
+      calls.push(args);
+    });
+    try {
+      await log.onMail(session);
+    } finally {
+      stub.restore();
+    }
+    assert.strictEqual(calls.length, 1);
+    assert.strictEqual(calls[0][0], "INFO");
+    assert.ok(calls[0][1].includes("subject: Subject"));
+  }
 }

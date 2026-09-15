@@ -106,7 +106,8 @@ export class HeadersTransform extends Transform {
     if (currentChunk.endsWith("\n")) {
       this.previousChunk = "";
     } else {
-      this.previousChunk = lines.pop() ?? "";
+      // `split` always yields at least one element, so `pop` cannot return undefined here
+      this.previousChunk = lines.pop()!;
     }
     const filteredLines = lines.filter(line => this.includeHeader(line));
     this.push(filteredLines.join("\n"));

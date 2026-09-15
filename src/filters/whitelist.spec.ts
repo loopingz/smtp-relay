@@ -85,6 +85,26 @@ class WhitelistSmtpServerTest {
   }
 
   @test
+  async whitelistSubnetCombinedWithIps() {
+    let output = new WorkerOutput();
+    const filter = new WhitelistFilter(
+      undefined as any,
+      {
+        type: "whitelist",
+        subnets: ["10.0.0.0/8"],
+        ips: ["192.168.0.1"]
+      },
+      output
+    );
+    // Matched by the `ips` list: the subnet checker must not override the decision
+    assert.strictEqual(await filter.onConnect(<any>{ remoteAddress: "192.168.0.1" }), true);
+    // Not in `ips` but inside a whitelisted subnet
+    assert.strictEqual(await filter.onConnect(<any>{ remoteAddress: "10.1.1.1" }), true);
+    // Neither in `ips` nor in a whitelisted subnet
+    assert.strictEqual(await filter.onConnect(<any>{ remoteAddress: "11.1.1.1" }), false);
+  }
+
+  @test
   async getRegExpInvalidRegex() {
     let output = new WorkerOutput();
     const filter = new WhitelistFilter(

@@ -45,6 +45,26 @@ class CloudEventTest {
   }
 
   @test
+  truncatesAttachmentFilenames() {
+    let session = getFakeSession();
+    session.email!.attachments.push(<Attachment>(<unknown>{
+      filename: "a".repeat(4096),
+      size: 12,
+      content: Buffer.from("Coucou")
+    }));
+    // Attachment without a filename: must stay undefined rather than throw
+    session.email!.attachments.push(<Attachment>(<unknown>{
+      size: 34,
+      content: Buffer.from("Coucou")
+    }));
+    const evt = getCloudEvent(session, 10);
+    assert.deepStrictEqual(evt.data!.email.attachments, [
+      { filename: "aaaaaaaaaa", size: 12 },
+      { filename: undefined, size: 34 }
+    ]);
+  }
+
+  @test
   fallback() {
     let session = getFakeSession();
 

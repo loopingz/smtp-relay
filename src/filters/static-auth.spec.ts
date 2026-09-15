@@ -36,4 +36,19 @@ class StaticSmtpServerTest {
       await filter.onAuth({ method: "LOGIN", username: "test", password: "test", validatePassword: () => false })
     );
   }
+
+  @test
+  async rejectsPlainPasswordWithoutValue() {
+    const logger = new WorkerOutput();
+    const flow = new SmtpFlow("test", { outputs: [] }, logger);
+    process.env.SMTP_USERNAME = "test";
+    process.env.SMTP_PASSWORD = "plain:test";
+    delete process.env.SMTP_PASSWORD_SALT;
+    const filter = new StaticAuthFilter(flow, { type: "static-auth" }, logger);
+    // A malformed "plain" entry carries no expected value: nothing must ever match
+    filter.config.password = "plain";
+    delete filter.config.salt;
+    assert.strictEqual(filter.validatePassword("test"), false);
+    assert.strictEqual(filter.validatePassword(""), true, "an empty password matches the empty expected value");
+  }
 }
