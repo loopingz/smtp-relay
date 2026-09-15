@@ -3,9 +3,9 @@ import { WorkerOutput } from "@webda/workout";
 import * as assert from "assert";
 import { Attachment } from "mailparser";
 import * as sinon from "sinon";
-import { SmtpSession } from "../server";
-import { getFakeSession } from "../server.spec";
-import { GCPProcessor } from "./gcp";
+import { SmtpSession } from "../server.js";
+import { getFakeSession } from "../server.spec.js";
+import { GCPProcessor } from "./gcp.js";
 import { readFileSync } from "node:fs";
 
 @suite
@@ -20,6 +20,40 @@ class GCPProcessorTest {
       // @ts-ignore
       () => new GCPProcessor(undefined, { storage: { bucket: "Test" } }),
       /Need to specify a path for CloudStorage/
+    );
+  }
+
+  @test
+  async fallsBackToConsoleWithoutLogger() {
+    // No WorkerOutput provided: store() and onMail() must fall back to the global console
+    const gcp = new GCPProcessor(
+      undefined as any,
+      { type: "gcp", storage: { bucket: "test", path: "${id}.eml", type: "html" }, pubsub: { topic: "test" } },
+      undefined as any
+    );
+    const session: SmtpSession = getFakeSession();
+    session.email!.html = "Coucou";
+    (sinon.stub(gcp.storage, "bucket") as any).callsFake(() => ({
+      file: () => ({ save: () => {} })
+    }));
+    (sinon.stub(gcp.pubsub, "topic") as any).callsFake(() => ({ publishMessage: () => {} }));
+    const calls: any[][] = [];
+    const stub = sinon.stub(console, "log").callsFake((...args: any[]) => {
+      calls.push(args);
+    });
+    try {
+      await gcp.onMail(session);
+    } finally {
+      stub.restore();
+    }
+    const messages = calls.map(c => c.join(" "));
+    assert.ok(
+      messages.some(m => m.includes("Storing html")),
+      `store() should log through console: ${JSON.stringify(messages)}`
+    );
+    assert.ok(
+      messages.some(m => m.includes("Publishing cloudevent")),
+      `onMail() should log through console: ${JSON.stringify(messages)}`
     );
   }
 

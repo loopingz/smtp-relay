@@ -1,6 +1,6 @@
 import { PubSub } from "@google-cloud/pubsub";
 import { Storage } from "@google-cloud/storage";
-import { CloudProcessor, CloudProcessorConfig } from "./cloud";
+import { CloudProcessor, CloudProcessorConfig } from "./cloud.js";
 
 /**
  * Configuration for GCPProcessor

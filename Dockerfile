@@ -9,7 +9,7 @@ ADD package-lock.json /app
 RUN cd /app && npm install && npm run build && npm prune --production
 
 # Run it in distroless
-FROM gcr.io/distroless/nodejs22-debian11:latest
+FROM gcr.io/distroless/nodejs26-debian13:latest
 # Copy default config
 ADD configs /smtp-relay/configs
 COPY --from=builder /app/lib /smtp-relay/lib

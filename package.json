@@ -48,16 +48,16 @@
     "lib"
   ],
   "scripts": {
-    "build": "tsc-esm",
+    "build": "tsc",
     "build:binaries": "esbuild ./src/index.ts --bundle --platform=node --outfile=bin/smtp-relay.cjs && node --experimental-sea-config sea-config.json",
     "build:schema": "ts-json-schema-generator -f ./tsconfig.json --type 'SmtpConfig' -o config.schema.json",
     "pretest": "npm run build",
     "typecheck": "tsc --noEmit",
     "lint": "prettier --check src/**/*",
     "lint:fix": "prettier --write src/**/*",
-    "test": "c8 mocha --recursive --exit --timeout=6000 src/**/*.spec.ts src/*.spec.ts",
-    "test:debug": "mocha --recursive --exit --no-timeouts src/**/*.spec.ts src/*.spec.ts",
-    "server": "tsc-esm && node lib/index.js",
+    "test": "c8 mocha --recursive --exit --timeout=6000 'lib/**/*.spec.js'",
+    "test:debug": "mocha --node-option import=tsx --recursive --exit --no-timeouts 'src/**/*.spec.ts'",
+    "server": "tsc && node lib/index.js",
     "release": "yarn build && yarn build:schema && auto shipit"
   },
   "c8": {
@@ -73,10 +73,11 @@
     ],
     "excludeNodeModules": true,
     "check-coverage": true,
-    "lines": 99,
-    "functions": 70,
-    "branches": 60,
-    "statements": 70
+    "lines": 100,
+    "functions": 100,
+    "branches": 100,
+    "statements": 100,
+    "excludeAfterRemap": true
   },
   "devDependencies": {
     "@auto-it/all-contributors": "^11.3.6",
@@ -85,21 +86,20 @@
     "@testdeck/mocha": "^0.3.3",
     "@types/mailparser": "^3.4.6",
     "@types/mocha": "^10.0.10",
+    "@types/nodemailer": "^7.0.11",
     "@types/sinon": "^21.0.0",
     "@types/smtp-server": "^3.5.12",
-    "@webda/tsc-esm": "^1.3.1",
     "auto": "^11.3.6",
     "axios": "^1.13.5",
-    "c8": "^11.0.0",
+    "c8": "^12.0.0",
     "esbuild": "^0.28.0",
     "mocha": "^11.7.5",
     "prettier": "^3.8.1",
-    "prettier-plugin-organize-imports": "^4.3.0",
     "selfsigned": "^5.5.0",
     "sinon": "^21.0.1",
     "ts-json-schema-generator": "^2.5.0",
-    "ts-node": "^10.9.2",
-    "typescript": "^6.0.2"
+    "tsx": "^4.23.13",
+    "typescript": "^7.0.2"
   },
   "auto": {
     "plugins": [

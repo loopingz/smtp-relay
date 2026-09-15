@@ -1,5 +1,5 @@
 import { WorkerOutput } from "@webda/workout";
-import { SmtpFlow } from "./flow";
+import { SmtpFlow } from "./flow.js";
 
 /**
  * Define a component and its type

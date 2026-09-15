@@ -3,9 +3,9 @@ import { WorkerOutput } from "@webda/workout";
 import * as assert from "assert";
 import { HeaderValue } from "mailparser";
 import * as sinon from "sinon";
-import { SmtpSession } from "../server";
-import { getFakeSession } from "../server.spec";
-import { NodeMailerProcessor } from "./nodemailer";
+import { SmtpSession } from "../server.js";
+import { getFakeSession } from "../server.spec.js";
+import { NodeMailerProcessor } from "./nodemailer.js";
 
 @suite
 class NodeMailerProcessorTest {
@@ -142,5 +142,44 @@ class NodeMailerProcessorTest {
         }
       ]
     });
+  }
+
+  @test
+  async bccResolutionWithSeveralRecipients() {
+    const session = getFakeSession();
+    session.envelope.rcptTo = [
+      { address: "bcc1@test.com", args: [] },
+      { address: "bcc2@test.com", args: [] },
+      { address: "to@test.com", args: [] }
+    ];
+    session.email!.to = [{ html: "", text: "", value: [{ name: "", address: "to@test.com" }] }];
+    session.email!.headerLines = [{ key: "plop", line: "test" }];
+    NodeMailerProcessor.transformEmail(session);
+    // More than one bcc: the whole array is kept instead of a single address object
+    assert.ok(Array.isArray(session.email!.bcc), "bcc should stay an array");
+    assert.deepStrictEqual(
+      (session.email!.bcc as any[]).map(b => b.text),
+      ["bcc1@test.com", "bcc2@test.com"]
+    );
+  }
+
+  @test
+  async transformEmailHandlesFalseHtmlAndInlineAttachment() {
+    const session = getFakeSession();
+    session.email!.headerLines = [{ key: "plop", line: "test" }];
+    // mailparser reports `html: false` when the email has no HTML part
+    session.email!.html = false;
+    const headers = new Map<string, HeaderValue>();
+    headers.set("plop", "test");
+    session.email!.attachments.push(<any>{ contentDisposition: "inline", headers });
+    session.email!.attachments.push(<any>{ contentDisposition: "plop", headers });
+
+    const result = NodeMailerProcessor.transformEmail(session);
+    assert.strictEqual(result.html, undefined, "html:false must become undefined");
+    assert.deepStrictEqual(
+      result.attachments!.map((a: any) => a.contentDisposition),
+      ["inline", "attachment"],
+      "only `inline` is preserved, anything else becomes an attachment"
+    );
   }
 }

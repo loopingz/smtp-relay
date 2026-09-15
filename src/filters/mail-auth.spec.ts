@@ -1,12 +1,14 @@
 import { suite, test } from "@testdeck/mocha";
 import { WorkerOutput } from "@webda/workout";
 import * as assert from "assert";
-import { SmtpFlow } from "../flow";
+import { SmtpFlow } from "../flow.js";
 import * as fs from "node:fs";
-import { MailAuthFilter } from "./mail-auth";
-import { getFakeSession } from "../server.spec";
+import { MailAuthFilter } from "./mail-auth.js";
+import { getFakeSession } from "../server.spec.js";
 import { generateKeyPairSync } from "node:crypto";
-import { dkimSign } from "mailauth/lib/dkim/sign";
+import { dkimSign } from "mailauth/lib/dkim/sign.js";
+import dns from "node:dns/promises";
+import * as sinon from "sinon";
 
 @suite
 class MailAuthTest {
@@ -176,6 +178,52 @@ class MailAuthTest {
       //assert.strictEqual(session.context.mailauth.dkim.results[0].status.result, "fail", "DKIM should fail");
     } finally {
       // Restore original content
+      await fs.promises.writeFile(emailPath, originalContent, "utf-8");
+    }
+  }
+
+  @test
+  async worksWithoutMailauthConfigAndWithoutSender() {
+    const session = getFakeSession();
+    const emailPath = session.emailPath!;
+    const originalContent = fs.readFileSync(emailPath, "utf-8");
+    try {
+      const logger = new WorkerOutput();
+      const flow = new SmtpFlow("test", { outputs: [] }, logger);
+      // Config carries no `mailauth` section at all
+      const mailauth = new MailAuthFilter(flow, { type: "mail-auth" }, logger);
+      // A missing/rejected sender surfaces as `mailFrom: false`
+      session.envelope.mailFrom = false;
+      assert.ok(await mailauth.onData(session, "mailauth"), "no policy configured means the email passes");
+      assert.ok(session.context.mailauth, "authentication results are still recorded");
+    } finally {
+      await fs.promises.writeFile(emailPath, originalContent, "utf-8");
+    }
+  }
+
+  @test
+  async fallsBackToNodeDnsResolver() {
+    const session = getFakeSession();
+    const emailPath = session.emailPath!;
+    const originalContent = fs.readFileSync(emailPath, "utf-8");
+    // enforceDmarc is set but no custom resolver: lookups must go through node's DNS
+    const resolved: [string, string][] = [];
+    const stub = sinon.stub(dns, "resolve").callsFake(((domain: string, type: string) => {
+      resolved.push([domain, type]);
+      return Promise.resolve([]);
+    }) as any);
+    try {
+      const logger = new WorkerOutput();
+      const flow = new SmtpFlow("test", { outputs: [] }, logger);
+      const mailauth = new MailAuthFilter(flow, { type: "mail-auth", enforceDmarc: "v=DMARC1; p=none" }, logger);
+      assert.ok(await mailauth.onData(session, "mailauth"), "a p=none policy must not reject the email");
+      assert.deepStrictEqual(resolved, [["test.com", "TXT"]], "the SPF lookup went through node's DNS resolver");
+      assert.ok(
+        !resolved.some(([domain]) => domain.startsWith("_dmarc.")),
+        "_dmarc lookups are answered by enforceDmarc and never reach the DNS resolver"
+      );
+    } finally {
+      stub.restore();
       await fs.promises.writeFile(emailPath, originalContent, "utf-8");
     }
   }

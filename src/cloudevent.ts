@@ -1,5 +1,5 @@
 import { CloudEvent } from "cloudevents";
-import { SmtpSession } from "./server";
+import { SmtpSession } from "./server.js";
 import { AddressObject } from "mailparser";
 import { SMTPServerAddress } from "smtp-server";
 

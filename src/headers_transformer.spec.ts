@@ -3,7 +3,7 @@ import * as assert from "assert";
 import { pipeline } from "node:stream/promises";
 import { Writable } from "node:stream";
 import { createReadStream } from "node:fs";
-import { HeadersTransform } from "./headers_transformer";
+import { HeadersTransform } from "./headers_transformer.js";
 
 class BufferWritable extends Writable {
   buffer: Buffer;

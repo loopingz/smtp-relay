@@ -1,7 +1,7 @@
 import { suite, test } from "@testdeck/mocha";
 import * as assert from "assert";
-import { SmtpFilter } from "./filter";
-import { SmtpSession } from "./server";
+import { SmtpFilter } from "./filter.js";
+import { SmtpSession } from "./server.js";
 
 @suite
 class FilterTest {

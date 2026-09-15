@@ -1,6 +1,6 @@
-import { SmtpComponentConfig } from "../component";
-import { SmtpFilter } from "../filter";
-import { SmtpSession } from "../server";
+import { SmtpComponentConfig } from "../component.js";
+import { SmtpFilter } from "../filter.js";
+import { SmtpSession } from "../server.js";
 import { authenticate } from "mailauth";
 import { createReadStream } from "node:fs";
 import { readFile, writeFile } from "node:fs/promises";

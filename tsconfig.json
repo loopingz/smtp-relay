@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
-    "target": "es2020",
+    "target": "es2021",
     "lib": [
-      "es2019",
+      "es2021",
       "DOM"
     ],
-    "module": "esnext",
+    "module": "nodenext",
     "rootDir": "./src",
     "outDir": "./lib",
     "strict": true,
@@ -13,7 +13,7 @@
     "sourceMap": true,
     "experimentalDecorators": true,
     "esModuleInterop": true,
-    "moduleResolution": "bundler",
+    "moduleResolution": "nodenext",
     "skipLibCheck": true
   },
   "include": [
@@ -21,12 +21,5 @@
   ],
   "exclude": [
     "**/node_modules"
-  ],
-  "ts-node": {
-    "transpileOnly": true,
-    "preferTsExts": true,
-    "compilerOptions": {
-      "experimentalDecorators": true
-    }
-  }
+  ]
 }

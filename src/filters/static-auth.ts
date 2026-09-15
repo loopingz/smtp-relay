@@ -1,7 +1,7 @@
 import * as crypto from "crypto";
 import { SMTPServerAuthentication } from "smtp-server";
-import { SmtpComponentConfig } from "../component";
-import { SmtpFilter } from "../filter";
+import { SmtpComponentConfig } from "../component.js";
+import { SmtpFilter } from "../filter.js";
 
 /**
  * Define a static auth

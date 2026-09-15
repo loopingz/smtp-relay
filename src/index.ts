@@ -1,18 +1,18 @@
 import * as url from "node:url";
-import { SmtpFilter } from "./filter";
-import { StaticAuthFilter } from "./filters/static-auth";
-import { WhitelistFilter } from "./filters/whitelist";
-import { SmtpProcessor } from "./processor";
-import { AWSProcessor } from "./processors/aws";
-import { FileProcessor } from "./processors/file";
-import { GCPProcessor } from "./processors/gcp";
-import { NodeMailerProcessor } from "./processors/nodemailer";
-import { SmtpServer } from "./server";
-import { HttpAuthFilter } from "./filters/http-auth";
-import { HttpFilter } from "./filters/http-filter";
-import { LogProcessor } from "./processors/log";
-import { MailAuthFilter } from "./filters/mail-auth";
-export * from "./cloudevent";
+import { SmtpFilter } from "./filter.js";
+import { StaticAuthFilter } from "./filters/static-auth.js";
+import { WhitelistFilter } from "./filters/whitelist.js";
+import { SmtpProcessor } from "./processor.js";
+import { AWSProcessor } from "./processors/aws.js";
+import { FileProcessor } from "./processors/file.js";
+import { GCPProcessor } from "./processors/gcp.js";
+import { NodeMailerProcessor } from "./processors/nodemailer.js";
+import { SmtpServer } from "./server.js";
+import { HttpAuthFilter } from "./filters/http-auth.js";
+import { HttpFilter } from "./filters/http-filter.js";
+import { LogProcessor } from "./processors/log.js";
+import { MailAuthFilter } from "./filters/mail-auth.js";
+export * from "./cloudevent.js";
 import { generateKeyPairSync } from "node:crypto";
 
 /**

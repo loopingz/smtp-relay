@@ -1,7 +1,7 @@
-import { getCloudEvent } from "../cloudevent";
-import { SmtpComponentConfig } from "../component";
-import { SmtpProcessor } from "../processor";
-import { SmtpServer, SmtpSession } from "../server";
+import { getCloudEvent } from "../cloudevent.js";
+import { SmtpComponentConfig } from "../component.js";
+import { SmtpProcessor } from "../processor.js";
+import { SmtpServer, SmtpSession } from "../server.js";
 import { readFile, writeFile } from "node:fs/promises";
 
 /**

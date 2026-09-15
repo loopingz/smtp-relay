@@ -1,8 +1,8 @@
 import { suite, test } from "@testdeck/mocha";
 import * as assert from "assert";
 import { Attachment } from "mailparser";
-import { getCloudEvent } from "./cloudevent";
-import { getFakeSession } from "./server.spec";
+import { getCloudEvent } from "./cloudevent.js";
+import { getFakeSession } from "./server.spec.js";
 
 @suite
 class CloudEventTest {
@@ -42,6 +42,26 @@ class CloudEventTest {
     let evt = getCloudEvent(session);
     // Should have been truncated
     assert.strictEqual(evt.data!.email.subject, "1234".repeat(2048));
+  }
+
+  @test
+  truncatesAttachmentFilenames() {
+    let session = getFakeSession();
+    session.email!.attachments.push(<Attachment>(<unknown>{
+      filename: "a".repeat(4096),
+      size: 12,
+      content: Buffer.from("Coucou")
+    }));
+    // Attachment without a filename: must stay undefined rather than throw
+    session.email!.attachments.push(<Attachment>(<unknown>{
+      size: 34,
+      content: Buffer.from("Coucou")
+    }));
+    const evt = getCloudEvent(session, 10);
+    assert.deepStrictEqual(evt.data!.email.attachments, [
+      { filename: "aaaaaaaaaa", size: 12 },
+      { filename: undefined, size: 34 }
+    ]);
   }
 
   @test

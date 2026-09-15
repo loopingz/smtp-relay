@@ -1,6 +1,6 @@
 import { suite, test } from "@testdeck/mocha";
 import * as assert from "assert";
-import { FileProcessor } from "./file";
+import { FileProcessor } from "./file.js";
 
 @suite
 class FileProcessorTest {

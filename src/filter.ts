@@ -1,8 +1,8 @@
 import { WorkerOutput } from "@webda/workout";
 import { SMTPServerAddress, SMTPServerAuthentication } from "smtp-server";
-import { SmtpComponent, SmtpComponentConfig } from "./component";
-import { SmtpFlow } from "./flow";
-import { SmtpSession } from "./server";
+import { SmtpComponent, SmtpComponentConfig } from "./component.js";
+import { SmtpFlow } from "./flow.js";
+import { SmtpSession } from "./server.js";
 
 export class SmtpFilter<T extends SmtpComponentConfig = SmtpComponentConfig> extends SmtpComponent<T> {
   declare name: string;

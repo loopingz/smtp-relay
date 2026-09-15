@@ -3,12 +3,12 @@ import { MemoryLogger, WorkerOutput } from "@webda/workout";
 import * as assert from "assert";
 import axios from "axios";
 import { Socket } from "net";
-import { defaultModules } from ".";
-import { SmtpFilter } from "./filter";
-import { SmtpFlow } from "./flow";
-import { SmtpProcessor } from "./processor";
+import { defaultModules } from "./index.js";
+import { SmtpFilter } from "./filter.js";
+import { SmtpFlow } from "./flow.js";
+import { SmtpProcessor } from "./processor.js";
 import { register } from "prom-client";
-import { SmtpServer, SmtpSession, mapAddressObjects } from "./server";
+import { SmtpServer, SmtpSession, mapAddressObjects } from "./server.js";
 import { readdirSync, unlinkSync } from "node:fs";
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join, dirname } from "node:path";
@@ -423,6 +423,138 @@ class SmtpServerTest {
     await test.write(`dGVzdA==`, "334");
     await test.write(`dGVzdA==`, "235");
     server.close();
+  }
+
+  @test
+  async prometheusCountersAreIncremented() {
+    register.clear();
+    defaultModules();
+    // This configuration enables prometheus, so `counter` is defined
+    const server = new SmtpServer("./tests/whitelist-prometheus.json");
+    try {
+      const failingOutput = { name: "boom", onMail: async () => throwBoom() };
+      const okOutput = { name: "ok", onMail: async () => {} };
+      server.flows = <any>{ localhost: { outputs: [okOutput, failingOutput] } };
+
+      const session = getFakeSession();
+      // An unknown sender is reported as "unknown"
+      session.envelope.mailFrom = false;
+      session.flows = <any>{ localhost: "ACCEPTED" };
+      await server.onDataRead(session);
+
+      // A session without any accepted flow is rejected
+      const rejected = getFakeSession();
+      rejected.envelope.mailFrom = false;
+      rejected.flows = <any>{};
+      const err = await new Promise<any>(resolve => server.manageCallback(rejected, resolve));
+      assert.strictEqual(err.message, "Message refused");
+
+      const metrics = await register.metrics();
+      assert.match(metrics, /status="accepted",flow="localhost"/);
+      assert.match(metrics, /status="error",flow="localhost",output="boom"/);
+      assert.match(metrics, /status="rejected"/);
+    } finally {
+      server.promServer!.close();
+      register.clear();
+    }
+  }
+}
+
+function throwBoom(): never {
+  throw new Error("boom");
+}
+
+@suite
+class SmtpServerEdgeCasesTest {
+  @test
+  emptyConfigurationsFallBackToAnEmptyObject() {
+    // JSON parsing to a falsy value
+    const json = new SmtpServer("./tests/empty-config.json");
+    assert.deepStrictEqual(json.config.flows, undefined);
+    assert.strictEqual(json.config.port, 10025, "defaults are still applied");
+    // YAML parsing to a falsy value
+    const yaml = new SmtpServer("./tests/empty-config.yaml");
+    assert.deepStrictEqual(yaml.config.flows, undefined);
+    assert.strictEqual(yaml.config.port, 10025, "defaults are still applied");
+  }
+
+  @test
+  disablesSmtpServerLoggingWhenNoLoggerConfigured() {
+    // An explicitly empty `loggers` list must disable smtp-server's own logger
+    const server = new SmtpServer("./tests/no-loggers.json");
+    assert.deepStrictEqual(server.config.options.loggers, []);
+    server.init();
+    try {
+      assert.strictEqual((server.server as any).options.logger, false);
+    } finally {
+      server.close();
+    }
+  }
+
+  @test
+  downgradesSmtpServerInfoLogsToDebug() {
+    defaultModules();
+    const server = new SmtpServer("./tests/whitelist-and.json");
+    server.init();
+    try {
+      const logger = (server.server as any).options.logger;
+      assert.notStrictEqual(logger, false, "a configured logger is forwarded to smtp-server");
+      // smtp-server is very verbose on INFO, so INFO is remapped onto DEBUG
+      assert.strictEqual(logger.info, logger.debug);
+      // `level` is a no-op: the level is owned by the smtp-relay configuration
+      assert.strictEqual(logger.level(), undefined);
+    } finally {
+      server.close();
+    }
+  }
+
+  @test
+  replaceVariablesWithoutSender() {
+    const session = getFakeSession();
+    session.envelope.mailFrom = false;
+    assert.strictEqual(SmtpServer.replaceVariables("${from}", session), "");
+  }
+
+  @test
+  async onDataCallsBackOnlyOnceWhenSeveralErrorsOccur() {
+    const server = new SmtpServer("./tests/whitelist-and.json");
+    const { PassThrough } = await import("node:stream");
+    const pt = new PassThrough();
+    const session = getFakeSession();
+    let calls = 0;
+    await new Promise<void>(resolve => {
+      server.onData(<any>pt, <any>session, (err?: any) => {
+        calls++;
+        assert.ok(err, "Expected the first error to be propagated");
+        resolve();
+      });
+      const pipes = (pt as any)._readableState.pipes;
+      const transform = Array.isArray(pipes) ? pipes[0] : pipes;
+      setImmediate(() => {
+        // Two independent failures must collapse into a single callback
+        transform.emit("error", new Error("transform error"));
+        pt.emit("error", new Error("stream error"));
+      });
+    });
+    await new Promise(r => setTimeout(r, 50));
+    assert.strictEqual(calls, 1, "callback must only fire once");
+  }
+
+  @test
+  async logsWhenTheCachedEmailCannotBeDeleted() {
+    const server = new SmtpServer("./tests/whitelist-and.json");
+    const memory = new MemoryLogger(server.logger, "ERROR");
+    server.flows = <any>{};
+    const session = getFakeSession();
+    session.flows = <any>{};
+    // The cached file does not exist, so the unlink reports an error
+    session.emailPath = "./tests/does-not-exist.eml";
+    await (server as any).processAndCleanup(session);
+    await new Promise(r => setTimeout(r, 50));
+    assert.ok(
+      memory.getLogs().some(l => (<any>l).log?.args?.[0]?.toString().includes("Unable to delete")),
+      `expected an "Unable to delete" error, got ${JSON.stringify(memory.getLogs())}`
+    );
   }
 }
 

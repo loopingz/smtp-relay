@@ -2,12 +2,12 @@ import { suite, test } from "@testdeck/mocha";
 import { WorkerOutput } from "@webda/workout";
 import * as assert from "assert";
 import * as http from "http";
-import { defaultModules } from "..";
-import { SmtpFlow } from "../flow";
-import { SmtpServer } from "../server";
-import { SmtpTest } from "../server.spec";
-import { HttpFilter } from "./http-filter";
-import { SmtpCloudEvent } from "../cloudevent";
+import { defaultModules } from "../index.js";
+import { SmtpFlow } from "../flow.js";
+import { SmtpServer } from "../server.js";
+import { SmtpTest } from "../server.spec.js";
+import { HttpFilter } from "./http-filter.js";
+import { SmtpCloudEvent } from "../cloudevent.js";
 
 @suite
 class HttpSmtpServerTest extends SmtpTest {
@@ -132,5 +132,28 @@ class HttpSmtpServerTest extends SmtpTest {
 
     await test.write("DATA", "354");
     await test.write("Coucou\r\n.\r\n", "250");
+  }
+}
+
+@suite
+class HttpFilterAuthTest {
+  @test
+  async onAuthHonoursAllowAnyUser() {
+    const logger = new WorkerOutput();
+    const flow = new SmtpFlow("test", { outputs: [] }, logger);
+    const auth = <any>{ method: "LOGIN", username: "test", password: "test", validatePassword: () => false };
+
+    // Defaults to false: the filter abstains so other filters can decide
+    const strict = new HttpFilter(flow, { type: "http-filter", url: "http://localhost:16661" }, logger);
+    assert.strictEqual(strict.config.allowAnyUser, false, "allowAnyUser defaults to false");
+    assert.strictEqual(await strict.onAuth(auth, <any>{}), undefined);
+
+    // Explicitly enabled: any user is accepted
+    const permissive = new HttpFilter(
+      flow,
+      { type: "http-filter", url: "http://localhost:16661", allowAnyUser: true },
+      logger
+    );
+    assert.strictEqual(await permissive.onAuth(auth, <any>{}), true);
   }
 }

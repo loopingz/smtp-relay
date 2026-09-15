@@ -1,7 +1,7 @@
-import { SmtpComponentConfig } from "../component";
-import { SmtpProcessor } from "../processor";
-import { SmtpSession } from "../server";
-import { NodeMailerProcessor } from "./nodemailer";
+import { SmtpComponentConfig } from "../component.js";
+import { SmtpProcessor } from "../processor.js";
+import { SmtpSession } from "../server.js";
+import { NodeMailerProcessor } from "./nodemailer.js";
 
 export interface LogProcessorConfig extends SmtpComponentConfig {
   type: "log";

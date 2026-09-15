@@ -1,7 +1,7 @@
 import { SMTPServerAddress } from "smtp-server";
-import { SmtpComponentConfig } from "../component";
-import { SmtpFilter } from "../filter";
-import { SmtpSession } from "../server";
+import { SmtpComponentConfig } from "../component.js";
+import { SmtpFilter } from "../filter.js";
+import { SmtpSession } from "../server.js";
 import { createChecker } from "is-in-subnet";
 
 export interface WhitelistFilterConfiguration extends SmtpComponentConfig {
@@ -61,7 +61,8 @@ export class WhitelistFilter extends SmtpFilter<WhitelistFilterConfiguration> {
     try {
       return new RegExp(reg);
     } catch (e) {
-      throw new Error(`Invalid regex pattern in whitelist filter: '${reg}' - ${e instanceof Error ? e.message : e}`);
+      // `new RegExp` can only ever throw a SyntaxError
+      throw new Error(`Invalid regex pattern in whitelist filter: '${reg}' - ${(e as SyntaxError).message}`);
     }
   }
 

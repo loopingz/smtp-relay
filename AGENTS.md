@@ -7,7 +7,7 @@ smtp-relay is a configurable SMTP relay server written in TypeScript. It support
 ## Build & Test
 
 ```bash
-npm run build          # Compile TypeScript (tsc-esm)
+npm run build          # Compile TypeScript (tsc)
 npm test               # Build + run tests with coverage (c8 mocha)
 npm run typecheck      # Type-check without emitting
 ```
