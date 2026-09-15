@@ -25,7 +25,7 @@ jobs:
       - name: Build image
         id: build-image
         if: ${{ steps.release.outputs.release_created }}
-        uses: redhat-actions/buildah-build@v2
+        uses: redhat-actions/buildah-build@v3
         with:
           image: smtp-relay
           tags: latest v${{ steps.release.outputs.major }} v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }} v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }}.${{ steps.release.outputs.patch }}
