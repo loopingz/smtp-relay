@@ -32,8 +32,7 @@ export function jsonPathValue(object: any, path: string, value?: string) {
   }
   const parts = path.split(".");
   let current = object;
-  const isUnsafeKey = (key: string) =>
-    key === "__proto__" || key === "prototype" || key === "constructor";
+  const isUnsafeKey = (key: string) => key === "__proto__" || key === "prototype" || key === "constructor";
   for (let i = 0; i < parts.length; i++) {
     const part = parts[i];
     // Prevent prototype pollution by blocking unsafe keys

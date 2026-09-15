@@ -106,7 +106,7 @@ export class NodeMailerProcessor<
       subject: email.subject,
       attachments: email.attachments.map(a => ({
         ...a,
-        contentDisposition: a.contentDisposition === "inline" ? "inline" : "attachment" as const,
+        contentDisposition: a.contentDisposition === "inline" ? "inline" : ("attachment" as const),
         headers: ((headers: Map<string, string>) => {
           let res: { [key: string]: string } = {};
           [...headers.keys()].forEach(k => {

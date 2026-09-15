@@ -226,7 +226,9 @@ export class SmtpServer {
         typeof (this.config.options as any)[attr] === "string" &&
         (this.config.options as any)[attr]?.startsWith("file://")
       ) {
-        (this.config.options as any)[attr] = fs.readFileSync((this.config.options as any)[attr].replace("file://", "")).toString();
+        (this.config.options as any)[attr] = fs
+          .readFileSync((this.config.options as any)[attr].replace("file://", ""))
+          .toString();
       }
     });
     this.config.port ??= 10025;
