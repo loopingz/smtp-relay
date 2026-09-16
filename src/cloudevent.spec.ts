@@ -74,7 +74,7 @@ class CloudEventTest {
         address: "test@test.com",
         args: {}
       }
-    ]
+    ];
     // @ts-ignore
     session.email = {};
     session.email!.attachments = [];

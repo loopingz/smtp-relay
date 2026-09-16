@@ -39,7 +39,7 @@ export function getCloudEvent<T extends SmtpCloudEvent = SmtpCloudEvent>(
   session: SmtpSession,
   truncation: number = 8192
 ): CloudEvent<T> {
-  const getAddressObject = (arg: SMTPServerAddress | false) : AddressObject | undefined => {
+  const getAddressObject = (arg: SMTPServerAddress | false): AddressObject | undefined => {
     if (!arg) {
       return undefined;
     }
@@ -52,11 +52,13 @@ export function getCloudEvent<T extends SmtpCloudEvent = SmtpCloudEvent>(
       ],
       html: arg.address,
       text: arg.address
-    }
-  }
+    };
+  };
   const email = session.email!;
   email.from ??= getAddressObject(session.envelope.mailFrom);
-  email.to ??= session.envelope.rcptTo?.map(a => getAddressObject(a)).filter((a): a is AddressObject => a !== undefined);
+  email.to ??= session.envelope.rcptTo
+    ?.map(a => getAddressObject(a))
+    .filter((a): a is AddressObject => a !== undefined);
   return new CloudEvent<T>({
     type: "com.loopingz.smtp-relay.v2",
     source: session.localAddress,

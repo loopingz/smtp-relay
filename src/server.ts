@@ -226,7 +226,9 @@ export class SmtpServer {
         typeof (this.config.options as any)[attr] === "string" &&
         (this.config.options as any)[attr]?.startsWith("file://")
       ) {
-        (this.config.options as any)[attr] = fs.readFileSync((this.config.options as any)[attr].replace("file://", "")).toString();
+        (this.config.options as any)[attr] = fs
+          .readFileSync((this.config.options as any)[attr].replace("file://", ""))
+          .toString();
       }
     });
     this.config.port ??= 10025;
@@ -289,7 +291,7 @@ export class SmtpServer {
       banner: "loopingz/smtp-relay",
       ...this.config.options,
       // We move SMTPServer log INFO level to DEBUG as it is very verbose
-      logger: this.config.options.loggers!.length > 0 ? { ...logger, info: logger.debug, level: () => {} } : false,
+      logger: this.config.options.loggers!.length > 0 ? { ...logger, info: logger.debug } : false,
       onAuth: (auth: SMTPServerAuthentication, session: SmtpSession, callback: SmtpCallback) =>
         this.onAuth(auth, session, callback),
       onConnect: (session: SmtpSession, callback: SmtpCallback) => this.onConnect(session, callback),

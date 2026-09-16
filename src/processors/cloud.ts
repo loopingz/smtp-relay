@@ -93,7 +93,7 @@ export abstract class CloudProcessor<T extends CloudProcessorConfig = CloudProce
    * @param session
    */
   async store(session: SmtpSession) {
-    const logger = (this.logger ?? console);
+    const logger = this.logger ?? console;
     const storage = this.config.storage!;
     const email = session.email!;
     if (storage.type === "attachments") {
@@ -143,10 +143,7 @@ export abstract class CloudProcessor<T extends CloudProcessorConfig = CloudProce
           logger.log("INFO", `Output[${this.name}] Storing ${storage.type} to ${destFileName}`);
           await this.storeData(destFileName, data);
         } else {
-          logger.log(
-            "DEBUG",
-            `Output[${this.name}] No data(${storage.type}) ignoring ${email.messageId}`
-          );
+          logger.log("DEBUG", `Output[${this.name}] No data(${storage.type}) ignoring ${email.messageId}`);
         }
       }
     }
