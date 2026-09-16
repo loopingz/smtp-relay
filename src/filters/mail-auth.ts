@@ -70,9 +70,7 @@ export class MailAuthFilter extends SmtpFilter<MailAuthConfig> {
               if (domain.startsWith("_dmarc.")) {
                 return [[this.config.enforceDmarc]];
               }
-              return mailauthConfig.resolver
-                ? mailauthConfig.resolver(domain, type)
-                : dns.resolve(domain, type);
+              return mailauthConfig.resolver ? mailauthConfig.resolver(domain, type) : dns.resolve(domain, type);
             }
           : mailauthConfig.resolver
       }

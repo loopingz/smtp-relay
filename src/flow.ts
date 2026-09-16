@@ -19,11 +19,7 @@ export interface SmtpFlowConfig {
    * Filters to apply to define if the connection/email should be accepted
    */
   filters?: (
-    | StaticAuthConfiguration
-    | WhitelistFilterConfiguration
-    | MailAuthConfig
-    | HttpAuthConfig
-    | HttpFilterConfig
+    StaticAuthConfiguration | WhitelistFilterConfiguration | MailAuthConfig | HttpAuthConfig | HttpFilterConfig
   )[];
   /**
    * Define which operator applies if several filters are applied

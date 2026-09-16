@@ -31,8 +31,8 @@ export class LogProcessor<T extends LogProcessorConfig = LogProcessorConfig> ext
 ${"-".repeat(80)}
 `;
 
-    this.config.fields!
-      .filter(f => (email as any)[f] !== undefined)
+    this.config
+      .fields!.filter(f => (email as any)[f] !== undefined)
       .forEach(f => {
         let value = (email as any)[f];
         if (value instanceof Array) {

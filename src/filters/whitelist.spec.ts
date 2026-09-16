@@ -114,9 +114,6 @@ class WhitelistSmtpServerTest {
       },
       output
     );
-    assert.throws(
-      () => filter.getRegExp("regexp:[invalid"),
-      /Invalid regex pattern in whitelist filter/
-    );
+    assert.throws(() => filter.getRegExp("regexp:[invalid"), /Invalid regex pattern in whitelist filter/);
   }
 }
