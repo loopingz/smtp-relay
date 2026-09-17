@@ -1,6 +1,6 @@
 {
   "name": "smtp-relay",
-  "version": "2.3.0",
+  "version": "3.0.0",
   "main": "lib/index.js",
   "bin": "lib/index.js",
   "license": "MIT",
