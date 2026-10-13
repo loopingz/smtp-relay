@@ -500,7 +500,7 @@ export class SmtpServer {
     try {
       await this.filter(evt, session, [param, session]);
       // Send an error if no more flows are active
-      this.manageCallback(session, callback);
+      this.manageCallback(session, callback, { stage: evt, address: param });
     } catch (err) {
       callback(err);
     }
@@ -547,14 +547,34 @@ export class SmtpServer {
     }
   }
 
-  manageCallback(session: SmtpSession, callback: SmtpCallback) {
+  /**
+   * Call back with an error if no flow is still active
+   *
+   * @param session
+   * @param callback
+   * @param rejected the stage and address being evaluated, as SMTPServer only adds an address
+   *  to the envelope once it has been accepted
+   */
+  manageCallback(
+    session: SmtpSession,
+    callback: SmtpCallback,
+    rejected?: { stage: "MailFrom" | "RcptTo"; address: SMTPServerAddress }
+  ) {
     if (Object.keys(session.flows).length === 0) {
       this.counter?.inc({ status: "rejected" });
+      const from =
+        rejected?.stage === "MailFrom"
+          ? rejected.address.address
+          : (session.envelope.mailFrom || { address: "unknown" }).address;
+      const to = session.envelope.rcptTo.map(a => a.address);
+      if (rejected?.stage === "RcptTo") {
+        to.push(rejected.address.address);
+      }
       this.logger.log(
         "INFO",
-        `Rejecting mail from ${
-          session.envelope.mailFrom ? session.envelope.mailFrom.address : "unknown"
-        } to ${session.envelope.rcptTo.map(a => a.address).join(",")} (${session.clientHostname})`
+        `Rejecting mail from ${from} to ${to.join(",")} (${session.clientHostname})${
+          rejected ? ` at ${rejected.stage}` : ""
+        }`
       );
       callback(new Error("Message refused"));
     } else {

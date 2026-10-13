@@ -426,6 +426,34 @@ class SmtpServerTest {
   }
 
   @test
+  async rejectionLogsTheRejectedAddress() {
+    const server = new SmtpServer("./tests/whitelist-and.json");
+    const memory = new MemoryLogger(server.logger, "INFO");
+    const logs = () => memory.getLogs().map(l => (<any>l).log?.args?.[0]?.toString());
+    const reject = (rejected?: Parameters<SmtpServer["manageCallback"]>[2], sender = true) => {
+      const session = getFakeSession();
+      session.flows = <any>{};
+      session.envelope.rcptTo = [{ address: "first@example.com", args: {} }];
+      session.envelope.mailFrom = sender ? session.envelope.mailFrom : false;
+      return new Promise<any>(resolve => server.manageCallback(session, resolve, rejected));
+    };
+    // MAIL FROM is not in the envelope yet so the rejected address is used
+    await reject({ stage: "MailFrom", address: { address: "bad@example.com", args: {} } });
+    // RCPT TO keeps the sender and the recipients already accepted
+    await reject({ stage: "RcptTo", address: { address: "rcpt@example.com", args: {} } });
+    // Other stages keep using the envelope
+    await reject(undefined, false);
+    assert.deepStrictEqual(
+      logs().filter(l => l?.startsWith("Rejecting")),
+      [
+        "Rejecting mail from bad@example.com to first@example.com (localhost) at MailFrom",
+        "Rejecting mail from test@test.com to first@example.com,rcpt@example.com (localhost) at RcptTo",
+        "Rejecting mail from unknown to first@example.com (localhost)"
+      ]
+    );
+  }
+
+  @test
   async prometheusCountersAreIncremented() {
     register.clear();
     defaultModules();
