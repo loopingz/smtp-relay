@@ -31,6 +31,8 @@ The goal is to have a dynamic SMTP server that can either be:
 docker run -p 10025:10025 loopingz/smtp-relay:latest configs/aws-smtp-relay.jsonc
 ```
 
+To send through an SES identity owned by another AWS account, see [configs/aws-ses-cross-account.jsonc](configs/aws-ses-cross-account.jsonc).
+
 **Configuration file can leverage the published schema:**
 ```json
 {

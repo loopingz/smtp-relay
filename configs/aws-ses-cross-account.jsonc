@@ -1,0 +1,65 @@
+// Sending Authorization setup can be found here: https://docs.aws.amazon.com/ses/latest/dg/sending-authorization.html
+//
+// This is useful if you have multiple SES identities in different accounts, regions or both that you want to re-use, or if you want to send e-mail using an identity that a 3rd party controls (customer, vendor, etc.).
+//
+// The account that owns the verified identity (e.g. 111111111111) attaches an identity policy allowing the account running the relay (e.g. 222222222222) to send:
+// {
+//   "Version": "2012-10-17",
+//   "Statement": [{
+//     "Effect": "Allow",
+//     "Principal": { "AWS": "arn:aws:iam::222222222222:root" }, // This can be the account root or a more specific identity used by the AWS SDK. More information about available identities can be found here: https://docs.aws.amazon.com/sdkref/latest/guide/standardized-credentials.html
+//     "Action": ["ses:SendRawEmail"],
+//     "Resource": "arn:aws:ses:us-east-1:111111111111:identity/example.com"
+//   }]
+// }
+//
+// The account running the relay (e.g. 222222222222) must have an IAM policy allowing it to send using the identity in the owning account (e.g. 111111111111):
+// {
+//   "Version": "2012-10-17",
+//   "Statement": [{
+//     "Effect": "Allow",
+//     "Action": ["ses:SendRawEmail"],
+//     "Resource": "arn:aws:ses:us-east-1:111111111111:identity/example.com"
+//   }]
+// }
+//
+// The relay then passes the identity ARN as SourceArn/FromArn/ReturnPathArn.
+//
+//  IMPORTANT: The account running the relay MUST be removed from the sandbox in the same region that the identity exists in.
+//   In this case BOTH account 111111111111 and 222222222222 must be removed from the SES sandbox in us-east-1.
+
+{
+  "$schema": "https://raw.githubusercontent.com/loopingz/smtp-relay/main/config.schema.json",
+  "flows": {
+    "cross-account-example": {
+      "filters": [
+        {
+          "type": "whitelist",
+          "from": ["regexp:.*@example.com"] // Recommended filter when multiple identities configured and need to be routed to different accounts
+          // This is a simple example and as-is creates an open relay, so additional filtering or authenticationis probably a good idea. 
+        }
+      ],
+      "outputs": [
+        {
+          "type": "aws",
+          "ses": {},
+          // Region of the SES identity in the owning account.
+          // Not required if it is the same region as the smtp-relay
+          "sesClient": {
+            "region": "us-east-1"
+          },
+          // ARN of the identity in the owning account
+          "sendRawEmailOptions": {
+            "SourceArn": "arn:aws:ses:us-east-1:111111111111:identity/example.com",
+            "FromArn": "arn:aws:ses:us-east-1:111111111111:identity/example.com",
+            "ReturnPathArn": "arn:aws:ses:us-east-1:111111111111:identity/example.com" // In testing this was not always necessary
+          }
+        }
+      ]
+    }
+  },
+  "options": {
+    "hideSTARTTLS": true,
+    "authOptional": true
+  }
+}
