@@ -25,7 +25,7 @@
 //
 // The relay then passes the identity ARN as SourceArn/FromArn/ReturnPathArn.
 //
-//  IMPORTANT: The account running the relay MUST be removed from the sandbox in the same region that the identity exists in.
+//  IMPORTANT: The account running the relay MUST be removed from the sandbox in the same region that the SES identity exists in.
 //   In this case BOTH account 111111111111 and 222222222222 must be removed from the SES sandbox in us-east-1.
 
 {
