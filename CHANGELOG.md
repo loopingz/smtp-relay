@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.1.0](https://github.com/loopingz/smtp-relay/compare/v3.0.1...v3.1.0) (2026-10-16)
+
+
+### Features
+
+* log rejected sender/recipient address on MAIL FROM/RCPT TO refusal ([#278](https://github.com/loopingz/smtp-relay/issues/278)) ([2e17bd0](https://github.com/loopingz/smtp-relay/commit/2e17bd070d1b81d3425e2049e1aa80686d9234aa))
+
+
+### Bug Fixes
+
+* **deps:** reference fast-xml-parser direct dependency in override ([#283](https://github.com/loopingz/smtp-relay/issues/283)) ([d8ef0f6](https://github.com/loopingz/smtp-relay/commit/d8ef0f6455fa773b00749a382b58845a147bf43a))
+
 ## [3.0.1](https://github.com/loopingz/smtp-relay/compare/v3.0.0...v3.0.1) (2026-10-06)
 
 
