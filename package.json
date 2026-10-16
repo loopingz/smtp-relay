@@ -19,7 +19,7 @@
     "ses"
   ],
   "overrides": {
-    "fast-xml-parser": ">=5.11.1"
+    "fast-xml-parser": "$fast-xml-parser"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1132.0",
