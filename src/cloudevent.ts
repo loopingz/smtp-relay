@@ -72,7 +72,7 @@ export function getCloudEvent<T extends SmtpCloudEvent = SmtpCloudEvent>(
           size: a.size
         })),
         subject: email.subject?.substring(0, truncation),
-        priority: email.priority,
+        priority: email.headers?.get("priority") as string | undefined,
         cc: email.cc,
         to: email.to,
         bcc: email.bcc,

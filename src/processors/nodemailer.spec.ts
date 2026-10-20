@@ -33,7 +33,7 @@ class NodeMailerProcessorTest {
       new WorkerOutput()
     );
     const session: SmtpSession = getFakeSession();
-    session.envelope.mailFrom = { address: "sender@example.com", args: [] };
+    session.envelope.mailFrom = { address: "sender@example.com", args: false };
     let sendMailArg: any;
     sinon.stub(processor.transporter, "sendMail").callsFake((arg: any) => {
       sendMailArg = arg;
@@ -44,7 +44,7 @@ class NodeMailerProcessorTest {
     assert.strictEqual(sendMailArg.dkim.domainName, "example.com");
     assert.strictEqual(sendMailArg.dkim.keySelector, "testselector");
     assert.strictEqual(sendMailArg.dkim.privateKey, dkimConfig["example.com"].privateKey);
-    session.envelope.mailFrom = { address: "sender@toto.com", args: [] };
+    session.envelope.mailFrom = { address: "sender@toto.com", args: false };
     await processor.onMail(session);
     assert.ok(!sendMailArg.dkim, "DKIM option should not be set");
   }
@@ -112,9 +112,9 @@ class NodeMailerProcessorTest {
       new WorkerOutput()
     );
     session.envelope.rcptTo = [
-      { address: "bcc@test.com", args: [] },
-      { address: "to@test.com", args: [] },
-      { address: "cc@test.com", args: [] }
+      { address: "bcc@test.com", args: false },
+      { address: "to@test.com", args: false },
+      { address: "cc@test.com", args: false }
     ];
     session.email!.cc = [
       {
@@ -148,9 +148,9 @@ class NodeMailerProcessorTest {
   async bccResolutionWithSeveralRecipients() {
     const session = getFakeSession();
     session.envelope.rcptTo = [
-      { address: "bcc1@test.com", args: [] },
-      { address: "bcc2@test.com", args: [] },
-      { address: "to@test.com", args: [] }
+      { address: "bcc1@test.com", args: false },
+      { address: "bcc2@test.com", args: false },
+      { address: "to@test.com", args: false }
     ];
     session.email!.to = [{ html: "", text: "", value: [{ name: "", address: "to@test.com" }] }];
     session.email!.headerLines = [{ key: "plop", line: "test" }];
