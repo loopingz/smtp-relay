@@ -610,7 +610,7 @@ export function getFakeSession(): SmtpSession {
     envelope: {
       mailFrom: {
         address: "test@test.com",
-        args: []
+        args: false
       },
       rcptTo: []
     },
