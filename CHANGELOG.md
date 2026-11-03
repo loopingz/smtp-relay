@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.1](https://github.com/loopingz/smtp-relay/compare/v3.1.0...v3.1.1) (2026-11-03)
+
+
+### Bug Fixes
+
+* Match exact whitelist values case-insensitively ([#297](https://github.com/loopingz/smtp-relay/issues/297)) ([67c6380](https://github.com/loopingz/smtp-relay/commit/67c63802e18661c8bec81ecceff70c18538c4094))
+
 ## [3.1.0](https://github.com/loopingz/smtp-relay/compare/v3.0.1...v3.1.0) (2026-10-20)
 
 
