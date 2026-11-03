@@ -105,6 +105,39 @@ class WhitelistSmtpServerTest {
   }
 
   @test
+  exactEmailAndDomainMatchesIgnoreCase() {
+    const filter = new WhitelistFilter(
+      undefined as any,
+      {
+        type: "whitelist",
+        from: ["sender@example.com"],
+        to: ["recipient@example.com"],
+        domains: ["mail.example.com"]
+      },
+      new WorkerOutput()
+    );
+
+    assert.strictEqual(filter.check("from", "Sender@Example.com"), true);
+    assert.strictEqual(filter.check("to", "Recipient@EXAMPLE.COM"), true);
+    assert.strictEqual(filter.check("domains", "Mail.Example.COM"), true);
+  }
+
+  @test
+  regexWhitelistMatchesRemainCaseSensitive() {
+    const filter = new WhitelistFilter(
+      undefined as any,
+      {
+        type: "whitelist",
+        to: [/^recipient@example\.com$/]
+      },
+      new WorkerOutput()
+    );
+
+    assert.strictEqual(filter.check("to", "recipient@example.com"), true);
+    assert.strictEqual(filter.check("to", "recipient@EXAMPLE.COM"), false);
+  }
+
+  @test
   async getRegExpInvalidRegex() {
     let output = new WorkerOutput();
     const filter = new WhitelistFilter(

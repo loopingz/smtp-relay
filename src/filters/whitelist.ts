@@ -78,7 +78,7 @@ export class WhitelistFilter extends SmtpFilter<WhitelistFilterConfiguration> {
     if (this.config[attr]) {
       for (let f of this.config[attr]) {
         if (typeof f === "string") {
-          if (f === value) {
+          if (f.toLowerCase() === value.toLowerCase()) {
             return true;
           }
         } else if (f instanceof RegExp && f.test(value)) {
