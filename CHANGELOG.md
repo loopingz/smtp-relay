@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.2](https://github.com/loopingz/smtp-relay/compare/v3.1.1...v3.1.2) (2026-11-07)
+
+
+### Bug Fixes
+
+* **deps:** update node dependencies ([#301](https://github.com/loopingz/smtp-relay/issues/301)) ([70e77f8](https://github.com/loopingz/smtp-relay/commit/70e77f85ebcd58b98276a8a6ab086d35294af87b))
+
 ## [3.1.1](https://github.com/loopingz/smtp-relay/compare/v3.1.0...v3.1.1) (2026-11-03)
 
 
