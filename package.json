@@ -27,7 +27,7 @@
     "@aws-sdk/client-sqs": "^3.1132.0",
     "@aws-sdk/client-sts": "^3.1132.0",
     "@google-cloud/pubsub": "^6.0.1",
-    "@google-cloud/storage": "^8.1.0",
+    "@google-cloud/storage": "^9.0.0",
     "@webda/workout": "^3.2.1",
     "cloudevents": "^10.0.0",
     "fast-xml-parser": ">=5.11.1",
