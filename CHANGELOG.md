@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.1.3](https://github.com/loopingz/smtp-relay/compare/v3.1.2...v3.1.3) (2026-11-22)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @google-cloud/storage to v9 ([#305](https://github.com/loopingz/smtp-relay/issues/305)) ([5366cbf](https://github.com/loopingz/smtp-relay/commit/5366cbf962443f69c56ff720b9c6e92af7fad817))
+* **deps:** update node dependencies ([#307](https://github.com/loopingz/smtp-relay/issues/307)) ([f650784](https://github.com/loopingz/smtp-relay/commit/f650784bc852b45be74f674c268ebd051c996a13))
+
 ## [3.1.2](https://github.com/loopingz/smtp-relay/compare/v3.1.1...v3.1.2) (2026-11-08)
 
 
